@@ -1,0 +1,38 @@
+{
+  "name": "alcmonavis-poeschli",
+  "version": "1.0.0",
+  "description": "A packaged version of Christain M. Zmasek's archaeopteryx.js phylogenetic tree viewer",
+  "main": "alcmonavispoeschli.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Benjathing/alcmonavis-poeschli-js.git"
+  },
+  "keywords": [
+    "phylogenetic",
+    "tree",
+    "archaeopteryx"
+  ],
+  "author": "Benjamin Moore",
+  "license": "LGPL-2.1+",
+  "bugs": {
+    "url": "https://github.com/Benjathing/alcmonavis-poeschli-js/issues"
+  },
+  "homepage": "https://github.com/Benjathing/alcmonavis-poeschli-js#readme",
+  "dependencies": {
+    "d3": "^3.5.17",
+    "jQuery": "^1.7.4",
+    "jquery": "^3.6.0",
+    "typescript": "^4.2.3"
+  },
+  "devDependencies": {
+    "@types/d3": "^3.5.34",
+    "@types/jquery": "^3.5.5",
+    "@types/node": "^14.14.33"
+  }
+}
