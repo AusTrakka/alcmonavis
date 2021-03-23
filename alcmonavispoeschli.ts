@@ -11,16 +11,16 @@ export default class alcmonavispoeschli {
     // "Instance variables"
     // ---------------------------
     baseSvg!: d3.Selection<any>;
-    basicTreeProperties: Forester.TreeProperty?= null;
-    branch_length_collapse_data = {};
+    basicTreeProperties: Forester.TreeProperty | null | undefined = null;
+    branch_length_collapse_data: Alcmonavis.CollapseData = {} as Alcmonavis.CollapseData;
     branch_length_collapse_level = -1;
-    colorPickerData: Alcmonavis.ColourPickerData?= null;
-    colorsForColorPicker: string[]?= null;
-    currentLabelColorVisualization!: string;
-    currentNodeBorderColorVisualization: string?= null;
-    currentNodeFillColorVisualization: string?= null;
-    currentNodeShapeVisualization: string?= null;
-    currentNodeSizeVisualization: string?= null;
+    colorPickerData: Alcmonavis.ColourPickerData | null | undefined = null;
+    colorsForColorPicker: string[] | null | undefined = null;
+    currentLabelColorVisualization: string | null | undefined = null;
+    currentNodeBorderColorVisualization: string | null | undefined = null;
+    currentNodeFillColorVisualization: string | null | undefined = null;
+    currentNodeShapeVisualization: string | null | undefined = null;
+    currentNodeSizeVisualization: string | null | undefined = null;
     depth_collapse_level = -1;
     displayHeight = 0;
     displayWidth = 0;
@@ -39,39 +39,39 @@ export default class alcmonavispoeschli {
     maxLabelLength = 0;
     msa_residue_vis_curr_res_pos = 0;
     nodeVisualizations!: Dict<Alcmonavis.NodeVisualisation>;
-    specialVisualizations = null; //~~
+    specialVisualizations!: Dict<Alcmonavis.SpecialVisulaisation> //BM ? //~~
     offsetTop = 0;
-    options: Alcmonavis.Options?= null;
+    options: Alcmonavis.Options | null | undefined = null;
     rank_collapse_level = -1;
     root!: Alcmonavis.phylo;
-    scale: number?= null;
+    scale: number | null | undefined = null;
     searchBox0Empty = true;
     searchBox1Empty = true;
-    settings: Alcmonavis.Settings?= null;
+    settings: Alcmonavis.Settings | null | undefined = null;
     showColorPicker = false;
     showLegends = true;
     superTreeRoots: Alcmonavis.phylo[] = [];
     svgGroup!: d3.Selection<any>;
     totalSearchedWithData = 0;
-    translate: [number, number]?= null;
-    treeData: Alcmonavis.phylo?= null;
+    translate: [number, number] | null | undefined = null;
+    treeData: Alcmonavis.phylo | null | undefined = null;
     treeFn!: Alcmonavis.CustomCluster<Alcmonavis.phylo>
     usedColorCategories = new Set<string>();
-    visualizations!: Alcmonavis.Visualisations;
+    visualizations: Alcmonavis.Visualisations | null | undefined = null;
     visualizations2 = null;
     w!: number;
     yScale!: d3.scale.Linear<number, number>
     zoomListener!: d3.behavior.Zoom<unknown>;
     zoomed_x_or_y = false;
-    node_mouseover_div!;
+    node_mouseover_div!: d3.Selection<any>;
     visualizations2_color!: string;
     visualizations3_color!: string;
-    visualizations2_applies_to_ref = null;
-    visualizations3_applies_to_ref = null;
-    visualizations2_property_datatype = null;
-    visualizations3_property_datatype = null;
-    visualizations2_property_applies_to = null;
-    visualizations3_property_applies_to = null;
+    visualizations2_applies_to_ref!: string;
+    visualizations3_applies_to_ref!: string;
+    visualizations2_property_datatype!: string;
+    visualizations3_property_datatype!: string;
+    visualizations2_property_applies_to!: string;
+    visualizations3_property_applies_to!: string;
 
     constructor() {
         $('html').on("click", (d) => {
@@ -195,9 +195,9 @@ export default class alcmonavispoeschli {
             .style('opacity', 1);
     }
 
-    mousemove = (d) => {
+    mousemove = (d: Alcmonavis.phylo) => {
         this.node_mouseover_div
-            .text(d.name)
+            .text(d.name || '')
             .style('left', (d3.event as MouseEvent).pageX + 'px')
             .style('top', (d3.event as MouseEvent).pageY + 'px');
     }
@@ -212,10 +212,10 @@ export default class alcmonavispoeschli {
 
     createVisualization = (label: string | undefined,
         description: string | undefined,
-        field: (keyof Forester.phylo)?,
-        cladePropertyRef: string?, //?
+        field: keyof Forester.phylo | null | undefined,
+        cladePropertyRef: string | null | undefined, //?
         isRegex: boolean,
-        mapping: Dict<string>?,
+        mapping: Dict<string> | null | undefined,
         mappingFn: d3.scale.Ordinal<string, string> | undefined, // mappingFn is a scale
         scaleType: string,
         altMappingFn?: d3.scale.Linear<string, string>) => {
@@ -288,7 +288,7 @@ export default class alcmonavispoeschli {
                             Array.isArray(nodeVisualization.shapes) &&
                             (nodeVisualization.shapes.length > 0)) {
 
-                            var shapeScale: d3.scale.Ordinal<string, Alcmonavis.Shape>?= null;
+                            var shapeScale: d3.scale.Ordinal<string, Alcmonavis.Shape> | null | undefined = null;
                             if (nodeVisualization.label === AP.MSA_RESIDUE) {
                                 const domain: string[] = this.basicTreeProperties &&
                                     this.basicTreeProperties.molSeqResiduesPerPosition &&
@@ -520,10 +520,10 @@ export default class alcmonavispoeschli {
 
     addNodeFillColorVisualization = (label: string,
         description: string,
-        field: (keyof Forester.phylo)?,
-        cladePropertyRef: string?,
+        field: keyof Forester.phylo | null | undefined,
+        cladePropertyRef: string | null | undefined,
         isRegex: boolean,
-        mapping: Dict<string>?,
+        mapping: Dict<string> | null | undefined,
         mappingFn: d3.scale.Ordinal<string, string>,
         scaleType: string,
         altMappingFn?: d3.scale.Linear<string, string>) => {
@@ -556,10 +556,10 @@ export default class alcmonavispoeschli {
 
     addNodeBorderColorVisualization = (label: string,
         description: string,
-        field: (keyof Forester.phylo)?,
+        field: keyof Forester.phylo | null | undefined,
         cladePropertyRef: string,
         isRegex: boolean,
-        mapping: Dict<string>?,
+        mapping: Dict<string> | null | undefined,
         mappingFn: d3.scale.Ordinal<string, string>,
         scaleType: string,
         altMappingFn?: d3.scale.Linear<string, string>) => {
@@ -591,10 +591,10 @@ export default class alcmonavispoeschli {
 
     addNodeShapeVisualization = (label: string,
         description: string,
-        field: (keyof Forester.phylo)?,
-        cladePropertyRef: string?,
+        field: keyof Forester.phylo | null | undefined,
+        cladePropertyRef: string | null | undefined,
         isRegex: boolean,
-        mapping: Dict<string>?,
+        mapping: Dict<string> | null | undefined,
         mappingFn: d3.scale.Ordinal<string, string>,
         scaleType: string) => {
         // if (arguments.length != 8) {
@@ -624,10 +624,10 @@ export default class alcmonavispoeschli {
 
     addLabelColorVisualization = (label: string,
         description: string,
-        field: (keyof Forester.phylo)?,
-        cladePropertyRef: string?,
+        field: keyof Forester.phylo | null | undefined,
+        cladePropertyRef: string | null | undefined,
         isRegex: boolean,
-        mapping: Dict<string>?,
+        mapping: Dict<string> | null | undefined,
         mappingFn: d3.scale.Ordinal<string, string>,
         scaleType: string,
         altMappingFn?: d3.scale.Linear<string, string>) => {
@@ -671,8 +671,15 @@ export default class alcmonavispoeschli {
 
     removeSizeLegend = (id: string) => this.baseSvg.selectAll('g.' + id).remove();
 
-    makeColorLegend = (id, xPos, yPos, colorScale, scaleType: string, label: string | undefined, description) => {
-
+    makeColorLegend = (id: string,
+        xPos: number,
+        yPos: number,
+        colorScale,
+        scaleType: string,
+        label: string | undefined,
+        description: string
+    ) => {
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
         if (!label) {
             throw 'legend label is missing';
         }
@@ -710,35 +717,35 @@ export default class alcmonavispoeschli {
 
         legendEnter.append('rect')
             .style('cursor', 'pointer')
-            .attr('width', null)
-            .attr('height', null)
-            .on('click', function (clickedName, clickedIndex) {
-                legendColorRectClicked(colorScale, label, description, clickedName, clickedIndex);
+            .attr('width', null as unknown as d3.Primitive)
+            .attr('height', null as unknown as d3.Primitive)
+            .on('click', (clickedName, clickedIndex) => {
+                this.legendColorRectClicked(colorScale, label!, description, clickedName, clickedIndex);
             });
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'normal')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_LABEL)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_DESCRIPTION)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
@@ -807,7 +814,14 @@ export default class alcmonavispoeschli {
         return counter;
     }
 
-    makeShapeLegend = (id, xPos, yPos, shapeScale, label, description) => {
+    makeShapeLegend = (id:string,
+        xPos: number, 
+        yPos: number, 
+        shapeScale, 
+        label: string, 
+        description: string
+    ) => {
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
 
         if (!label) {
             throw 'legend label is missing';
@@ -840,27 +854,27 @@ export default class alcmonavispoeschli {
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'normal')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_LABEL)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_DESCRIPTION)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
@@ -891,6 +905,7 @@ export default class alcmonavispoeschli {
                 if (i === 0) {
                     return label;
                 }
+                return '';
             });
 
         legendUpdate.select('text.' + AP.LEGEND_DESCRIPTION)
@@ -903,6 +918,7 @@ export default class alcmonavispoeschli {
                     }
                     return description;
                 }
+                return '';
             });
 
         legendUpdate.select('path')
@@ -926,7 +942,15 @@ export default class alcmonavispoeschli {
     }
 
 
-    makeSizeLegend = (id, xPos, yPos, sizeScale, scaleType, label, description) => {
+    makeSizeLegend = (id: string, 
+        xPos: number, 
+        yPos: number, 
+        sizeScale, 
+        scaleType: string, 
+        label: string, 
+        description: string) => {
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+
         if (!label) {
             throw 'legend label is missing';
         }
@@ -959,27 +983,27 @@ export default class alcmonavispoeschli {
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'normal')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_LABEL)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings!.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
 
         legendEnter.append('text')
             .attr('class', AP.LEGEND_DESCRIPTION)
-            .style('color', this.settings!.controlsFontColor)
+            .style('color', this.settings.controlsFontColor)
             .style('font-size', fs)
-            .style('font-family', this.settings!.controlsFont)
+            .style('font-family', this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
             .style('font-style', 'normal')
             .style('font-weight', 'bold')
             .style('text-decoration', 'none');
@@ -1034,7 +1058,7 @@ export default class alcmonavispoeschli {
             });
 
         legendUpdate.select('path')
-            .attr('transform', function () {
+            .attr('transform', () => {
                 return 'translate(' + 1 + ',' + 3 + ')'
             })
             .attr('d', d3.svg.symbol()
@@ -1044,7 +1068,7 @@ export default class alcmonavispoeschli {
                 })
                 .type(() => 'circle'))
             .style('fill', 'none')
-            .style('stroke', this.options!.branchColorDefault);
+            .style('stroke', this.options!.branchColorDefault || AP.WHITE);
 
         legend.exit().remove();
 
@@ -1078,12 +1102,13 @@ export default class alcmonavispoeschli {
             throw ('unknown direction for legends ' + this.options.visualizationsLegendOrientation);
         }
         var label = '';
-        var desc: string?= '';
+        var desc: string | null | undefined = '';
         var counter = 0;
         var scaleType = '';
 
         if (this.showLegends
             && this.legendColorScales[AP.LEGEND_LABEL_COLOR]
+            && this.visualizations
             && this.visualizations.labelColor
             && this.currentLabelColorVisualization
             && this.visualizations.labelColor[this.currentLabelColorVisualization]
@@ -1108,6 +1133,7 @@ export default class alcmonavispoeschli {
         if (this.showLegends
             && this.options.showNodeVisualizations
             && this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR]
+            && this.visualizations
             && this.visualizations.nodeFillColor
             && this.currentNodeFillColorVisualization
             && this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]
@@ -1132,6 +1158,7 @@ export default class alcmonavispoeschli {
         if (this.showLegends
             && this.options.showNodeVisualizations
             && this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR]
+            && this.visualizations
             && this.visualizations.nodeBorderColor
             && this.currentNodeBorderColorVisualization
             && this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]
@@ -1167,6 +1194,7 @@ export default class alcmonavispoeschli {
         if (this.showLegends
             && this.options.showNodeVisualizations
             && this.legendSizeScales[AP.LEGEND_NODE_SIZE]
+            && this.visualizations
             && this.visualizations.nodeSize
             && this.currentNodeSizeVisualization
             && this.visualizations.nodeSize[this.currentNodeSizeVisualization]
@@ -1236,14 +1264,14 @@ export default class alcmonavispoeschli {
         return colors;
     }
 
-    addColorPicker = (targetScale: d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string, clickedIndex) => {
+    addColorPicker = (targetScale: d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string, clickedIndex: number) => {
         this.colorPickerData = {} as Alcmonavis.ColourPickerData;
         this.colorPickerData.targetScale = targetScale;
         this.colorPickerData.legendLabel = legendLabel;
         this.colorPickerData.legendDescription = legendDescription;
         this.colorPickerData.clickedName = clickedName;
         this.colorPickerData.clickedIndex = clickedIndex;
-        this.colorPickerData.clickedOrigColor = this.targetScale(clickedName);
+        this.colorPickerData.clickedOrigColor = targetScale(clickedName);
         this.showColorPicker = true;
     }
 
@@ -1307,7 +1335,7 @@ export default class alcmonavispoeschli {
             var cs = this.obtainPredefinedColors(e);
             var csl = cs.length;
             for (var csi = 0; csi < csl; ++csi) {
-                this.colorsForColorPicker.push(cs[csi]);
+                this.colorsForColorPicker!.push(cs[csi]);
             }
         });
     }
@@ -1485,6 +1513,7 @@ export default class alcmonavispoeschli {
 
 
     colorPickerClicked = (colorPicked: string) => {
+        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
 
         var vis = this.visualizations.labelColor![this.colorPickerData!.legendDescription];
         var mf = vis.mappingFn;
@@ -1534,7 +1563,7 @@ export default class alcmonavispoeschli {
         if (!OptionsDeclared(this.options)) throw "Options not set";
         if (!SettingsDeclared(this.settings)) throw "Settings not set";
         const options = this.options,
-              settings = this.settings;
+            settings = this.settings;
 
         const source: Alcmonavis.phylo = source_u || this.root;
         const transitionDuration: number = transitionDuration_u || AP.TRANSITION_DURATION_DEFAULT;
@@ -1602,9 +1631,11 @@ export default class alcmonavispoeschli {
             .attr('transform', () => {
                 return 'translate(' + source.y0 + ',' + source.x0 + ')';
             })
-            .style('cursor', 'default')
-            .on('click', this.treeFn.clickEvent);
+            .style('cursor', 'default');
 
+        if (this.treeFn.clickEvent) {
+            nodeEnter.on('click', this.treeFn.clickEvent);
+        }
 
         nodeEnter.append('path')
             .attr('d', 'M0,0');
@@ -1830,7 +1861,7 @@ export default class alcmonavispoeschli {
                         .each('end', (() => {
                             const _: (this: HTMLElement) => void = function () {
                                 d3.select(this).text('');
-                            }; 
+                            };
                             return _;
                         })());
                 }
@@ -1950,6 +1981,8 @@ export default class alcmonavispoeschli {
 
     makeBranchColor = (link: d3.layout.cluster.Link<Alcmonavis.phylo>) => {
         if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
+
         //const options = this.options;
 
         const n = link.target;
@@ -1981,8 +2014,8 @@ export default class alcmonavispoeschli {
                         }
                     }
                 }
-                if (residue != null && residue != '-' && residue != '.' && residue != '?') {
-                    var vis = this.visualizations.nodeFillColor[AP.MSA_RESIDUE];
+                if (residue != null && residue != '-' && residue != '.' && residue != '?' && this.visualizations.nodeFillColor) {
+                    let vis = this.visualizations.nodeFillColor[AP.MSA_RESIDUE];
                     return vis.mappingFn ? vis.mappingFn(residue) : vis.mapping[residue];
                 }
             }
@@ -2013,11 +2046,11 @@ export default class alcmonavispoeschli {
                     else if (n.properties[p].ref === 'vipr:PANGO_Lineage'
                         && n.properties[p].datatype === 'xsd:string'
                         && n.properties[p].applies_to === 'node') {
-                        var viz = null;
-                        if (this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]) {
+                        let vis: Alcmonavis.Visualisation | null | undefined = null;
+                        if (this.visualizations.nodeFillColor && this.currentNodeFillColorVisualization && this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]) {
                             vis = this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization];
                         }
-                        else if (this.visualizations.nodeFillColor[this.currentLabelColorVisualization]) {
+                        else if (this.visualizations.nodeFillColor && this.currentLabelColorVisualization && this.visualizations.nodeFillColor[this.currentLabelColorVisualization]) {
                             vis = this.visualizations.nodeFillColor[this.currentLabelColorVisualization];
                         }
                         if (vis != null) {
@@ -2037,14 +2070,14 @@ export default class alcmonavispoeschli {
         return this.options.branchColorDefault;
     };
 
-    makeNodeEventsDependentColor = (ev) => {
-        if (ev.duplications > 0 && (!ev.speciations || ev.speciations <= 0)) {
+    makeNodeEventsDependentColor = (ev: Forester.PhyloEvents) => {
+        if (ev.duplications && ev.duplications > 0 && (!ev.speciations || ev.speciations <= 0)) {
             return AP.DUPLICATION_COLOR;
         }
-        else if (ev.speciations > 0 && (!ev.duplications || ev.duplications <= 0)) {
+        else if (ev.speciations && ev.speciations > 0 && (!ev.duplications || ev.duplications <= 0)) {
             return AP.SPECIATION_COLOR;
         }
-        else if (ev.speciations > 0 && ev.duplications > 0) {
+        else if (ev.duplications && ev.speciations && ev.speciations > 0 && ev.duplications > 0) {
             return AP.DUPLICATION_AND_SPECIATION_COLOR_COLOR;
         }
         return null;
@@ -2144,6 +2177,25 @@ export default class alcmonavispoeschli {
     };
 
     makeNodeVisShape = (node: Alcmonavis.phylo) => {
+        const produceVis = (vis: Alcmonavis.Visualisation, key: string) => {
+            if (vis.mappingFn) {
+                if (vis.mappingFn(key)) {
+                    return makeShape(node, vis.mappingFn(key));
+                }
+            }
+            else if (vis.mapping[key]) {
+                return makeShape(node, vis.mapping[key]);
+            }
+            return undefined as unknown as string;
+        }
+
+        const makeShape = (node: Alcmonavis.phylo, shape: string) => {
+            node.hasVis = true;
+            return d3.svg.symbol<Alcmonavis.phylo>().type(shape).size(this.makeVisNodeSize(node))(node);
+        }
+
+        if(!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree properties not set"
+
         if (this.currentNodeShapeVisualization && this.visualizations && !node._children && this.visualizations.nodeShape
             && this.visualizations.nodeShape[this.currentNodeShapeVisualization] && !this.isNodeFound(node)
             && this.options && !(this.options.showNodeEvents && (node.events && (node.events.duplications
@@ -2172,7 +2224,7 @@ export default class alcmonavispoeschli {
             else {
                 if (vis.field) {
                     var fieldValue = node[vis.field];
-                    if (fieldValue) {
+                    if (fieldValue && typeof (fieldValue) === 'string') {
                         if (vis.isRegex) {
                             for (var key in vis.mapping) {
                                 if (vis.mapping.hasOwnProperty(key)) {
@@ -2195,7 +2247,7 @@ export default class alcmonavispoeschli {
                     for (var i = 0; i < propertiesLength; ++i) {
                         var p = node.properties[i];
                         if (p.value && p.ref === ref_name) {
-                            if (this.settings.valuesToIgnoreForNodeVisualization) {
+                            if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
                                 if (p.ref in this.settings.valuesToIgnoreForNodeVisualization) {
                                     var ignoreValues = this.settings.valuesToIgnoreForNodeVisualization[p.ref];
                                     var arrayLength = ignoreValues.length;
@@ -2214,23 +2266,6 @@ export default class alcmonavispoeschli {
         }
 
         return undefined as unknown as string;
-
-        const produceVis = (vis: Alcmonavis.Visualisation, key: string) => {
-            if (vis.mappingFn) {
-                if (vis.mappingFn(key)) {
-                    return makeShape(node, vis.mappingFn(key));
-                }
-            }
-            else if (vis.mapping[key]) {
-                return makeShape(node, vis.mapping[key]);
-            }
-            return undefined as unknown as string;
-        }
-
-        const makeShape = (node: Alcmonavis.phylo, shape: string) => {
-            node.hasVis = true;
-            return d3.svg.symbol().type(shape).size(this.makeVisNodeSize(node))();
-        }
     };
 
     makeVisNodeFillColor = (node: Alcmonavis.phylo) => {
@@ -2295,7 +2330,7 @@ export default class alcmonavispoeschli {
     makeVisColor = (node: Forester.phylo, vis: Alcmonavis.Visualisation) => {
         if (vis.field) {
             var fieldValue = node[vis.field];
-            if (fieldValue) {
+            if (fieldValue && typeof (fieldValue) === 'string') {
                 if (vis.isRegex) {
                     for (var key in vis.mapping) {
                         if (vis.mapping.hasOwnProperty(key)) {
@@ -2317,7 +2352,7 @@ export default class alcmonavispoeschli {
             for (var i = 0; i < propertiesLength; ++i) {
                 var p = node.properties[i];
                 if (p.value && p.ref === ref_name) {
-                    if (this.settings.valuesToIgnoreForNodeVisualization) {
+                    if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
                         var ignore = this.settings.valuesToIgnoreForNodeVisualization;
                         // for (var key in nodeProperties) {
                         if (p.ref in ignore) {
@@ -2342,34 +2377,34 @@ export default class alcmonavispoeschli {
         }
     };
 
-    addLegend = (type, vis) => {
-        if (vis) {
-            this.legendColorScales[type] = vis.mappingFn ? vis.mappingFn : null;
+    addLegend = (type: string, vis?: Alcmonavis.Visualisation) => {
+        if (vis && vis.mappingFn) {
+            this.legendColorScales[type] = vis.mappingFn;
         }
     }
 
-    addLegendForShapes = (type, vis) => {
-        if (vis) {
-            this.legendShapeScales[type] = vis.mappingFn ? vis.mappingFn : null;
+    addLegendForShapes = (type: string, vis?: Alcmonavis.Visualisation) => {
+        if (vis && vis.mappingFn) {
+            this.legendShapeScales[type] = vis.mappingFn;
         }
     }
 
-    addLegendForSizes = (type, vis) => {
-        if (vis) {
-            this.legendSizeScales[type] = vis.mappingFn ? vis.mappingFn : null;
+    addLegendForSizes = (type: string, vis?: Alcmonavis.Visualisation) => {
+        if (vis && vis.mappingFn) {
+            this.legendSizeScales[type] = vis.mappingFn;
         }
     }
 
-    removeLegend = (type) => {
-        this.legendColorScales[type] = null;
+    removeLegend = (type: string) => {
+        delete this.legendColorScales[type];
     }
 
-    removeLegendForShapes = (type) => {
-        this.legendShapeScales[type] = null;
+    removeLegendForShapes = (type: string) => {
+        delete this.legendShapeScales[type];
     }
 
-    removeLegendForSizes = (type) => {
-        this.legendSizeScales[type] = null;
+    removeLegendForSizes = (type: string) => {
+        delete this.legendSizeScales[type];
     }
 
     makeVisNodeBorderColor = (node: Alcmonavis.phylo) => {
@@ -2381,10 +2416,13 @@ export default class alcmonavispoeschli {
     };
 
     makeVisLabelColor = (node: Alcmonavis.phylo) => {
-        if (this.currentLabelColorVisualization === AP.MSA_RESIDUE) {
+        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+
+        if (this.currentLabelColorVisualization === AP.MSA_RESIDUE && this.visualizations.labelColor) {
             return this.makeMsaResidueVisualizationColor(node, this.visualizations.labelColor[AP.MSA_RESIDUE]);
         }
-        if (!node.this.children && this.currentLabelColorVisualization) {
+        if (!node._children && this.currentLabelColorVisualization) {
             if (this.visualizations && this.visualizations.labelColor
                 && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
                 var vis = this.visualizations.labelColor[this.currentLabelColorVisualization];
@@ -2418,9 +2456,21 @@ export default class alcmonavispoeschli {
         return this.options.labelColorDefault;
     };
 
-    makeVisLabelColorForSubtree = (node) => {
-        var color: string?= null;
-        var success = true;
+    makeVisLabelColorForSubtree = (node: Alcmonavis.phylo) => {
+        class InternalColour { // Sometimes, TypeScript sucks
+            private color: string | null | undefined = null;
+            private success: boolean = true;
+            constructor() {
+
+            }
+
+            setSuccess = (s: boolean) => this.success = s;
+            setColour = (c: string) => c;
+            getSuccess = () => this.success;
+            getColour = () => this.color;
+        }
+        const colour = new InternalColour();
+
         if (this.currentLabelColorVisualization && this.visualizations && this.visualizations.labelColor
             && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
             var vis = this.visualizations.labelColor[this.currentLabelColorVisualization];
@@ -2428,21 +2478,21 @@ export default class alcmonavispoeschli {
                 if (forester.isHasNodeData(n)) {
                     var c = this.makeVisColor(n, vis);
                     if (!c) {
-                        success = false;
+                        colour.setSuccess(false);
                     }
-                    else if (color == null) {
-                        color = c;
+                    else if (colour.getColour() === null) {
+                        colour.setColour(c);
                     }
-                    else if (color != c) {
-                        success = false;
+                    else if (colour.getColour() != c) {
+                        colour.setSuccess(false);
                     }
                 }
             });
         }
-        if (success === false) {
+        if (colour.getSuccess() === false) {
             return null;
         }
-        return color;
+        return colour.getColour();
     };
 
 
@@ -2470,7 +2520,7 @@ export default class alcmonavispoeschli {
                 var size;
                 if (vis.field) {
                     var fieldValue = node[vis.field];
-                    if (fieldValue) {
+                    if (fieldValue && typeof (fieldValue) === 'string') {
                         if (vis.isRegex) {
                             for (var key in vis.mapping) {
                                 if (vis.mapping.hasOwnProperty(key)) {
@@ -2613,7 +2663,7 @@ export default class alcmonavispoeschli {
 
     makeNodeLabel = (phynode: Alcmonavis.phylo) => {
         if (!OptionsDeclared(this.options)) throw "Options not set";
-    
+
         if (!this.options.showExternalLabels && !(phynode.children || phynode._children)) {
             return null;
         }
@@ -2854,7 +2904,7 @@ export default class alcmonavispoeschli {
     };
 
 
-    initializeOptions = (options?: Alcmonavis.Options?) => {
+    initializeOptions = (options?: Alcmonavis.Options | null | undefined) => {
         this.options = options ? options : {} as Alcmonavis.Options;
 
         if (this.basicTreeProperties && this.basicTreeProperties.branchLengths) {
@@ -3256,13 +3306,14 @@ export default class alcmonavispoeschli {
 
 
     intitializeDisplaySize = () => {
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
         if (this.settings.enableDynamicSizing) {
             if (this.baseSvg) {
-                this.displayHeight = this.baseSvg.attr('height');
-                this.displayWidth = this.baseSvg.attr('width');
+                this.displayHeight = +this.baseSvg.attr('height');
+                this.displayWidth = +this.baseSvg.attr('width');
             }
             else {
-                var element = d3.select(this.id).node();
+                var element = d3.select(this.id).node() as HTMLElement;
                 var width = element.getBoundingClientRect().width - AP.WIDTH_OFFSET;
                 var top = element.getBoundingClientRect().top;
                 var height = window.innerHeight - (top + AP.HEIGHT_OFFSET);
@@ -3279,11 +3330,14 @@ export default class alcmonavispoeschli {
     mouseDown = () => {
         const event: MouseEvent = d3.event as MouseEvent;
         if (event.which === 1 && (event.altKey || event.shiftKey)) {
-            if ((this.showLegends && this.settings && (this.settings.enableNodeVisualizations || this.settings.enableBranchVisualizations) && (this.legendColorScales[LEGEND_LABEL_COLOR] ||
-                (this.options && this.options.showNodeVisualizations && (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-                    this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-                    this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-                    this.legendSizeScales[AP.LEGEND_NODE_SIZE]))))) {
+            if ((this.showLegends
+                && this.settings && (this.settings.enableNodeVisualizations || this.settings.enableBranchVisualizations)
+                && (this.legendColorScales[AP.LEGEND_LABEL_COLOR]
+                    || (this.options && this.options.showNodeVisualizations
+                        && (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR]
+                            || this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR]
+                            || this.legendShapeScales[AP.LEGEND_NODE_SHAPE]
+                            || this.legendSizeScales[AP.LEGEND_NODE_SIZE]))))) {
                 this.moveLegendWithMouse(event);
             }
         }
@@ -3381,7 +3435,7 @@ export default class alcmonavispoeschli {
         options: Alcmonavis.Options | undefined | null,
         settings: Alcmonavis.Settings,
         nodeVisualizations?: Dict<Alcmonavis.NodeVisualisation>,
-        specialVisualizations?: boolean) => {
+        specialVisualizations?: Dict<Alcmonavis.SpecialVisulaisation>) => {
 
 
         if (phylo === undefined || phylo === null) {
@@ -3470,7 +3524,7 @@ export default class alcmonavispoeschli {
 
                 refsSet.forEach((value: string) => {
                     var arr = re.exec(value);
-                    var propertyName: PropertyKey?= arr && arr[1]; // The substring after the ':'
+                    var propertyName: PropertyKey | null | undefined = arr && arr[1]; // The substring after the ':'
 
                     if (propertyName && this.settings && (!this.nodeVisualizations.hasOwnProperty(propertyName))
                         &&
@@ -3500,7 +3554,7 @@ export default class alcmonavispoeschli {
             this.initializeNodeVisualizations(nodeProperties);
         }
 
-        createGui();
+        this.createGui();
 
         if (settings.enableNodeVisualizations || settings.enableBranchVisualizations) {
             d3.select(window)
@@ -3522,7 +3576,7 @@ export default class alcmonavispoeschli {
 
         if (this.settings && this.settings.enableDynamicSizing) {
             d3.select(window)
-                .on('resize', (function (self: alcmonavispoeschli) {
+                .on('resize', ((self: alcmonavispoeschli) => {
                     const _: ((this: Window) => void) = function () {
                         var element = d3.select(this).node(); //this.id //?
                         var width = (element as HTMLElement).getBoundingClientRect().width - AP.WIDTH_OFFSET;
@@ -3533,7 +3587,7 @@ export default class alcmonavispoeschli {
                         if ((self.settings && self.settings.zoomToFitUponWindowResize === true)
                             && (self.zoomed_x_or_y == false)
                             && (Math.abs(self.zoomListener.scale() - 1.0) < 0.001)) {
-                            zoomToFit();
+                            self.zoomToFit();
                         }
                         if (self.settings && (self.settings.enableNodeVisualizations || self.settings.enableBranchVisualizations)) {
                             var c1 = $('#' + self.settings.controls1);
@@ -3561,15 +3615,15 @@ export default class alcmonavispoeschli {
         this.root.x0 = this.displayHeight / 2;
         this.root.y0 = 0;
 
-        initializeGui();
+        this.initializeGui();
 
         this.svgGroup = this.baseSvg.append('g');
 
         if (this.options && this.options.searchAinitialValue) {
-            search0();
+            this.search0();
         }
         if (this.options && this.options.searchBinitialValue) {
-            search1();
+            this.search1();
         }
 
         if (this.options && this.options.initialCollapseFeature) {
@@ -3585,7 +3639,7 @@ export default class alcmonavispoeschli {
             }
             if (found) {
                 console.log(AP.MESSAGE + 'Setting initial value for collapse by feature to: ' + feature);
-                collapseSpecificSubtrees(this.root, feature, AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
+                this.collapseSpecificSubtrees(this.root, feature, AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
                 var s = $('#' + AP.COLLAPSE_BY_FEATURE_SELECT);
                 if (s) {
                     s.val(feature);
@@ -3604,7 +3658,7 @@ export default class alcmonavispoeschli {
             }
             console.log(AP.MESSAGE + 'Setting initial value for collapse depth to: ' + this.depth_collapse_level);
             forester.collapseToDepth(this.root, this.depth_collapse_level);
-            updateDepthCollapseDepthDisplay();
+            this.updateDepthCollapseDepthDisplay();
         }
 
         this.update(undefined, 0);
@@ -3640,6 +3694,10 @@ export default class alcmonavispoeschli {
     removeTooltips = () => this.svgGroup.selectAll('.tooltipElem').remove();
 
     getClickEventListenerNode = (tree: Alcmonavis.phylo) => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+        const options = this.options,
+            settings = this.settings;
 
         const nodeClick = (self: alcmonavispoeschli) => {
             const _: (this: EventTarget) => void = function () {
@@ -3786,7 +3844,7 @@ export default class alcmonavispoeschli {
                     $("<div id='" + AP.NODE_DATA + "'>" + text + "</div>").dialog();
                     var dialog = $('#' + AP.NODE_DATA);
 
-                    var fs = ( self.settings && self.settings.controlsFontSize || 0 + 4).toString() + 'px';
+                    var fs = (self.settings && self.settings.controlsFontSize || 0 + 4).toString() + 'px';
 
                     $('.ui-dialog').css({
                         'text-align': 'left',
@@ -3819,7 +3877,7 @@ export default class alcmonavispoeschli {
 
                 function listExternalNodeData(node: Alcmonavis.phylo) {
 
-                    var addSep = function (t) {
+                    var addSep = function (t: string) {
                         if (t.length > 0) {
                             t += ', ';
                         }
@@ -3837,7 +3895,7 @@ export default class alcmonavispoeschli {
                         if (self.options && self.options.showNodeName && n.name) {
                             text += n.name
                         }
-                        if (self.options && self.options.showTaxonomy && n.taxonomies) {
+                        if (options.showTaxonomy && n.taxonomies) {
                             for (var i = 0; i < n.taxonomies.length; ++i) {
                                 var t = n.taxonomies[i];
                                 if (t.id) {
@@ -3850,28 +3908,28 @@ export default class alcmonavispoeschli {
                                         text += t.id.value;
                                     }
                                 }
-                                if (self.options.showTaxonomyCode && t.code) {
+                                if (options.showTaxonomyCode && t.code) {
                                     text = addSep(text);
                                     text += t.code;
                                 }
-                                if (self.options.showTaxonomyScientificName && t.scientific_name) {
+                                if (options.showTaxonomyScientificName && t.scientific_name) {
                                     text = addSep(text);
                                     text += t.scientific_name;
                                 }
-                                if (self.options.showTaxonomyCommonName && t.common_name) {
+                                if (options.showTaxonomyCommonName && t.common_name) {
                                     text = addSep(text);
                                     text += t.common_name;
                                 }
-                                if (this.options.showTaxonomyRank && t.rank) {
+                                if (options.showTaxonomyRank && t.rank) {
                                     text = addSep(text);
                                     text += t.rank;
                                 }
                             }
                         }
-                        if (self.options && self.options.showSequence && n.sequences) {
+                        if (options.showSequence && n.sequences) {
                             for (i = 0; i < n.sequences.length; ++i) {
                                 var s = n.sequences[i];
-                                if (self.options.showSequenceAccession && s.accession) {
+                                if (options.showSequenceAccession && s.accession) {
                                     if (s.accession.source) {
                                         text = addSep(text);
                                         text += '[' + s.accession.source + ']:' + s.accession.value;
@@ -3882,11 +3940,11 @@ export default class alcmonavispoeschli {
                                     }
 
                                 }
-                                if (self.options.showSequenceSymbol && s.symbol) {
+                                if (options.showSequenceSymbol && s.symbol) {
                                     text = addSep(text);
                                     text += s.symbol;
                                 }
-                                if (this.options.showSequenceName && s.name) {
+                                if (options.showSequenceName && s.name) {
                                     text = addSep(text);
                                     text += s.name;
                                 }
@@ -3910,13 +3968,13 @@ export default class alcmonavispoeschli {
                     $("<div id='" + AP.NODE_DATA + "'>" + text_all + "</div>").dialog();
                     var dialog = $('#' + AP.NODE_DATA);
 
-                    var fs = (this.settings.controlsFontSize + 2).toString() + 'px';
+                    var fs = (+settings.controlsFontSize + 2).toString() + 'px';
 
                     $('.ui-dialog').css({
                         'text-align': 'left',
-                        'color': this.settings.controlsFontColor,
+                        'color': settings.controlsFontColor,
                         'font-size': fs,
-                        'font-family': AP.MOLSEQ_FONT_DEFAULTS,
+                        'font-family': AP.MOLSEQ_FONT_DEFAULTS.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
                         'font-style': 'normal',
                         'font-weight': 'normal',
                         'text-decoration': 'none',
@@ -3927,9 +3985,9 @@ export default class alcmonavispoeschli {
 
                     $('.ui-dialog-titlebar').css({
                         'text-align': 'left',
-                        'color': self.settings.controlsFontColor,
+                        'color': settings.controlsFontColor,
                         'font-size': fs,
-                        'font-family': self.settings.controlsFont,
+                        'font-family': settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
                         'font-style': 'normal',
                         'font-weight': 'bold',
                         'text-decoration': 'none'
@@ -3941,14 +3999,15 @@ export default class alcmonavispoeschli {
                     self.update();
                 }
 
-                // ??
+                // BM ??
                 function accessDatabase(node: Alcmonavis.phylo) {
                     var url = null;
+                    let value: string = 'undefined';
                     if (node.sequences) {
                         for (var i = 0; i < node.sequences.length; ++i) {
                             var s = node.sequences[i];
                             if (s.accession && s.accession.value && s.accession.source) {
-                                var value = s.accession.value;
+                                value = s.accession.value;
                                 var source = s.accession.source.toUpperCase();
 
                                 if (source === AP.ACC_GENBANK) {
@@ -3985,7 +4044,7 @@ export default class alcmonavispoeschli {
                                         url = 'https://www.uniprot.org/uniprot/' + value;
                                     }
                                     else if (AP.RE_SWISSPROT_TREMBL_PFAM.test(value)) {
-                                        url = 'https://www.uniprot.org/uniprot/' + AP.RE_SWISSPROT_TREMBL_PFAM.exec(value)[1];
+                                        url = 'https://www.uniprot.org/uniprot/' + AP.RE_SWISSPROT_TREMBL_PFAM.exec(value)![1];
                                     }
                                 }
                             }
@@ -3996,13 +4055,15 @@ export default class alcmonavispoeschli {
                             url = 'https://www.uniprot.org/uniprot/' + node.name;
                         }
                         else if (AP.RE_SWISSPROT_TREMBL_PFAM.test(node.name)) {
-                            url = 'https://www.uniprot.org/uniprot/' + AP.RE_SWISSPROT_TREMBL_PFAM.exec(node.name)[1];
+                            url = 'https://www.uniprot.org/uniprot/' + AP.RE_SWISSPROT_TREMBL_PFAM.exec(node.name)![1];
                         }
                     }
 
                     if (url) {
                         var win = window.open(url, 'this.blank');
-                        win.focus();
+                        if (win) {
+                            win.focus();
+                        }
                     }
                     else {
                         alert("Don't know how to interpret sequence accession \'" + value + "\'");
@@ -4025,7 +4086,7 @@ export default class alcmonavispoeschli {
                                 var s = n.sequences[i];
                                 if (s.mol_seq && s.mol_seq.value && s.mol_seq.value.length > 0) {
                                     var seq = s.mol_seq.value;
-                                    var seqname = j;
+                                    var seqname = j + ''; // num as string
                                     if (s.name && s.name.length > 0) {
                                         seqname = s.name
                                     }
@@ -4033,7 +4094,7 @@ export default class alcmonavispoeschli {
                                         seqname = n.name
                                     }
 
-                                    var split_seq_ary = seq.match(/.{1,80}/g);
+                                    var split_seq_ary = seq.match(/.{1,80}/g) || [];
                                     var split_seq = '';
                                     for (var ii = 0; ii < split_seq_ary.length; ++ii) {
                                         split_seq += split_seq_ary[ii] + '<br>';
@@ -4046,18 +4107,18 @@ export default class alcmonavispoeschli {
                         }
                     }
 
-                    $('#' + NODE_DATA).dialog("destroy");
+                    $('#' + AP.NODE_DATA).dialog("destroy");
 
-                    $("<div id='" + NODE_DATA + "'>" + text_all + "</div>").dialog();
-                    var dialog = $('#' + NODE_DATA);
+                    $("<div id='" + AP.NODE_DATA + "'>" + text_all + "</div>").dialog();
+                    var dialog = $('#' + AP.NODE_DATA);
 
-                    var fs = (this.settings.controlsFontSize + 2).toString() + 'px';
+                    var fs = (+settings.controlsFontSize + 2).toString() + 'px';
 
                     $('.ui-dialog').css({
                         'text-align': 'left',
-                        'color': this.settings.controlsFontColor,
+                        'color': settings.controlsFontColor,
                         'font-size': fs,
-                        'font-family': MOLSEQ_FONT_DEFAULTS,
+                        'font-family': AP.MOLSEQ_FONT_DEFAULTS.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
                         'font-style': 'normal',
                         'font-weight': 'normal',
                         'text-decoration': 'none',
@@ -4068,9 +4129,9 @@ export default class alcmonavispoeschli {
 
                     $('.ui-dialog-titlebar').css({
                         'text-align': 'left',
-                        'color': this.settings.controlsFontColor,
+                        'color': settings.controlsFontColor,
                         'font-size': fs,
-                        'font-family': this.settings.controlsFont,
+                        'font-family': settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
                         'font-style': 'normal',
                         'font-weight': 'bold',
                         'text-decoration': 'none'
@@ -4079,15 +4140,15 @@ export default class alcmonavispoeschli {
                     dialog.dialog('option', 'modal', true);
                     dialog.dialog('option', 'title', title);
 
-                    update();
+                    self.update();
                 }
 
                 function goToSubTree(node: Alcmonavis.phylo) {
-                    if (node.parent && (node.children || node.this.children)) {
-                        if (this.superTreeRoots.length > 0 && node === this.root.children[0]) {
-                            this.root = this.superTreeRoots.pop();
-                            this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
-                            self.updateNodeVisualizationsAndLegends(this.root);
+                    if (node.parent && (node.children || node._children)) {
+                        if (self.root.children && self.superTreeRoots.length > 0 && node === self.root.children[0]) {
+                            self.root = self.superTreeRoots.pop()!;
+                            self.basicTreeProperties = forester.collectBasicTreeProperties(self.root);
+                            self.updateNodeVisualizationsAndLegends(self.root);
                             self.resetDepthCollapseDepthValue();
                             self.resetRankCollapseRankValue();
                             self.resetBranchLengthCollapseValue();
@@ -4096,7 +4157,7 @@ export default class alcmonavispoeschli {
                             self.zoomToFit();
                         }
                         else if (node.parent.parent) {
-                            self.superTreeRoots.push(this.root);
+                            self.superTreeRoots.push(self.root);
                             var fakeNode = {} as Alcmonavis.phylo;
                             fakeNode.children = [node];
                             fakeNode.x = 0;
@@ -4109,8 +4170,8 @@ export default class alcmonavispoeschli {
                                 node.children = node._children;
                                 node._children = null;
                             }
-                            self.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
-                            self.updateNodeVisualizationsAndLegends(this.root);
+                            self.basicTreeProperties = forester.collectBasicTreeProperties(self.root);
+                            self.updateNodeVisualizationsAndLegends(self.root);
                             self.resetDepthCollapseDepthValue();
                             self.resetRankCollapseRankValue();
                             self.resetBranchLengthCollapseValue();
@@ -4121,25 +4182,25 @@ export default class alcmonavispoeschli {
                     }
                 }
 
-                function swapChildren(d) {
+                function swapChildren(d: Alcmonavis.phylo) {
                     var c = d.children;
-                    var l = c.length;
+                    var l = c && c.length || 0;
                     if (l > 1) {
-                        var first = c[0];
+                        var first = c![0];
                         for (var i = 0; i < l - 1; ++i) {
-                            c[i] = c[i + 1];
+                            c![i] = c![i + 1];
                         }
-                        c[l - 1] = first;
+                        c![l - 1] = first;
                     }
                 }
 
                 function toggleCollapse(node: Alcmonavis.phylo) {
                     if (node.children) {
                         node._children = node.children;
-                        node.children = null;
+                        node.children = undefined;
                     }
                     else {
-                        unCollapseAll(node);
+                        self.unCollapseAll(node);
                     }
                 }
 
@@ -4164,14 +4225,14 @@ export default class alcmonavispoeschli {
                 var textSum = 0;
                 var textInc = 20;
 
-                var fs = this.settings.controlsFontSize.toString() + 'px';
+                var fs = settings.controlsFontSize.toString() + 'px';
 
                 d3.select(this).append('text')
                     .attr('class', 'tooltipElem tooltipElemText')
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
                     .style('font-family', 'Helvetica')
                     .style('font-style', 'normal')
@@ -4182,6 +4243,7 @@ export default class alcmonavispoeschli {
                             textSum += textInc;
                             return 'Display Node Data';
                         }
+                        return '';
                     })
                     .on('click', function (d) {
                         displayNodeData(d);
@@ -4192,9 +4254,9 @@ export default class alcmonavispoeschli {
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', this.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
@@ -4209,13 +4271,14 @@ export default class alcmonavispoeschli {
                                 return 'Collapse';
                             }
                         }
+                        return '';
                     })
                     .on('click', function (d) {
                         toggleCollapse(d);
-                        resetDepthCollapseDepthValue();
-                        resetRankCollapseRankValue();
-                        resetBranchLengthCollapseValue();
-                        resetCollapseByFeature();
+                        self.resetDepthCollapseDepthValue();
+                        self.resetRankCollapseRankValue();
+                        self.resetBranchLengthCollapseValue();
+                        self.resetCollapseByFeature();
                         self.update(d);
                     });
 
@@ -4226,7 +4289,7 @@ export default class alcmonavispoeschli {
                     .style('text-align', 'left')
                     .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', self.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
@@ -4241,13 +4304,14 @@ export default class alcmonavispoeschli {
                             textSum += textInc;
                             return 'Uncollapse All';
                         }
+                        return '';
                     })
                     .on('click', function (d) {
-                        unCollapseAll(d);
-                        resetDepthCollapseDepthValue();
-                        resetRankCollapseRankValue();
-                        resetBranchLengthCollapseValue();
-                        resetCollapseByFeature();
+                        self.unCollapseAll(d);
+                        self.resetDepthCollapseDepthValue();
+                        self.resetRankCollapseRankValue();
+                        self.resetBranchLengthCollapseValue();
+                        self.resetCollapseByFeature();
                         self.update();
                     });
 
@@ -4258,13 +4322,13 @@ export default class alcmonavispoeschli {
                     .style('text-align', 'left')
                     .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', this.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
-                    .text(function (d) {
-                        if (d.parent && (d.children || d.this.children)) {
-                            if (this.superTreeRoots.length > 0 && d === this.root.children[0]) {
+                    .text((d: Alcmonavis.phylo) => {
+                        if (d.parent && (d.children || d._children)) {
+                            if (self.superTreeRoots.length > 0 && self.root.children && d === self.root.children[0]) {
                                 textSum += textInc;
                                 return 'Return to Supertree';
                             }
@@ -4273,7 +4337,7 @@ export default class alcmonavispoeschli {
                                 return 'Go to Subtree';
                             }
                         }
-
+                        return '';
                     })
                     .on('click', function (d) {
                         goToSubTree(d);
@@ -4284,9 +4348,9 @@ export default class alcmonavispoeschli {
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', this.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
@@ -4297,6 +4361,7 @@ export default class alcmonavispoeschli {
                                 return 'Swap Descendants';
                             }
                         }
+                        return '';
                     })
                     .on('click', (d) => {
                         swapChildren(d);
@@ -4308,30 +4373,31 @@ export default class alcmonavispoeschli {
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', this.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
-                    .text(function (d) {
+                    .text(function (d: Alcmonavis.phylo) {
                         if (d.parent) {
                             if (d.children) {
                                 textSum += textInc;
                                 return 'Order Subtree';
                             }
                         }
+                        return '';
                     })
-                    .on('click', function (d) {
-                        if (!this.treeFn.visData) {
+                    .on('click', (d: Alcmonavis.phylo) => {
+                        if (!self.treeFn.visData) {
                             self.treeFn.visData = {};
                         }
                         if (self.treeFn.visData.order === undefined) {
                             self.treeFn.visData.order = true;
                         }
-                        orderSubtree(d, self.treeFn.visData.order);
+                        self.orderSubtree(d, self.treeFn.visData.order);
                         self.treeFn.visData.order = !self.treeFn.visData.order;
-                        self.update(null, 0);
+                        self.update(undefined, 0);
                     });
 
 
@@ -4343,25 +4409,26 @@ export default class alcmonavispoeschli {
                     .style('align', 'left')
                     .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
-                    .style('font-family', self.settings.controlsFont)
+                    .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
                     .text(function (d) {
-                        if (d.parent && d.parent.parent && self.superTreeRoots.length < 1
+                        if (d.parent && d.parent.parent && self.superTreeRoots.length < 1 && self.treeData
                             && ((self.treeData.rerootable === undefined) || (self.treeData.rerootable === true))) {
                             textSum += textInc;
                             return 'Reroot';
                         }
+                        return '';
                     })
                     .on('click', function (d) {
-                        unCollapseAll(self.root);
+                        self.unCollapseAll(self.root);
                         forester.reRoot(tree, d, -1);
-                        resetDepthCollapseDepthValue();
-                        resetRankCollapseRankValue();
-                        resetBranchLengthCollapseValue();
-                        resetCollapseByFeature();
-                        zoomToFit();
+                        self.resetDepthCollapseDepthValue();
+                        self.resetRankCollapseRankValue();
+                        self.resetBranchLengthCollapseValue();
+                        self.resetCollapseByFeature();
+                        self.zoomToFit();
                     });
 
 
@@ -4370,17 +4437,18 @@ export default class alcmonavispoeschli {
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
                     .style('font-family', 'Helvetica')
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
-                    .text(function (d) {
+                    .text(function (d: Alcmonavis.phylo) {
                         if (d.parent) {
                             textSum += textInc;
                             return 'List External Node Data';
                         }
+                        return '';
                     })
                     .on('click', function (d) {
                         listExternalNodeData(d);
@@ -4391,23 +4459,26 @@ export default class alcmonavispoeschli {
                     .attr('y', topPad + textSum)
                     .attr('x', +rightPad)
                     .style('text-align', 'left')
-                    .style('fill', NODE_TOOLTIP_TEXT_COLOR)
+                    .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                     .style('font-size', fs)
                     .style('font-family', 'Helvetica')
                     .style('font-style', 'normal')
                     .style('font-weight', 'bold')
                     .style('text-decoration', 'none')
                     .text(function (d) {
-                        if (d.parent && this.basicTreeProperties.sequences && (this.basicTreeProperties.maxMolSeqLength && (this.basicTreeProperties.maxMolSeqLength > 0))) {
+                        if (d.parent && self.basicTreeProperties && self.basicTreeProperties.sequences
+                            && self.basicTreeProperties.maxMolSeqLength
+                            && (self.basicTreeProperties.maxMolSeqLength > 0)) {
                             textSum += textInc;
                             return 'List Sequences in Fasta';
                         }
+                        return '';
                     })
                     .on('click', function (d) {
                         listMolecularSequences(d);
                     });
 
-                if (self.settings.enableAccessToDatabases === true) {
+                if (settings.enableAccessToDatabases === true) {
                     d3.select(this).append('text')
                         .attr('class', 'tooltipElem tooltipElemText')
                         .attr('y', topPad + textSum)
@@ -4446,13 +4517,14 @@ export default class alcmonavispoeschli {
                                 }
                                 else if (AP.RE_SWISSPROT_TREMBL_PFAM.test(d.name)) {
                                     show = true;
-                                    value = AP.RE_SWISSPROT_TREMBL_PFAM.exec(d.name)[1];
+                                    value = AP.RE_SWISSPROT_TREMBL_PFAM.exec(d.name)![1];
                                 }
                             }
                             if (show) {
                                 textSum += textInc;
                                 return 'Access DB [' + value + ']';
                             }
+                            return '';
                         }
                         )
                         .on('click', function (d) {
@@ -4460,7 +4532,7 @@ export default class alcmonavispoeschli {
                         });
                 }
 
-                if (self.settings.enableSubtreeDeletion === true) {
+                if (settings.enableSubtreeDeletion === true) {
                     d3.select(this).append('text')
                         .attr('class', 'tooltipElem tooltipElemText')
                         .attr('y', topPad + textSum)
@@ -4469,7 +4541,7 @@ export default class alcmonavispoeschli {
                         .style('align', 'left')
                         .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
                         .style('font-size', fs)
-                        .style('font-family', this.settings.controlsFont)
+                        .style('font-family', settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v))
                         .style('font-style', 'normal')
                         .style('font-weight', 'bold')
                         .style('text-decoration', 'none')
@@ -4488,37 +4560,52 @@ export default class alcmonavispoeschli {
                                     return 'Delete External Node';
                                 }
                             }
+                            return '';
                         })
                         .on('click', function (d) {
-                            unCollapseAll(self.root);
+                            self.unCollapseAll(self.root);
                             forester.deleteSubtree(tree, d);
                             self.treeData = tree;
                             self.basicTreeProperties = forester.collectBasicTreeProperties(self.treeData);
-                            updateNodeVisualizationsAndLegends(self.treeData);
-                            resetDepthCollapseDepthValue();
-                            resetRankCollapseRankValue();
-                            resetBranchLengthCollapseValue();
-                            resetCollapseByFeature();
-                            search0();
-                            search1();
-                            zoomToFit();
+                            self.updateNodeVisualizationsAndLegends(self.treeData);
+                            self.resetDepthCollapseDepthValue();
+                            self.resetRankCollapseRankValue();
+                            self.resetBranchLengthCollapseValue();
+                            self.resetCollapseByFeature();
+                            self.search0();
+                            self.search1();
+                            self.zoomToFit();
                         });
                 }
 
-                d3.selection.prototype.moveToFront = function () {
-                    return this.each(function () {
-                        this.parentNode.appendChild(this);
-                    });
+                (d3.selection.prototype as CustomD3Prototype<HTMLElement>).moveToFront = function () {
+                    return this.each((() => {
+                        const _: (this: HTMLElement) => void = function () {
+                            if (this.parentNode) {
+                                this.parentNode.appendChild(this);
+                            }
+                        };
+                        return _;
+                    })());
                 };
-                d3.select(this).moveToFront();
-                d3.select(this).selectAll('.tooltipElemText').each(function (d) {
-                    d3.select(this).on('mouseover', function (d) {
-                        d3.select(this).transition().duration(50).style('fill', AP.NODE_TOOLTIP_TEXT_ACTIVE_COLOR);
-                    });
-                    d3.select(this).on('mouseout', function (d) {
-                        d3.select(this).transition().duration(50).style('fill', AP.NODE_TOOLTIP_TEXT_COLOR);
-                    });
-                });
+                (d3.select(this) as CustomD3Prototype<HTMLElement>).moveToFront();
+                d3.select(this).selectAll('.tooltipElemText').each((() => {
+                    const _1: (this: HTMLElement, d: any) => void = function (d) {
+                        d3.select(this).on('mouseover', (() => {
+                            const _2: (this: HTMLElement, d: any) => void = function (d) {
+                                d3.select(this).transition().duration(50).style('fill', AP.NODE_TOOLTIP_TEXT_ACTIVE_COLOR);
+                            };
+                            return _2;
+                        })());
+                        d3.select(this).on('mouseout', (() => {
+                            const _3: (this: HTMLElement, d: any) => void = function (d) {
+                                d3.select(this).transition().duration(50).style('fill', AP.NODE_TOOLTIP_TEXT_COLOR);
+                            };
+                            return _3;
+                        })());
+                    };
+                    return _1;
+                })());
             }
             return _;
         }
@@ -4534,6 +4621,7 @@ export default class alcmonavispoeschli {
             this.deleteValuesFromNodeProperties(this.settings.valuesToIgnoreForNodeVisualization, nodeProperties);
         }
         this.initializeNodeVisualizations(nodeProperties);
+        this.visualizations = this.visualizations!;
 
         if (this.showLegends
             && this.settings && this.options
@@ -4546,7 +4634,7 @@ export default class alcmonavispoeschli {
                         || this.legendSizeScales[AP.LEGEND_NODE_SIZE]
 
                     )))) {
-            if (this.legendColorScales[AP.LEGEND_LABEL_COLOR] && this.visualizations.labelColor && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
+            if (this.legendColorScales[AP.LEGEND_LABEL_COLOR] && this.visualizations.labelColor && this.currentLabelColorVisualization && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
                 this.removeLegend(AP.LEGEND_LABEL_COLOR);
                 this.addLegend(AP.LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
             }
@@ -4588,7 +4676,7 @@ export default class alcmonavispoeschli {
             this.displayHeight = this.displayHeight * zoomInFactor;
         }
         else {
-            this.displayHeight = this.displayHeight * BUTTON_ZOOM_IN_FACTOR;
+            this.displayHeight = this.displayHeight * AP.BUTTON_ZOOM_IN_FACTOR;
         }
         this.update(undefined, 0);
     }
@@ -4658,7 +4746,7 @@ export default class alcmonavispoeschli {
             if (this.treeFn.visData.order === undefined) {
                 this.treeFn.visData.order = true;
             }
-            orderSubtree(this.root, this.treeFn.visData.order);
+            this.orderSubtree(this.root, this.treeFn.visData.order);
             this.treeFn.visData.order = !this.treeFn.visData.order;
             this.update(undefined, 0);
         }
@@ -4915,7 +5003,7 @@ export default class alcmonavispoeschli {
     downloadButtonPressed = () => {
         var s = $('#' + AP.EXPORT_FORMAT_SELECT);
         if (s) {
-            var format = s.val(); // as string
+            var format = s.val() as string;
             this.downloadTree(format);
         }
     }
@@ -4929,42 +5017,42 @@ export default class alcmonavispoeschli {
         }
     }
 
-    changeBranchWidth = (_e: unknown, slider) => {
+    changeBranchWidth = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
         this.options!.branchWidthDefault = this.getSliderValue(slider);
         this.update(undefined, 0, true);
     }
 
-    changeNodeSize = (_e: unknown, slider) => {
-        this.options!.nodeSizeDefault = getSliderValue(slider);
+    changeNodeSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+        this.options!.nodeSizeDefault = this.getSliderValue(slider);
         if (!this.options!.showInternalNodes && !this.options!.showExternalNodes && !this.options!.showNodeVisualizations
             && !this.options!.showNodeEvents) {
             this.options!.showInternalNodes = true;
             this.options!.showExternalNodes = true;
-            setCheckboxValue(AP.INTERNAL_NODES_CB, true);
-            setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+            this.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
+            this.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
         }
         this.update(undefined, 0, true);
     }
 
 
-    changeInternalFontSize = (_e: unknown, slider) => {
+    changeInternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
         this.options!.internalNodeFontSize = this.getSliderValue(slider);
         this.update(undefined, 0, true);
     }
 
-    changeExternalFontSize = (_e: unknown, slider) => {
+    changeExternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
         this.options!.externalNodeFontSize = this.getSliderValue(slider);
         this.update(undefined, 0, true);
     }
 
-    changeBranchDataFontSize = (_e: unknown, slider) => {
+    changeBranchDataFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
         this.options!.branchDataFontSize = this.getSliderValue(slider);
         this.update(undefined, 0, true);
     }
 
-    updateMsaResidueVisCurrResPosFromSlider = (_e: unknown, slider) => {
+    updateMsaResidueVisCurrResPosFromSlider = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
         this.removeColorPicker();
-        this.msa_residue_vis_curr_res_pos = this.getSliderValue(slider) - 1;
+        this.msa_residue_vis_curr_res_pos = (this.getSliderValue(slider) || 0) - 1;
         this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
         this.update(undefined, 0, true);
     }
@@ -5002,7 +5090,7 @@ export default class alcmonavispoeschli {
     }
 
 
-    legendMoveUp = (x: number?) => {
+    legendMoveUp = (x: number | null | undefined) => {
         if (!x) {
             x = 10;
         }
@@ -5013,7 +5101,7 @@ export default class alcmonavispoeschli {
         }
     }
 
-    legendMoveDown = (x: number?) => {
+    legendMoveDown = (x: number | null | undefined) => {
         if (!x) {
             x = 10;
         }
@@ -5024,7 +5112,7 @@ export default class alcmonavispoeschli {
         }
     }
 
-    legendMoveRight = (x: number?) => {
+    legendMoveRight = (x: number | null | undefined) => {
         if (!x) {
             x = 10;
         }
@@ -5035,7 +5123,7 @@ export default class alcmonavispoeschli {
         }
     }
 
-    legendMoveLeft = (x: number?) => {
+    legendMoveLeft = (x: number | null | undefined) => {
         if (!x) {
             x = 10;
         }
@@ -5046,9 +5134,9 @@ export default class alcmonavispoeschli {
         }
     }
 
-    moveLegendWithMouse = (ev: d3.DragEvent) => {
-        var x = ev.layerX;
-        var y = ev.layerY - this.offsetTop;
+    moveLegendWithMouse = (ev: MouseEvent) => { // layerX/Y was deprecated 9 years ago!
+        var x = ev.offsetX;
+        var y = ev.offsetY - this.offsetTop;
         if (x > 0 && x < this.displayWidth) {
             this.options!.visualizationsLegendXpos = x;
         }
@@ -5060,11 +5148,11 @@ export default class alcmonavispoeschli {
     }
 
     legendHorizVertClicked = () => {
-        if (this.options!.visualizationsLegendOrientation === VERTICAL) {
-            this.options!.visualizationsLegendOrientation = HORIZONTAL;
+        if (this.options!.visualizationsLegendOrientation === AP.VERTICAL) {
+            this.options!.visualizationsLegendOrientation = AP.HORIZONTAL;
         }
         else {
-            this.options!.visualizationsLegendOrientation = VERTICAL;
+            this.options!.visualizationsLegendOrientation = AP.VERTICAL;
         }
         this.removeColorPicker();
         this.update(undefined, 0);
@@ -5078,2491 +5166,2600 @@ export default class alcmonavispoeschli {
         this.update(undefined, 0, true);
     }
 
-function legendResetClicked() {
-    removeColorPicker();
-    legendReset();
-    update(null, 0, true);
-}
-
-function legendReset() {
-    this.options.visualizationsLegendXpos = this.options.visualizationsLegendXposOrig;
-    this.options.visualizationsLegendYpos = this.options.visualizationsLegendYposOrig;
-}
-
-function legendColorRectClicked(targetScale, legendLabel, legendDescription, clickedName, clickedIndex) {
-
-    addColorPicker(targetScale, legendLabel, legendDescription, clickedName, clickedIndex);
-    update();
-}
-
-function setRadioButtonValue(id, value) {
-    var radio = $('#' + id);
-    if (radio) {
-        radio[0].checked = value;
-        radio.button('refresh');
+    legendResetClicked = () => {
+        this.removeColorPicker();
+        this.legendReset();
+        this.update(undefined, 0, true);
     }
-}
 
-function setCheckboxValue(id, value) {
-    var cb = $('#' + id);
-    if (cb && cb[0]) {
-        cb[0].checked = value;
-        cb.button('refresh');
+    legendReset = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        this.options.visualizationsLegendXpos = this.options.visualizationsLegendXposOrig;
+        this.options.visualizationsLegendYpos = this.options.visualizationsLegendYposOrig;
     }
-}
 
-function setSelectMenuValue(id, valueToSelect) {
-    const element = document.getElementById(id);
-    if (element != null) {
-        element.value = valueToSelect;
-    }
-}
+    legendColorRectClicked = (targetScale: d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string, clickedIndex: number) => {
 
-function getCheckboxValue(id) {
-    return $('#' + id).is(':checked');
-}
+        this.addColorPicker(targetScale, legendLabel, legendDescription, clickedName, clickedIndex);
+        this.update();
+    }
 
-function getSliderValue(slider) {
-    return slider.value;
-}
+    setRadioButtonValue = (id: string, value: boolean) => {
+        var radio = $<HTMLInputElement>('input#' + id); // BM
+        if (radio) {
+            radio[0].checked = value;
+            radio.button('refresh');
+        }
+    }
 
-function setSliderValue(id, value) {
-    var sli = $('#' + id);
-    if (sli) {
-        sli.slider('value', value);
+    setCheckboxValue = (id: string, value: boolean) => {
+        var cb = $<HTMLInputElement>('#' + id);
+        if (cb && cb[0]) {
+            cb[0].checked = value;
+            cb.button('refresh');
+        }
     }
-}
 
-function updateMsaResidueVisCurrResPosSliderValue() {
-    var sli = $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1);
-    if (sli) {
-        sli.slider('value', this.msa_residue_vis_curr_res_pos + 1);
+    setSelectMenuValue = (id: string, valueToSelect: string) => {
+        const element = document.getElementById(id) as HTMLSelectElement;
+        if (element != null) {
+            element.value = valueToSelect;
+        }
     }
-}
 
+    getCheckboxValue = (id: string) => {
+        return $('#' + id).is(':checked');
+    }
 
-function increaseFontSizes() {
-    var step = SLIDER_STEP * 2;
-    var max = FONT_SIZE_MAX - step;
-    var up = false;
-    if (this.options.externalNodeFontSize <= max) {
-        this.options.externalNodeFontSize += step;
-        up = true;
+    getSliderValue = (slider: JQueryUI.SliderUIParams) => {
+        return slider.value;
     }
-    if (this.options.internalNodeFontSize <= max) {
-        this.options.internalNodeFontSize += step;
-        up = true;
-    }
-    if (this.options.branchDataFontSize <= max) {
-        this.options.branchDataFontSize += step;
-        up = true;
-    }
-    if (up) {
-        setSliderValue(EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
-        setSliderValue(INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
-        setSliderValue(BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
-        update(null, 0, true);
-    }
-}
 
-function decreaseFontSizes() {
-    var step = SLIDER_STEP * 2;
-    var min = FONT_SIZE_MIN + step;
-    var up = false;
-    if (this.options.externalNodeFontSize >= min) {
-        this.options.externalNodeFontSize -= step;
-        up = true;
+    setSliderValue(id: string, value: number) {
+        var sli = $('#' + id);
+        if (sli) {
+            sli.slider('value', value);
+        }
     }
-    if (this.options.internalNodeFontSize >= min) {
-        this.options.internalNodeFontSize -= step;
-        up = true;
-    }
-    if (this.options.branchDataFontSize >= min) {
-        this.options.branchDataFontSize -= step;
-        up = true;
-    }
-    if (up) {
-        setSliderValue(EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
-        setSliderValue(INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
-        setSliderValue(BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
-        update(null, 0, true);
-    }
-}
 
-
-function createGui() {
-
-    var d3selectId = d3.select(this.id);
-    if (d3selectId && d3selectId[0]) {
-        var phyloDiv = d3selectId[0][0];
-        if (phyloDiv) {
-            this.offsetTop = phyloDiv.offsetTop;
-            phyloDiv.style.textAlign = 'left';
+    updateMsaResidueVisCurrResPosSliderValue = () => {
+        var sli = $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1);
+        if (sli) {
+            sli.slider('value', this.msa_residue_vis_curr_res_pos + 1);
         }
     }
 
 
-    var container = $(this.id);
+    increaseFontSizes = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        this.options.externalNodeFontSize = +this.options.externalNodeFontSize;
+        this.options.internalNodeFontSize = +this.options.internalNodeFontSize;
+        this.options.branchDataFontSize = +this.options.branchDataFontSize;
 
-    container.css({
-        'font-style': 'normal',
-        'font-weight': 'normal',
-        'text-decoration': 'none',
-        'text-align': 'left',
-        'borderColor': 'LightGray'
-    });
+        const step = AP.SLIDER_STEP * 2;
+        const max = AP.FONT_SIZE_MAX - step;
+        let up = false;
+
+        if (this.options.externalNodeFontSize <= max) {
+            this.options.externalNodeFontSize += step;
+            up = true;
+        }
+        if (this.options.internalNodeFontSize <= max) {
+            this.options.internalNodeFontSize += step;
+            up = true;
+        }
+        if (this.options.branchDataFontSize <= max) {
+            this.options.branchDataFontSize += step;
+            up = true;
+        }
+        if (up) {
+            this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
+            this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
+            this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
+            this.update(undefined, 0, true);
+        }
+    }
+
+    decreaseFontSizes = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        this.options.externalNodeFontSize = +this.options.externalNodeFontSize;
+        this.options.internalNodeFontSize = +this.options.internalNodeFontSize;
+        this.options.branchDataFontSize = +this.options.branchDataFontSize;
+
+        const step = AP.SLIDER_STEP * 2;
+        const min = AP.FONT_SIZE_MIN + step;
+        var up = false;
+        if (this.options.externalNodeFontSize >= min) {
+            this.options.externalNodeFontSize -= step;
+            up = true;
+        }
+        if (this.options.internalNodeFontSize >= min) {
+            this.options.internalNodeFontSize -= step;
+            up = true;
+        }
+        if (this.options.branchDataFontSize >= min) {
+            this.options.branchDataFontSize -= step;
+            up = true;
+        }
+        if (up) {
+            this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
+            this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
+            this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
+            this.update(undefined, 0, true);
+        }
+    }
 
 
-    this.node_mouseover_div = d3.select("body").append("div")
-        .attr("class", "node_mouseover_tooltip")
-        .style("opacity", 1e-6);
+    createGui = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+        const options = this.options,
+            settings = this.settings;
+
+        const self: alcmonavispoeschli = this;
+
+        var d3selectId = d3.select(this.id);
+        if (d3selectId && d3selectId[0]) {
+            var phyloDiv = d3selectId[0][0] as HTMLElement;
+            if (phyloDiv) {
+                this.offsetTop = phyloDiv.offsetTop;
+                phyloDiv.style.textAlign = 'left';
+            }
+        }
 
 
-    var c0 = $('#' + this.settings.controls0);
+        var container = $(this.id);
 
-    if (c0) {
-        c0.css({
-            'position': 'absolute',
-            'left': this.settings.controls0Left,
-            'top': this.settings.controls0Top + this.offsetTop,
-            'text-align': 'left',
-            'padding': '0px',
-            'margin': '0 0 0 0',
-            'opacity': 0.80,
-            'background-color': this.settings.controlsBackgroundColor,
-            'color': this.settings.controlsFontColor,
-            'font-size': this.settings.controlsFontSize,
-            'font-family': this.settings.controlsFont,
+        container.css({
             'font-style': 'normal',
             'font-weight': 'normal',
-            'text-decoration': 'none'
+            'text-decoration': 'none',
+            'text-align': 'left',
+            'borderColor': 'LightGray'
         });
 
-        c0.draggable({ containment: 'parent' });
 
-        c0.append(makeProgramDesc());
+        this.node_mouseover_div = d3.select("body").append("div")
+            .attr("class", "node_mouseover_tooltip")
+            .style("opacity", 1e-6);
 
-        c0.append(makePhylogramControl());
 
-        c0.append(makeDisplayControl());
+        var c0 = $('#' + this.settings.controls0);
 
-        c0.append(makeZoomControl());
-
-        var pn = $('.' + PROG_NAME);
-        if (pn) {
-            pn.css({
-                'text-align': 'center',
-                'padding-top': '3px',
-                'padding-bottom': '5px',
+        if (c0) {
+            c0.css({
+                'position': 'absolute',
+                'left': this.settings.controls0Left,
+                'top': this.settings.controls0Top + this.offsetTop,
+                'text-align': 'left',
+                'padding': '0px',
+                'margin': '0 0 0 0',
+                'opacity': 0.80,
+                'background-color': this.settings.controlsBackgroundColor,
+                'color': this.settings.controlsFontColor,
                 'font-size': this.settings.controlsFontSize,
-                'font-family': this.settings.controlsFont,
-                'font-style': 'italic',
-                'font-weight': 'bold',
+                'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                'font-style': 'normal',
+                'font-weight': 'normal',
                 'text-decoration': 'none'
             });
-        }
-        var pnl = $('.' + PROGNAMELINK);
-        if (pnl) {
-            pnl.css({
-                'color': COLOR_FOR_ACTIVE_ELEMENTS,
-                'font-size': this.settings.controlsFontSize,
-                'font-family': this.settings.controlsFont,
-                'font-style': 'italic',
-                'font-weight': 'bold',
-                'text-decoration': 'none',
-                'border': 'none'
-            });
-            $('.' + PROGNAMELINK + ':hover').css({
-                'color': COLOR_FOR_ACTIVE_ELEMENTS,
-                'font-size': this.settings.controlsFontSize,
-                'font-family': this.settings.controlsFont,
-                'font-style': 'italic',
-                'font-weight': 'bold',
-                'text-decoration': 'none',
-                'border': 'none'
-            });
-            $('.' + PROGNAMELINK + ':link').css({
-                'color': COLOR_FOR_ACTIVE_ELEMENTS,
-                'font-size': this.settings.controlsFontSize,
-                'font-family': this.settings.controlsFont,
-                'font-style': 'italic',
-                'font-weight': 'bold',
-                'text-decoration': 'none',
-                'border': 'none'
-            });
-            $('.' + PROGNAMELINK + ':visited').css({
-                'color': COLOR_FOR_ACTIVE_ELEMENTS,
-                'font-size': this.settings.controlsFontSize,
-                'font-family': this.settings.controlsFont,
-                'font-style': 'italic',
-                'font-weight': 'bold',
-                'text-decoration': 'none',
-                'border': 'none'
-            });
-        }
 
-        $('.' + PHYLOGRAM_CLADOGRAM_CONTROLGROUP).controlgroup({
-            'direction': 'horizontal'
-        });
+            c0.draggable({ containment: 'parent' });
 
-        $('.' + DISPLAY_DATA_CONTROLGROUP).controlgroup({
-            'direction': 'vertical'
-        });
+            c0.append(makeProgramDesc());
 
-        c0.append(makeControlButtons());
+            c0.append(makePhylogramControl());
 
-        c0.append(makeSliders());
+            c0.append(makeDisplayControl());
 
-        c0.append(makeSearchBoxes());
+            c0.append(makeZoomControl());
 
-        $('.' + SEARCH_OPTIONS_GROUP).controlgroup({
-            'direction': 'horizontal'
-        });
-
-        c0.append(makeAutoCollapse());
-
-        if (this.settings.enableDownloads) {
-            c0.append(makeDownloadSection());
-        }
-    }
-
-    var c1 = $('#' + this.settings.controls1);
-    if (c1) {
-        c1.css({
-            'position': 'absolute',
-            'left': this.settings.controls1Left,
-            'top': this.settings.controls1Top + this.offsetTop,
-            'text-align': 'left',
-            'padding': '0px',
-            'margin': '0 0 0 0',
-            'opacity': 0.80,
-            'background-color': this.settings.controlsBackgroundColor,
-            'color': this.settings.controlsFontColor,
-            'font-size': this.settings.controlsFontSize,
-            'font-family': this.settings.controlsFont,
-            'font-style': 'normal',
-            'font-weight': 'normal',
-            'text-decoration': 'none'
-        });
-
-        c1.draggable({ containment: 'parent' });
-
-        if (this.settings.enableNodeVisualizations && this.nodeVisualizations) {
-            c1.append(makeVisualControls());
-            if (isCanDoMsaResidueVisualizations()) {
-                c1.append(makeMsaResidueVisCurrResPositionControl());
-            }
-
-
-            if (isAddVisualization2() && this.specialVisualizations != null) { //~~
-                if ('Mutations' in this.specialVisualizations) {
-                    const mutations = this.specialVisualizations['Mutations'];
-                    if (mutations != null) {
-                        c1.append(makeVisualization2(mutations.label));
-                        this.visualizations2_color = mutations.color;
-                        this.visualizations2_applies_to_ref = mutations.applies_to_ref;
-                        this.visualizations2_property_datatype = mutations.property_datatype;
-                        this.visualizations2_property_applies_to = mutations.property_applies_to;
-                        console.log(MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations2_applies_to_ref);
-                        console.log(MESSAGE + 'Setting special visualization property applies to to: ' + this.visualizations2_property_applies_to);
-                        console.log(MESSAGE + 'Setting special visualization property datatype to: ' + this.visualizations2_property_datatype);
-                        console.log(MESSAGE + 'Setting special visualization color to: ' + this.visualizations2_color);
-                    }
-                }
-            }
-            if (isAddVisualization3() && this.specialVisualizations != null) { //~~
-                if ('Convergent_Mutations' in this.specialVisualizations) {
-                    const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
-                    if (conv_mutations != null) {
-                        c1.append(makeVisualization3(conv_mutations.label));
-                        this.visualizations3_color = conv_mutations.color;
-                        this.visualizations3_applies_to_ref = conv_mutations.applies_to_ref;
-                        this.visualizations3_property_datatype = conv_mutations.property_datatype;
-                        this.visualizations3_property_applies_to = conv_mutations.property_applies_to;
-                        console.log(MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations3_applies_to_ref);
-                        console.log(MESSAGE + 'Setting special visualization property applies to to: ' + this.visualizations3_property_applies_to);
-                        console.log(MESSAGE + 'Setting special visualization property datatype to: ' + this.visualizations3_property_datatype);
-                        console.log(MESSAGE + 'Setting special visualization color to: ' + this.visualizations3_color);
-                    }
-                }
-            }
-
-            c1.append(makeLegendControl());
-        }
-    }
-
-    $('input:button')
-        .button()
-        .css({
-            'width': '26px',
-            'text-align': 'center',
-            'outline': 'none',
-            'margin': '0px',
-            'font-style': 'normal',
-            'font-weight': 'normal',
-            'text-decoration': 'none'
-        });
-
-    $('#' + ZOOM_IN_Y + ', #' + ZOOM_OUT_Y)
-        .css({
-            'width': '78px'
-        });
-
-    $('#' + ZOOM_IN_Y + ', #' + ZOOM_OUT_Y + ', #' + ZOOM_TO_FIT + ', #' + ZOOM_IN_X + ', #' + ZOOM_OUT_X)
-        .css({
-            'height': '16px'
-        });
-
-
-    $('#' + DECR_DEPTH_COLLAPSE_LEVEL + ', #' + INCR_DEPTH_COLLAPSE_LEVEL + ', #' + DECR_BL_COLLAPSE_LEVEL + ', #' + INCR_BL_COLLAPSE_LEVEL)
-        .css({
-            'width': '16px'
-        });
-
-    $('#' + LEGENDS_MOVE_UP_BTN + ', #' + LEGENDS_MOVE_DOWN_BTN)
-        .css({
-            'width': '72px'
-        });
-
-    $('#' + LEGENDS_RESET_BTN + ', #' + LEGENDS_MOVE_LEFT_BTN + ', #' + LEGENDS_MOVE_RIGHT_BTN)
-        .css({
-            'width': '24px'
-        });
-
-    $('#' + LEGENDS_SHOW_BTN + ', #' + LEGENDS_HORIZ_VERT_BTN)
-        .css({
-            'width': '36px'
-        });
-
-    $('#' + LEGENDS_MOVE_UP_BTN + ', #' + LEGENDS_MOVE_DOWN_BTN + ', #' +
-        LEGENDS_RESET_BTN + ', #' + LEGENDS_MOVE_LEFT_BTN + ', #' + LEGENDS_MOVE_RIGHT_BTN +
-        ', #' + LEGENDS_SHOW_BTN + ', #' + LEGENDS_HORIZ_VERT_BTN
-    )
-        .css({
-            'height': '16px'
-        });
-
-
-    var downloadButton = $('#' + DOWNLOAD_BUTTON);
-
-    if (downloadButton) {
-        downloadButton.css({
-            'width': '60px',
-            'margin-bottom': '3px'
-        });
-    }
-
-    $(':radio').checkboxradio({
-        icon: false
-    });
-
-    $(':checkbox').checkboxradio({
-        icon: false
-    });
-
-    $('#' + SEARCH_FIELD_0).keyup(search0);
-
-    $('#' + SEARCH_FIELD_1).keyup(search1);
-
-    $('#' + PHYLOGRAM_BUTTON).click(toPhylogram);
-
-    $('#' + PHYLOGRAM_ALIGNED_BUTTON).click(toAlignedPhylogram);
-
-    $('#' + CLADOGRAM_BUTTON).click(toCladegram);
-
-    $('#' + NODE_NAME_CB).click(nodeNameCbClicked);
-
-    $('#' + TAXONOMY_CB).click(taxonomyCbClicked);
-
-    $('#' + SEQUENCE_CB).click(sequenceCbClicked);
-
-    $('#' + CONFIDENCE_VALUES_CB).click(confidenceValuesCbClicked);
-
-    $('#' + BRANCH_LENGTH_VALUES_CB).click(branchLengthsCbClicked);
-
-    $('#' + NODE_EVENTS_CB).click(nodeEventsCbClicked);
-
-    $('#' + BRANCH_EVENTS_CB).click(branchEventsCbClicked);
-
-    $('#' + INTERNAL_LABEL_CB).click(internalLabelsCbClicked);
-
-    $('#' + EXTERNAL_LABEL_CB).click(externalLabelsCbClicked);
-
-    $('#' + INTERNAL_NODES_CB).click(internalNodesCbClicked);
-
-    $('#' + EXTERNAL_NODES_CB).click(externalNodesCbClicked);
-
-    $('#' + NODE_VIS_CB).click(nodeVisCbClicked);
-
-    $('#' + BRANCH_VIS_CB).click(branchVisCbClicked);
-
-    $('#' + BRANCH_COLORS_CB).click(branchColorsCbClicked);
-
-    $('#' + DYNAHIDE_CB).click(dynaHideCbClicked);
-
-    $('#' + SHORTEN_NODE_NAME_CB).click(shortenCbClicked);
-
-    $('#' + LABEL_COLOR_SELECT_MENU).on('change', function () {
-        const v = this.value;
-        if (isAddVisualization2()) {
-            setSelectMenuValue(LABEL_COLOR_SELECT_MENU_2, DEFAULT);
-        }
-        if (isAddVisualization3()) {
-            setSelectMenuValue(LABEL_COLOR_SELECT_MENU_3, DEFAULT);
-        }
-
-        if (v && v != DEFAULT) {
-            this.currentLabelColorVisualization = v;
-            if (this.visualizations.labelColor[this.currentLabelColorVisualization] != null) {
-                addLegend(LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
-            }
-        }
-        else {
-            this.currentLabelColorVisualization = null;
-            removeLegend(LEGEND_LABEL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-    $('#' + LABEL_COLOR_SELECT_MENU_2).on('change', function () {
-        const v = this.value;
-        setSelectMenuValue(LABEL_COLOR_SELECT_MENU, DEFAULT);
-        if (isAddVisualization3()) {
-            setSelectMenuValue(LABEL_COLOR_SELECT_MENU_3, DEFAULT);
-        }
-        if (v && v != DEFAULT) {
-            this.currentLabelColorVisualization = v;
-            this.options.showNodeName = true;
-            setCheckboxValue(NODE_NAME_CB, true);
-            this.options.showExternalLabels = true;
-            setCheckboxValue(EXTERNAL_LABEL_CB, true);
-            this.options.showInternalLabels = true;
-            setCheckboxValue(INTERNAL_LABEL_CB, true);
-        }
-        else {
-            this.currentLabelColorVisualization = null;
-            removeLegend(LEGEND_LABEL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-
-    $('#' + LABEL_COLOR_SELECT_MENU_3).on('change', function () {
-        const v = this.value;
-        setSelectMenuValue(LABEL_COLOR_SELECT_MENU, DEFAULT);
-        if (isAddVisualization2()) {
-            setSelectMenuValue(LABEL_COLOR_SELECT_MENU_2, DEFAULT);
-        }
-        if (v && v != DEFAULT) {
-            this.currentLabelColorVisualization = v;
-            this.options.showNodeName = true;
-            setCheckboxValue(NODE_NAME_CB, true);
-            this.options.showExternalLabels = true;
-            setCheckboxValue(EXTERNAL_LABEL_CB, true);
-            this.options.showInternalLabels = true;
-            setCheckboxValue(INTERNAL_LABEL_CB, true);
-
-        }
-        else {
-            this.currentLabelColorVisualization = null;
-            removeLegend(LEGEND_LABEL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU).on('change', function () {
-        var v = this.value;
-        if (isAddVisualization2()) {
-            setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU_2, DEFAULT);
-        }
-        if (isAddVisualization3()) {
-            setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU_3, DEFAULT);
-        }
-        if (v && v != DEFAULT) {
-            if (!this.options.showExternalNodes && !this.options.showInternalNodes
-                && (this.currentNodeShapeVisualization == null)) {
-                this.options.showExternalNodes = true;
-                setCheckboxValue(EXTERNAL_NODES_CB, true);
-            }
-            this.options.showNodeVisualizations = true;
-            setCheckboxValue(NODE_VIS_CB, true);
-            this.currentNodeFillColorVisualization = v;
-            addLegend(LEGEND_NODE_FILL_COLOR, this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]);
-        }
-        else {
-            this.currentNodeFillColorVisualization = null;
-            removeLegend(LEGEND_NODE_FILL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU_2).on('change', function () {
-        const v = this.value;
-        setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU, DEFAULT);
-        if (isAddVisualization3()) {
-            setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU_3, DEFAULT);
-        }
-        if (v && v != DEFAULT) {
-            this.options.showExternalNodes = true;
-            setCheckboxValue(EXTERNAL_NODES_CB, true);
-            this.options.showInternalNodes = true;
-            setCheckboxValue(INTERNAL_NODES_CB, true);
-
-            this.options.showNodeVisualizations = true;
-            setCheckboxValue(NODE_VIS_CB, true);
-            this.currentNodeFillColorVisualization = v;
-
-        }
-        else {
-            this.currentNodeFillColorVisualization = null;
-            removeLegend(LEGEND_NODE_FILL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU_3).on('change', function () {
-        const v = this.value;
-        setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU, DEFAULT);
-        if (isAddVisualization2()) {
-            setSelectMenuValue(NODE_FILL_COLOR_SELECT_MENU_2, DEFAULT);
-        }
-        if (v && v != DEFAULT) {
-            this.options.showExternalNodes = true;
-            setCheckboxValue(EXTERNAL_NODES_CB, true);
-            this.options.showInternalNodes = true;
-            setCheckboxValue(INTERNAL_NODES_CB, true);
-
-            this.options.showNodeVisualizations = true;
-            setCheckboxValue(NODE_VIS_CB, true);
-            this.currentNodeFillColorVisualization = v;
-
-        }
-        else {
-            this.currentNodeFillColorVisualization = null;
-            removeLegend(LEGEND_NODE_FILL_COLOR);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-
-    /*
-     $('#' + NODE_BORDER_COLOR_SELECT_MENU).on('change', function () {
-     const v = this.value;
-     if (isAddVisualization2()) {
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
-     }
-     if (isAddVisualization3()) {
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
-     }
-     if (v && v != DEFAULT) {
-     this.currentNodeBorderColorVisualization = v;
-     if ((v != SAME_AS_FILL ) && (v != NONE)) {
-     addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-     if (!this.options.showExternalNodes && !this.options.showInternalNodes
-     && ( this.currentNodeShapeVisualization == null )) {
-     this.options.showExternalNodes = true;
-     setCheckboxValue(EXTERNAL_NODES_CB, true);
-     }
-     this.options.showNodeVisualizations = true;
-     setCheckboxValue(NODE_VIS_CB, true);
-     }
-     }
-     else {
-     this.currentNodeBorderColorVisualization = null;
-     }
-     if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-     removeLegend(LEGEND_NODE_BORDER_COLOR);
-     }
-     removeColorPicker();
-     update(null, 0);
-     });
-     */
-
-    /*
-     $('#' + NODE_BORDER_COLOR_SELECT_MENU_2).on('change', function () {
-     const v = this.value;
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
-     if (isAddVisualization3()) {
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
-     }
-     if (v && v != DEFAULT) {
-     this.currentNodeBorderColorVisualization = v;
-     if ((v != SAME_AS_FILL ) && (v != NONE)) {
-     //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-     //if (!this.options.showExternalNodes && !this.options.showInternalNodes
-     //&& ( this.currentNodeShapeVisualization == null )) {
-     this.options.showExternalNodes = true;
-     setCheckboxValue(EXTERNAL_NODES_CB, true);
-     this.options.showInternalNodes = true;
-     setCheckboxValue(INTERNAL_NODES_CB, true);
-     // }
-     this.options.showNodeVisualizations = true;
-     setCheckboxValue(NODE_VIS_CB, true);
-     }
-     }
-     else {
-     this.currentNodeBorderColorVisualization = null;
-     }
-     if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-     removeLegend(LEGEND_NODE_BORDER_COLOR);
-     }
-     removeColorPicker();
-     update(null, 0);
-     });
-     */
-
-    /*
-     $('#' + NODE_BORDER_COLOR_SELECT_MENU_3).on('change', function () {
-     const v = this.value;
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
-     if (isAddVisualization2()) {
-     setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
-     }
-     if (v && v != DEFAULT) {
-     this.currentNodeBorderColorVisualization = v;
-     if ((v != SAME_AS_FILL ) && (v != NONE)) {
-     //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-     //if (!this.options.showExternalNodes && !this.options.showInternalNodes
-     //&& ( this.currentNodeShapeVisualization == null )) {
-     this.options.showExternalNodes = true;
-     setCheckboxValue(EXTERNAL_NODES_CB, true);
-     this.options.showInternalNodes = true;
-     setCheckboxValue(INTERNAL_NODES_CB, true);
-     // }
-     this.options.showNodeVisualizations = true;
-     setCheckboxValue(NODE_VIS_CB, true);
-     }
-     }
-     else {
-     this.currentNodeBorderColorVisualization = null;
-     }
-     if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-     removeLegend(LEGEND_NODE_BORDER_COLOR);
-     }
-     removeColorPicker();
-     update(null, 0);
-     });
-     */
-
-    $('#' + NODE_SHAPE_SELECT_MENU).on('change', function () {
-        var v = this.value;
-        if (v && v != DEFAULT) {
-            this.currentNodeShapeVisualization = v;
-            addLegendForShapes(LEGEND_NODE_SHAPE, this.visualizations.nodeShape[this.currentNodeShapeVisualization]);
-            this.options.showNodeVisualizations = true;
-            setCheckboxValue(NODE_VIS_CB, true);
-        }
-        else {
-            this.currentNodeShapeVisualization = null;
-            removeLegendForShapes(LEGEND_NODE_SHAPE);
-        }
-        removeColorPicker();
-        resetVis();
-        update(null, 0);
-        update(null, 0);
-    });
-
-    $('#' + NODE_SIZE_SELECT_MENU).on('change', function () {
-        var v = this.value;
-        if (v && v != DEFAULT) {
-            this.currentNodeSizeVisualization = v;
-            addLegendForSizes(LEGEND_NODE_SIZE, this.visualizations.nodeSize[this.currentNodeSizeVisualization]);
-            if (!this.options.showExternalNodes && !this.options.showInternalNodes
-                && (this.currentNodeShapeVisualization == null)) {
-                this.options.showExternalNodes = true;
-                setCheckboxValue(EXTERNAL_NODES_CB, true);
-            }
-            this.options.showNodeVisualizations = true;
-            setCheckboxValue(NODE_VIS_CB, true);
-        }
-        else {
-            this.currentNodeSizeVisualization = null;
-            removeLegendForSizes(LEGEND_NODE_SIZE);
-        }
-        removeColorPicker();
-        update(null, 0);
-    });
-
-    $('#' + NODE_SIZE_SLIDER).slider({
-        min: NODE_SIZE_MIN,
-        max: NODE_SIZE_MAX,
-        step: SLIDER_STEP,
-        value: this.options.nodeSizeDefault,
-        animate: 'fast',
-        slide: changeNodeSize,
-        change: changeNodeSize
-    });
-
-    $('#' + BRANCH_WIDTH_SLIDER).slider({
-        min: BRANCH_WIDTH_MIN,
-        max: BRANCH_WIDTH_MAX,
-        step: SLIDER_STEP,
-        value: this.options.branchWidthDefault,
-        animate: 'fast',
-        slide: changeBranchWidth,
-        change: changeBranchWidth
-    });
-
-    $('#' + EXTERNAL_FONT_SIZE_SLIDER).slider({
-        min: FONT_SIZE_MIN,
-        max: FONT_SIZE_MAX,
-        step: SLIDER_STEP,
-        value: this.options.externalNodeFontSize,
-        animate: 'fast',
-        slide: changeExternalFontSize,
-        change: changeExternalFontSize
-    });
-
-    $('#' + INTERNAL_FONT_SIZE_SLIDER).slider({
-        min: FONT_SIZE_MIN,
-        max: FONT_SIZE_MAX,
-        step: SLIDER_STEP,
-        value: this.options.internalNodeFontSize,
-        animate: 'fast',
-        slide: changeInternalFontSize,
-        change: changeInternalFontSize
-    });
-
-    $('#' + BRANCH_DATA_FONT_SIZE_SLIDER).slider({
-        min: FONT_SIZE_MIN,
-        max: FONT_SIZE_MAX,
-        step: SLIDER_STEP,
-        value: this.options.branchDataFontSize,
-        animate: 'fast',
-        slide: changeBranchDataFontSize,
-        change: changeBranchDataFontSize
-    });
-
-    $('#' + SEARCH_FIELD_0 + ', #' + SEARCH_FIELD_1)
-        .off('keydown')
-        .off('mouseenter')
-        .off('mousedown')
-        .css({
-            'font': 'inherit',
-            'color': 'inherit',
-            'text-align': 'left',
-            'outline': 'none',
-            'cursor': 'text',
-            'width': this.settings.searchFieldWidth,
-            'height': this.settings.textFieldHeight
-        });
-
-    $('#' + DEPTH_COLLAPSE_LABEL + ', #' + BL_COLLAPSE_LABEL)
-        .button()
-        .off('keydown')
-        .off('mouseenter')
-        .off('mousedown')
-        .attr('disabled', 'disabled')
-        .css({
-            'font': 'inherit',
-            'color': 'inherit',
-            'text-align': 'center',
-            'outline': 'none',
-            'cursor': 'text',
-            'width': this.settings.collapseLabelWidth
-        });
-
-    $('#' + ZOOM_IN_Y).mousedown(function () {
-        zoomInY();
-        this.intervalId = setInterval(zoomInY, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + ZOOM_OUT_Y).mousedown(function () {
-        zoomOutY();
-        this.intervalId = setInterval(zoomOutY, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + ZOOM_IN_X).mousedown(function () {
-        zoomInX();
-        this.intervalId = setInterval(zoomInX, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + ZOOM_OUT_X).mousedown(function () {
-        zoomOutX();
-        this.intervalId = setInterval(zoomOutX, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + DECR_DEPTH_COLLAPSE_LEVEL).mousedown(function () {
-        decrDepthCollapseLevel();
-        this.intervalId = setInterval(decrDepthCollapseLevel, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-    $('#' + INCR_DEPTH_COLLAPSE_LEVEL).mousedown(function () {
-        incrDepthCollapseLevel();
-        this.intervalId = setInterval(incrDepthCollapseLevel, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-    $('#' + DECR_BL_COLLAPSE_LEVEL).mousedown(function () {
-        decrBlCollapseLevel();
-        this.intervalId = setInterval(decrBlCollapseLevel, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-    $('#' + INCR_BL_COLLAPSE_LEVEL).mousedown(function () {
-        incrBlCollapseLevel();
-        this.intervalId = setInterval(incrBlCollapseLevel, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + ZOOM_TO_FIT).mousedown(zoomToFit);
-
-    $('#' + RETURN_TO_SUPERTREE_BUTTON).mousedown(returnToSupertreeButtonPressed);
-
-    $('#' + ORDER_BUTTON).mousedown(orderButtonPressed);
-
-    $('#' + UNCOLLAPSE_ALL_BUTTON).mousedown(uncollapseAllButtonPressed);
-
-    $('#' + MIDPOINT_ROOT_BUTTON).mousedown(midpointRootButtonPressed);
-
-    // Search Controls
-    // ---------------
-
-    $('#' + SEARCH_OPTIONS_CASE_SENSITIVE_CB).click(searchOptionsCaseSenstiveCbClicked);
-    $('#' + SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB).click(searchOptionsCompleteTermsOnlyCbClicked);
-    $('#' + SEARCH_OPTIONS_REGEX_CB).click(searchOptionsRegexCbClicked);
-    $('#' + SEARCH_OPTIONS_NEGATE_RES_CB).click(searchOptionsNegateResultCbClicked);
-
-    $('#' + RESET_SEARCH_A_BTN).mousedown(resetSearch0);
-    $('#' + RESET_SEARCH_B_BTN).mousedown(resetSearch1);
-
-    // Visualization Legends
-    // ---------------------
-
-    $('#' + LEGENDS_MOVE_UP_BTN).mousedown(function () {
-        legendMoveUp(2);
-        this.intervalId = setInterval(legendMoveUp, MOVE_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + LEGENDS_MOVE_DOWN_BTN).mousedown(function () {
-        legendMoveDown(2);
-        this.intervalId = setInterval(legendMoveDown, MOVE_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + LEGENDS_MOVE_LEFT_BTN).mousedown(function () {
-        legendMoveLeft(2);
-        this.intervalId = setInterval(legendMoveLeft, MOVE_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + LEGENDS_MOVE_RIGHT_BTN).mousedown(function () {
-        legendMoveRight(2);
-        this.intervalId = setInterval(legendMoveRight, MOVE_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + LEGENDS_HORIZ_VERT_BTN).click(legendHorizVertClicked);
-    $('#' + LEGENDS_SHOW_BTN).click(legendShowClicked);
-    $('#' + LEGENDS_RESET_BTN).click(legendResetClicked);
-
-    // ----------------
-
-    if (downloadButton) {
-        downloadButton.mousedown(downloadButtonPressed);
-    }
-
-    // Collapse
-    // ---------------
-
-    $('#' + COLLAPSE_BY_FEATURE_SELECT)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + EXPORT_FORMAT_SELECT)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + COLLAPSE_BY_FEATURE_SELECT).on('change', function () {
-        var s = $('#' + COLLAPSE_BY_FEATURE_SELECT);
-        if (s) {
-            var f = s.val();
-            if (f) {
-                collapseByFeature(f);
-            }
-        }
-    });
-
-
-    // ---------------
-
-    // Visualizations
-    // ---------------
-
-    $('#' + LABEL_COLOR_SELECT_MENU)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_BORDER_COLOR_SELECT_MENU)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_SHAPE_SELECT_MENU)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_SIZE_SELECT_MENU)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-
-    $('#' + LABEL_COLOR_SELECT_MENU_2) //~~
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU_2)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_BORDER_COLOR_SELECT_MENU_2)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + LABEL_COLOR_SELECT_MENU_3) //~~~
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_FILL_COLOR_SELECT_MENU_3)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-    $('#' + NODE_BORDER_COLOR_SELECT_MENU_3)
-        .select()
-        .css({
-            'font': 'inherit',
-            'color': 'inherit'
-        });
-
-
-    // MSA residue visualization: Position control
-    // -------------------------------------------
-    $('#' + MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN + ', #' + MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN)
-        .css({
-            'width': '18px'
-        });
-
-    $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_LABEL)
-        .off('keydown')
-        .off('mouseenter')
-        .off('mousedown')
-        .css({
-            'font': 'inherit',
-            'color': 'inherit',
-            'text-align': 'center',
-            'outline': 'none',
-            'cursor': 'text',
-            'width': '28px',
-            'height': this.settings.textFieldHeight
-        });
-
-    $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).keyup(function (e) {
-        var keycode = e.keyCode;
-        if ((((keycode >= VK_0) && (keycode <= VK_9)) || ((keycode >= VK_0_NUMPAD)) && (keycode <= VK_9_NUMPAD)) || (keycode === VK_BACKSPACE) || (keycode === VK_DELETE)) {
-            var i = 0;
-            if ((((keycode >= VK_0) && (keycode <= VK_9))
-                || ((keycode >= VK_0_NUMPAD) && (keycode <= VK_9_NUMPAD)))
-                && this.basicTreeProperties.maxMolSeqLength
-                && (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties.maxMolSeqLength - 1))) {
-                if (((keycode >= VK_0) && (keycode <= VK_9))) {
-                    i = keycode - 48;
-                }
-                else {
-                    i = keycode - 96;
-                }
-            }
-            else {
-                var x = $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).val().trim();
-                if (x === '') {
-                    return;
-                }
-                i = parseInt(x);
-                if ((i == null) || isNaN(i) || (i < 0)) {
-                    i = 0;
-                }
-            }
-            showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
-            setMsaResidueVisCurrResPos(i - 1);
-            updateMsaResidueVisCurrResPosLabel();
-            updateMsaResidueVisCurrResPosSliderValue();
-            update(null, 0, true);
-        }
-        else {
-            update(null, 0, true);
-        }
-    });
-
-    $('#' + MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN).mousedown(function () {
-        decrMsaResidueVisCurrResPos();
-        this.intervalId = setInterval(decrMsaResidueVisCurrResPos, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-    $('#' + MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN).mousedown(function () {
-        incrMsaResidueVisCurrResPos();
-        this.intervalId = setInterval(incrMsaResidueVisCurrResPos, ZOOM_INTERVAL);
-    }).bind('mouseup mouseleave', function () {
-        clearTimeout(this.intervalId);
-    });
-
-
-    // -------------------------------------------
-
-    $(document).keyup(function (e) {
-        if (e.altKey) {
-            if (e.keyCode === VK_O) {
-                orderButtonPressed();
-            }
-            else if (e.keyCode === VK_R) {
-                returnToSupertreeButtonPressed();
-            }
-            else if (e.keyCode === VK_U) {
-                uncollapseAllButtonPressed();
-            }
-            else if (e.keyCode === VK_M) {
-                midpointRootButtonPressed();
-            }
-            else if (e.keyCode === VK_C || e.keyCode === VK_DELETE
-                || e.keyCode === VK_BACKSPACE || e.keyCode === VK_HOME) {
-                zoomToFit();
-            }
-            else if (e.keyCode === VK_P) {
-                cycleDisplay();
-            }
-            else if (e.keyCode === VK_L) {
-                toggleAlignPhylogram();
-            }
-            else if (e.keyCode === VK_OPEN_BRACKET) {
-                if (isCanDoMsaResidueVisualizations()) {
-                    decrMsaResidueVisCurrResPos();
-                }
-            }
-            else if (e.keyCode === VK_CLOSE_BRACKET) {
-                if (isCanDoMsaResidueVisualizations()) {
-                    incrMsaResidueVisCurrResPos();
-                }
-            }
-        }
-        else if (e.keyCode === VK_HOME) {
-            zoomToFit();
-        }
-        else if (e.keyCode === VK_ESC) {
-            escPressed();
-        }
-    });
-
-    $(document).keydown(function (e) {
-        if (e.altKey) {
-            if (e.keyCode === VK_UP) {
-                zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
-            }
-            else if (e.keyCode === VK_DOWN) {
-                zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            }
-            else if (e.keyCode === VK_LEFT) {
-                zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            }
-            else if (e.keyCode === VK_RIGHT) {
-                zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
-            }
-            else if (e.keyCode === VK_PLUS || e.keyCode === VK_PLUS_N) {
-                if (e.shiftKey) {
-                    increaseFontSizes();
-                }
-                else {
-                    zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
-                    zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
-                }
-            }
-            else if (e.keyCode === VK_MINUS || e.keyCode === VK_MINUS_N) {
-                if (e.shiftKey) {
-                    decreaseFontSizes();
-                }
-                else {
-                    zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-                    zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-                }
-            }
-            else if (e.keyCode === VK_A) {
-                decrDepthCollapseLevel();
-            }
-            else if (e.keyCode === VK_S) {
-                incrDepthCollapseLevel();
-            }
-        }
-        if (e.keyCode === VK_PAGE_UP) {
-            increaseFontSizes();
-        }
-        else if (e.keyCode === VK_PAGE_DOWN) {
-            decreaseFontSizes();
-        }
-    });
-
-
-    $(document).on('mousewheel DOMMouseScroll', function (e) {
-        if (e.shiftKey) {
-            if (e.originalEvent) {
-                var oe = e.originalEvent;
-                if (oe.detail > 0 || oe.wheelDelta < 0) {
-                    if (e.ctrlKey) {
-                        decreaseFontSizes();
-                    }
-                    else if (e.altKey) {
-                        zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-                    }
-                    else {
-                        zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-                    }
-                }
-                else {
-                    if (e.ctrlKey) {
-                        increaseFontSizes();
-                    }
-                    else if (e.altKey) {
-                        zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
-                    }
-                    else {
-                        zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
-                    }
-                }
-            }
-            // To prevent page fom scrolling:
-            return false;
-        }
-    });
-
-    // --------------------------------------------------------------
-    // Functions to make GUI elements
-    // --------------------------------------------------------------
-
-    function makeProgramDesc() {
-        var h = "";
-        h = h.concat('<div class=' + PROG_NAME + '>');
-        h = h.concat('<a class="' + PROGNAMELINK + '" href="' + WEBSITE + '" target="this.blank">' + NAME + ' ' + VERSION + '</a>');
-        h = h.concat('</div>');
-        return h;
-    }
-
-    function makePhylogramControl() {
-        var radioGroup = 'phylogram_control_radio';
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<div class="' + PHYLOGRAM_CLADOGRAM_CONTROLGROUP + '">');
-        h = h.concat(makeRadioButton('P', PHYLOGRAM_BUTTON, radioGroup, 'phylogram display (uses branch length values)  (use Alt+P to cycle between display types)'));
-        h = h.concat(makeRadioButton('A', PHYLOGRAM_ALIGNED_BUTTON, radioGroup, 'phylogram display (uses branch length values) with aligned labels  (use Alt+P to cycle between display types)'));
-        h = h.concat(makeRadioButton('C', CLADOGRAM_BUTTON, radioGroup, ' cladogram display (ignores branch length values)  (use Alt+P to cycle between display types)'));
-        h = h.concat('</div>');
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeDisplayControl() {
-        var h = "";
-
-        h = h.concat('<fieldset><legend>Display Data</legend>');
-        h = h.concat('<div class="' + DISPLAY_DATA_CONTROLGROUP + '">');
-        if (this.basicTreeProperties.nodeNames) {
-            h = h.concat(makeCheckboxButton('Node Name', NODE_NAME_CB, 'to show/hide node names (node names usually are the untyped labels found in New Hampshire/Newick formatted trees)'));
-        }
-        if (this.basicTreeProperties.taxonomies) {
-            h = h.concat(makeCheckboxButton('Taxonomy', TAXONOMY_CB, 'to show/hide node taxonomic information'));
-        }
-        if (this.basicTreeProperties.sequences) {
-            h = h.concat(makeCheckboxButton('Sequence', SEQUENCE_CB, 'to show/hide node sequence information'));
-        }
-        if (this.basicTreeProperties.confidences) {
-            h = h.concat(makeCheckboxButton('Confidence', CONFIDENCE_VALUES_CB, 'to show/hide confidence values'));
-        }
-        if (this.basicTreeProperties.branchLengths) {
-            h = h.concat(makeCheckboxButton('Branch Length', BRANCH_LENGTH_VALUES_CB, 'to show/hide branch length values'));
-        }
-        if (this.basicTreeProperties.nodeEvents) {
-            h = h.concat(makeCheckboxButton('Node Events', NODE_EVENTS_CB, 'to show speciations and duplications as colored nodes (e.g. speciations green, duplications red)'));
-        }
-        if (this.basicTreeProperties.branchEvents) {
-            h = h.concat(makeCheckboxButton('Branch Events', BRANCH_EVENTS_CB, 'to show/hide branch events (e.g. mutations)'));
-        }
-        h = h.concat(makeCheckboxButton('External Labels', EXTERNAL_LABEL_CB, 'to show/hide external node labels'));
-        if (this.basicTreeProperties.internalNodeData) {
-            h = h.concat(makeCheckboxButton('Internal Labels', INTERNAL_LABEL_CB, 'to show/hide internal node labels'));
-        }
-        h = h.concat(makeCheckboxButton('External Nodes', EXTERNAL_NODES_CB, 'to show external nodes as shapes (usually circles)'));
-        h = h.concat(makeCheckboxButton('Internal Nodes', INTERNAL_NODES_CB, 'to show internal nodes as shapes (usually circles)'));
-
-        if (this.settings.showBranchColorsButton) {
-            h = h.concat(makeCheckboxButton('Branch Colors', BRANCH_COLORS_CB, 'to use/ignore branch colors (if present in tree file)'));
-        }
-        if (this.settings.enableNodeVisualizations) {
-            h = h.concat(makeCheckboxButton('Node Vis', NODE_VIS_CB, 'to show/hide node visualizations (colors, shapes, sizes), set with the Visualizations sub-menu'));
-        }
-        if (this.settings.enableBranchVisualizations) {
-            h = h.concat(makeCheckboxButton('Branch Vis', BRANCH_VIS_CB, 'to show/hide branch visualizations, set with the Visualizations sub-menu'));
-        }
-        if (this.settings.showDynahideButton) {
-            h = h.concat(makeCheckboxButton('Dyna Hide', DYNAHIDE_CB, 'to hide external labels depending on expected visibility'));
-        }
-        if (this.settings.showShortenNodeNamesButton) {
-            h = h.concat(makeCheckboxButton('Short Names', SHORTEN_NODE_NAME_CB, 'to shorten long node names'));
-        }
-        h = h.concat('</div>');
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeZoomControl() {
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Zoom</legend>');
-        h = h.concat(makeButton('Y+', ZOOM_IN_Y, 'zoom in vertically (Alt+Up or Shift+mousewheel)'));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('X-', ZOOM_OUT_X, 'zoom out horizontally (Alt+Left or Shift+Alt+mousewheel)'));
-        h = h.concat(makeButton('F', ZOOM_TO_FIT, 'fit and center tree display (Alt+C, Home, or Esc to re-position controls as well)'));
-        h = h.concat(makeButton('X+', ZOOM_IN_X, 'zoom in horizontally (Alt+Right or Shift+Alt+mousewheel)'));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('Y-', ZOOM_OUT_Y, 'zoom out vertically (Alt+Down or Shift+mousewheel)'));
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeControlButtons() {
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Tools</legend>');
-        h = h.concat('<div>');
-        h = h.concat(makeButton('O', ORDER_BUTTON, 'order all (Alt+O)'));
-        h = h.concat(makeButton('R', RETURN_TO_SUPERTREE_BUTTON, 'return to the supertree (if in subtree) (Alt+R)'));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('U', UNCOLLAPSE_ALL_BUTTON, 'uncollapse all (Alt+U)'));
-        h = h.concat(makeButton('M', MIDPOINT_ROOT_BUTTON, 'midpoint re-root (Alt+M)'));
-        h = h.concat('</div>');
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeDownloadSection() {
-        var h = "";
-        h = h.concat('<form action="#">');
-        h = h.concat('<fieldset>');
-        h = h.concat('<input type="button" value="Download" name="' + DOWNLOAD_BUTTON + '" title="download/export tree in a selected format" id="' + DOWNLOAD_BUTTON + '">');
-        h = h.concat('<br>');
-        h = h.concat('<select name="' + EXPORT_FORMAT_SELECT + '" id="' + EXPORT_FORMAT_SELECT + '">');
-        h = h.concat('<option value="' + PNG_EXPORT_FORMAT + '">' + PNG_EXPORT_FORMAT + '</option>');
-        h = h.concat('<option value="' + SVG_EXPORT_FORMAT + '">' + SVG_EXPORT_FORMAT + '</option>');
-        h = h.concat('<option value="' + PHYLOXML_EXPORT_FORMAT + '">' + PHYLOXML_EXPORT_FORMAT + '</option>');
-        h = h.concat('<option value="' + NH_EXPORT_FORMAT + '">' + NH_EXPORT_FORMAT + '</option>');
-        // h = h.concat('<option value="' + PDF_EXPORT_FORMAT + '">' + PDF_EXPORT_FORMAT + '</option>');
-        h = h.concat('</select>');
-        h = h.concat('</fieldset>');
-        h = h.concat('</form>');
-        return h;
-    }
-
-    function makeSliders() {
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat(makeSlider('External label size:', EXTERNAL_FONT_SIZE_SLIDER));
-        if (this.basicTreeProperties.internalNodeData) {
-            h = h.concat(makeSlider('Internal label size:', INTERNAL_FONT_SIZE_SLIDER));
-        }
-        if (this.basicTreeProperties.branchLengths || this.basicTreeProperties.confidences
-            || this.basicTreeProperties.branchEvents) {
-            h = h.concat(makeSlider('Branch label size:', BRANCH_DATA_FONT_SIZE_SLIDER));
-        }
-        h = h.concat(makeSlider('Node size:', NODE_SIZE_SLIDER));
-        h = h.concat(makeSlider('Branch width:', BRANCH_WIDTH_SLIDER));
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeAutoCollapse() {
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Collapse Depth</legend>');
-        h = h.concat(makeButton('-', DECR_DEPTH_COLLAPSE_LEVEL, 'to decrease the depth threshold (wraps around) (Alt+A)'));
-        h = h.concat(makeTextInput(DEPTH_COLLAPSE_LABEL, 'the current depth threshold'));
-        h = h.concat(makeButton('+', INCR_DEPTH_COLLAPSE_LEVEL, 'to increase the depth threshold (wraps around) (Alt+S)'));
-        h = h.concat('</fieldset>');
-        if (this.settings.enableCollapseByBranchLenghts && this.basicTreeProperties.branchLengths) {
-            h = h.concat('<fieldset>');
-            h = h.concat('<legend>Collapse Length</legend>');
-            h = h.concat(makeButton('-', DECR_BL_COLLAPSE_LEVEL, 'to decrease the maximal subtree branch length threshold (wraps around)'));
-            h = h.concat(makeTextInput(BL_COLLAPSE_LABEL, 'the current maximal subtree branch length threshold'));
-            h = h.concat(makeButton('+', INCR_BL_COLLAPSE_LEVEL, 'to increase the maximal subtree branch length threshold (wraps around)'));
-            h = h.concat('</fieldset>');
-        }
-
-
-        if (this.settings.enableCollapseByFeature) {
-            h = h.concat('<fieldset>');
-            h = h.concat('<legend>Collapse Feature</legend>');
-            h = h.concat('<select name="' + COLLAPSE_BY_FEATURE_SELECT + '" id="' + COLLAPSE_BY_FEATURE_SELECT + '">');
-            h = h.concat('<option value="' + OFF_FEATURE + '">' + OFF_FEATURE + '</option>');
-            if (this.basicTreeProperties.taxonomies) {
-                h = h.concat('<option value="' + SPECIES_FEATURE + '">' + SPECIES_FEATURE + '</option>');
-            }
-            var refs = forester.collectPropertyRefs(this.treeData, 'node', false);
-            if (refs) {
-                refs.forEach(function (v) {
-                    var label = v;
-                    label = label.replace(/^.+:/, '');
-                    if (!this.settings.propertiesToIgnoreForNodeVisualization || (this.settings.propertiesToIgnoreForNodeVisualization.indexOf(label) < 0)) {
-                        if (label.length > (MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL + 2)) {
-                            label = label.substring(0, MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL) + "..";
-                        }
-                        h = h.concat('<option value="' + v + '">' + label + '</option>');
-                    }
+            var pn = $('.' + AP.PROG_NAME);
+            if (pn) {
+                pn.css({
+                    'text-align': 'center',
+                    'padding-top': '3px',
+                    'padding-bottom': '5px',
+                    'font-size': this.settings.controlsFontSize,
+                    'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                    'font-style': 'italic',
+                    'font-weight': 'bold',
+                    'text-decoration': 'none'
                 });
             }
-            h = h.concat('</select>');
-            h = h.concat('</fieldset>');
+            var pnl = $('.' + AP.PROGNAMELINK);
+            if (pnl) {
+                pnl.css({
+                    'color': AP.COLOR_FOR_ACTIVE_ELEMENTS,
+                    'font-size': this.settings.controlsFontSize,
+                    'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                    'font-style': 'italic',
+                    'font-weight': 'bold',
+                    'text-decoration': 'none',
+                    'border': 'none'
+                });
+                $('.' + AP.PROGNAMELINK + ':hover').css({
+                    'color': AP.COLOR_FOR_ACTIVE_ELEMENTS,
+                    'font-size': this.settings.controlsFontSize,
+                    'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                    'font-style': 'italic',
+                    'font-weight': 'bold',
+                    'text-decoration': 'none',
+                    'border': 'none'
+                });
+                $('.' + AP.PROGNAMELINK + ':link').css({
+                    'color': AP.COLOR_FOR_ACTIVE_ELEMENTS,
+                    'font-size': this.settings.controlsFontSize,
+                    'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                    'font-style': 'italic',
+                    'font-weight': 'bold',
+                    'text-decoration': 'none',
+                    'border': 'none'
+                });
+                $('.' + AP.PROGNAMELINK + ':visited').css({
+                    'color': AP.COLOR_FOR_ACTIVE_ELEMENTS,
+                    'font-size': this.settings.controlsFontSize,
+                    'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                    'font-style': 'italic',
+                    'font-weight': 'bold',
+                    'text-decoration': 'none',
+                    'border': 'none'
+                });
+            }
+
+            $('.' + AP.PHYLOGRAM_CLADOGRAM_CONTROLGROUP).controlgroup({
+                'direction': 'horizontal'
+            });
+
+            $('.' + AP.DISPLAY_DATA_CONTROLGROUP).controlgroup({
+                'direction': 'vertical'
+            });
+
+            c0.append(makeControlButtons());
+
+            c0.append(makeSliders());
+
+            c0.append(makeSearchBoxes());
+
+            $('.' + AP.SEARCH_OPTIONS_GROUP).controlgroup({
+                'direction': 'horizontal'
+            });
+
+            c0.append(makeAutoCollapse());
+
+            if (this.settings.enableDownloads) {
+                c0.append(makeDownloadSection());
+            }
         }
-        return h;
-    }
 
-    // --------------------------------------------------------------
-    // Functions to make search-related elements
-    // --------------------------------------------------------------
-    function makeSearchBoxes() {
+        var c1 = $('#' + this.settings.controls1);
+        if (c1) {
+            c1.css({
+                'position': 'absolute',
+                'left': this.settings.controls1Left,
+                'top': this.settings.controls1Top + this.offsetTop,
+                'text-align': 'left',
+                'padding': '0px',
+                'margin': '0 0 0 0',
+                'opacity': 0.80,
+                'background-color': this.settings.controlsBackgroundColor,
+                'color': this.settings.controlsFontColor,
+                'font-size': this.settings.controlsFontSize,
+                'font-family': this.settings.controlsFont.map(v => /\s/.test(v) ? '"' + v + '"' : v).reduce((p, v) => p + ', ' + v),
+                'font-style': 'normal',
+                'font-weight': 'normal',
+                'text-decoration': 'none'
+            });
 
-        var tooltip = "enter text to search for (use ',' for logical OR and '+' for logical AND," +
-            " use expressions in form of XX:term for typed search -- e.g. NN:node name, TC:taxonomy code," +
-            " TS:taxonomy scientific name, SN:sequence name, GN:gene name, SS:sequence symbol, MS:molecular sequence, ...)";
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Search</legend>');
-        h = h.concat(makeTextInput(SEARCH_FIELD_0, tooltip));
-        h = h.concat(makeButton('R', RESET_SEARCH_A_BTN, RESET_SEARCH_A_BTN_TOOLTIP));
-        h = h.concat('<br>');
-        h = h.concat(makeTextInput(SEARCH_FIELD_1, tooltip));
-        h = h.concat(makeButton('R', RESET_SEARCH_B_BTN, RESET_SEARCH_B_BTN_TOOLTIP));
-        h = h.concat('<br>');
-        h = h.concat(makeSearchControls());
-        h = h.concat('</fieldset>');
-        return h;
-    }
+            c1.draggable({ containment: 'parent' });
 
-    function makeSearchControls() {
-        var h = "";
-        h = h.concat('<div class="' + SEARCH_OPTIONS_GROUP + '">');
-        h = h.concat(makeCheckboxButton('Cas', SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'));
-        h = h.concat(makeCheckboxButton('Wrd', SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)'));
-        h = h.concat('</div>');
-        h = h.concat('<br>');
-        h = h.concat('<div class="' + SEARCH_OPTIONS_GROUP + '">');
-        h = h.concat(makeCheckboxButton('Neg', SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
-        h = h.concat(makeCheckboxButton('Reg', SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
-        h = h.concat('</div>');
-        return h;
-    }
-
-    function makeSearchControlsCompact() {
-        var h = "";
-        h = h.concat('<div class="' + SEARCH_OPTIONS_GROUP + '">');
-        h = h.concat(makeCheckboxButton('C', SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'));
-        h = h.concat(makeCheckboxButton('W', SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)'));
-        h = h.concat(makeCheckboxButton('N', SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
-        h = h.concat(makeCheckboxButton('R', SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
-        h = h.concat('</div>');
-        return h;
-    }
-
-
-    // --------------------------------------------------------------
-    // Functions to make visualization controls
-    // --------------------------------------------------------------
-    function makeVisualControls() {
-        var h = "";
-        h = h.concat('<form action="#">');
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Visualizations</legend>');
-        h = h.concat(makeSelectMenu('Label Color:', '<br>', LABEL_COLOR_SELECT_MENU, 'colorize the node label according to a property'));
-        h = h.concat('<br>');
-        h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', NODE_FILL_COLOR_SELECT_MENU, 'colorize the node fill according to a property'));
-        h = h.concat('<br>');
-        //  h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU, 'colorize the node border according to a property'));
-        //  h = h.concat('<br>');
-        h = h.concat(makeSelectMenu('Node Shape:', '<br>', NODE_SHAPE_SELECT_MENU, 'change the node shape according to a property'));
-        h = h.concat('<br>');
-        h = h.concat(makeSelectMenu('Node Size:', '<br>', NODE_SIZE_SELECT_MENU, 'change the node size according to a property'));
-        h = h.concat('</fieldset>');
-        h = h.concat('</form>');
-        return h;
-    }
-
-    function makeVisualization2(title) { //~~
-        var h = "";
-        h = h.concat('<form action="#">');
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>' + title + '</legend>');
-        h = h.concat(makeSelectMenu('Label Color:', '<br>', LABEL_COLOR_SELECT_MENU_2, 'colorize the node label according to a property'));
-        h = h.concat('<br>');
-        h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', NODE_FILL_COLOR_SELECT_MENU_2, 'colorize the node fill according to a property'));
-        //  h = h.concat('<br>');
-        // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_2, 'colorize the node border according to a property'));
-        h = h.concat('</fieldset>');
-        h = h.concat('</form>');
-        return h;
-    }
-
-    function makeVisualization3(title) { //~~~
-        var h = "";
-        h = h.concat('<form action="#">');
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>' + title + '</legend>');
-        h = h.concat(makeSelectMenu('Label Color:', '<br>', LABEL_COLOR_SELECT_MENU_3, 'colorize the node label according to a property'));
-        h = h.concat('<br>');
-        h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', NODE_FILL_COLOR_SELECT_MENU_3, 'colorize the node fill according to a property'));
-        // h = h.concat('<br>');
-        // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_3, 'colorize the node border according to a property'));
-        h = h.concat('</fieldset>');
-        h = h.concat('</form>');
-        return h;
-    }
-
-    function makeMsaResidueVisCurrResPositionControl() {
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>MSA Residue Pos.</legend>');
-        h = h.concat(makeSlider(null, MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1));
-        h = h.concat(makeButton('-', MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN, 'to decrease current MSA residue position by 1 (wraps around) (Alt+[)'));
-        h = h.concat(makeTextInput(MSA_RESIDUE_VIS_CURR_RES_POS_LABEL, 'the current MSA residue position'));
-        h = h.concat(makeButton('+', MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN, 'to increase current MSA residue position by 1 (wraps around) (Alt+])'));
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-    function makeLegendControl() {
-        var mouseTip = ' (alternatively, place legend with mouse using shift+left-mouse-button click, or alt+left-mouse-button click)';
-        var h = "";
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Vis Legend</legend>');
-        h = h.concat(makeButton('Show', LEGENDS_SHOW_BTN, 'to show/hide legend(s)'));
-        h = h.concat(makeButton('Dir', LEGENDS_HORIZ_VERT_BTN, 'to toggle between vertical and horizontal alignment of (multiple) legends'));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('^', LEGENDS_MOVE_UP_BTN, 'move legend(s) up' + mouseTip));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('<', LEGENDS_MOVE_LEFT_BTN, 'move legend(s) left' + mouseTip));
-        h = h.concat(makeButton('R', LEGENDS_RESET_BTN, 'return legend(s) to original position' + mouseTip));
-        h = h.concat(makeButton('>', LEGENDS_MOVE_RIGHT_BTN, 'move legend(s) right' + mouseTip));
-        h = h.concat('<br>');
-        h = h.concat(makeButton('v', LEGENDS_MOVE_DOWN_BTN, 'move legend(s) down' + mouseTip));
-        h = h.concat('</fieldset>');
-        return h;
-    }
-
-
-    // --------------------------------------------------------------
-    // Functions to make individual GUI components
-    // --------------------------------------------------------------
-    function makeButton(label, id, tooltip) {
-        return '<input type="button" value="' + label + '" name="' + id + '" id="' + id + '" title="' + tooltip + '">';
-    }
-
-    function makeCheckboxButton(label, id, tooltip) {
-        return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label><input type="checkbox" name="' + id + '" id="' + id + '">';
-    }
-
-    function makeRadioButton(label, id, radioGroup, tooltip) {
-        return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label><input type="radio" name="' + radioGroup + '" id="' + id + '">';
-    }
-
-    function makeSelectMenu(label, sep, id, tooltip) {
-        return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label>' + sep + '<select name="' + id + '" id="' + id + '"></select>';
-    }
-
-    function makeSlider(label, id) {
-        if (label) {
-            return label + '<div id="' + id + '"></div>';
-        }
-        return '<div id="' + id + '"></div>';
-    }
-
-    function makeTextInput(id, tooltip) {
-        return '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
-    }
-
-    function makeTextInputWithLabel(label, sep, id, tooltip) {
-        return label + sep + '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
-    }
-
-} // function createGui()
-
-function initializeGui() {
-
-    setDisplayTypeButtons();
-
-    setCheckboxValue(NODE_NAME_CB, this.options.showNodeName);
-    setCheckboxValue(TAXONOMY_CB, this.options.showTaxonomy);
-    setCheckboxValue(SEQUENCE_CB, this.options.showSequence);
-    setCheckboxValue(CONFIDENCE_VALUES_CB, this.options.showConfidenceValues);
-    setCheckboxValue(BRANCH_LENGTH_VALUES_CB, this.options.showBranchLengthValues);
-    setCheckboxValue(NODE_EVENTS_CB, this.options.showNodeEvents);
-    setCheckboxValue(BRANCH_EVENTS_CB, this.options.showBranchEvents);
-    setCheckboxValue(INTERNAL_LABEL_CB, this.options.showInternalLabels);
-    setCheckboxValue(EXTERNAL_LABEL_CB, this.options.showExternalLabels);
-    setCheckboxValue(INTERNAL_NODES_CB, this.options.showInternalNodes);
-    setCheckboxValue(EXTERNAL_NODES_CB, this.options.showExternalNodes);
-    setCheckboxValue(BRANCH_COLORS_CB, this.options.showBranchColors);
-    setCheckboxValue(NODE_VIS_CB, this.options.showNodeVisualizations);
-    setCheckboxValue(BRANCH_VIS_CB, this.options.showBranchVisualizations);
-    setCheckboxValue(DYNAHIDE_CB, this.options.dynahide);
-    setCheckboxValue(SHORTEN_NODE_NAME_CB, this.options.shortenNodeNames);
-    initializeVisualizationMenu();
-    initializeSearchOptions();
-    makeBackgorund();
-}
-
-function makeBackgorund() {
-    this.baseSvg.append('rect')
-        .attr('width', '100%')
-        .attr('height', '100%')
-        .style('opacity', 1)
-        .attr('class', BASE_BACKGROUND)
-        .attr('fill', this.options.backgroundColorDefault);
-}
-
-
-function initializeVisualizationMenu() {
-
-    $('select#' + NODE_FILL_COLOR_SELECT_MENU).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
-        .val(NONE)
-        .html('none')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
-        .val(SAME_AS_FILL)
-        .html('same as fill')
-    );
-
-    $('select#' + NODE_SHAPE_SELECT_MENU).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_SIZE_SELECT_MENU).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + LABEL_COLOR_SELECT_MENU).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-
-    //~~
-    $('select#' + NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
-        .val(NONE)
-        .html('none')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
-        .val(SAME_AS_FILL)
-        .html('same as fill')
-    );
-
-    $('select#' + LABEL_COLOR_SELECT_MENU_2).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-
-    //
-
-    //~~
-    $('select#' + NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
-        .val(NONE)
-        .html('none')
-    );
-    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
-        .val(SAME_AS_FILL)
-        .html('same as fill')
-    );
-
-    $('select#' + LABEL_COLOR_SELECT_MENU_3).append($('<option>')
-        .val(DEFAULT)
-        .html('default')
-    );
-
-    //
-
-    if (this.visualizations) {
-        if (this.visualizations.labelColor) {
-            for (var key in this.visualizations.labelColor) {
-                if (this.visualizations.labelColor.hasOwnProperty(key)) {
-                    $('select#' + LABEL_COLOR_SELECT_MENU).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
+            if (this.settings.enableNodeVisualizations && this.nodeVisualizations) {
+                c1.append(makeVisualControls());
+                if (this.isCanDoMsaResidueVisualizations()) {
+                    c1.append(makeMsaResidueVisCurrResPositionControl());
                 }
-            }
-        }
-        if (this.visualizations.nodeShape) {
-            for (var key in this.visualizations.nodeShape) {
-                if (this.visualizations.nodeShape.hasOwnProperty(key)) {
-                    $('select#' + NODE_SHAPE_SELECT_MENU).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-        if (this.visualizations.nodeFillColor) {
-            for (var key in this.visualizations.nodeFillColor) {
-                if (this.visualizations.nodeFillColor.hasOwnProperty(key)) {
-                    $('select#' + NODE_FILL_COLOR_SELECT_MENU).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-        if (this.visualizations.nodeBorderColor) {
-            for (var key in this.visualizations.nodeBorderColor) {
-                if (this.visualizations.nodeBorderColor.hasOwnProperty(key)) {
-                    $('select#' + NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-        if (this.visualizations.nodeSize) {
-            for (var key in this.visualizations.nodeSize) {
-                if (this.visualizations.nodeSize.hasOwnProperty(key)) {
-                    $('select#' + NODE_SIZE_SELECT_MENU).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-    }
-
-    if (this.specialVisualizations != null) {
-        //~~
-        if ('Mutations' in this.specialVisualizations) {
-            const mutations = this.specialVisualizations['Mutations'];
-            if (mutations != null && mutations.property_values != null) {
-                const properties = mutations.property_values;
-                const arrayLength = properties.length;
-                for (var i = 0; i < arrayLength; i++) {
-                    const key = properties[i];
-                    $('select#' + LABEL_COLOR_SELECT_MENU_2).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                    $('select#' + NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-
-        if ('Convergent_Mutations' in this.specialVisualizations) {
-            const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
-
-            if (conv_mutations != null && conv_mutations.property_values != null) {
-                const properties = conv_mutations.property_values;
-                const arrayLength = properties.length;
-                for (var i = 0; i < arrayLength; i++) {
-                    const key = properties[i];
-                    $('select#' + LABEL_COLOR_SELECT_MENU_3).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                    $('select#' + NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                    $('select#' + NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
-                        .val(key)
-                        .html(key)
-                    );
-                }
-            }
-        }
-    }
 
 
-    $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1).slider({
-        min: 1,
-        max: this.basicTreeProperties.maxMolSeqLength,
-        step: 1,
-        value: 1,
-        animate: 'fast',
-        slide: updateMsaResidueVisCurrResPosFromSlider,
-        change: updateMsaResidueVisCurrResPosFromSlider
-    });
-
-}
-
-function initializeSearchOptions() {
-    if (this.options.searchUsesRegex === true) {
-        this.options.searchIsPartial = true;
-    }
-    if (this.options.searchIsPartial === false) {
-        this.options.searchUsesRegex = false;
-    }
-    this.options.searchNegateResult = false;
-    setCheckboxValue(SEARCH_OPTIONS_CASE_SENSITIVE_CB, this.options.searchIsCaseSensitive);
-    setCheckboxValue(SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, !this.options.searchIsPartial);
-    setCheckboxValue(SEARCH_OPTIONS_REGEX_CB, this.options.searchUsesRegex);
-    setCheckboxValue(SEARCH_OPTIONS_NEGATE_RES_CB, this.options.searchNegateResult);
-
-    if (this.options.searchAinitialValue) {
-        $('#' + SEARCH_FIELD_0).val(this.options.searchAinitialValue);
-    }
-    if (this.options.searchBinitialValue) {
-        $('#' + SEARCH_FIELD_1).val(this.options.searchBinitialValue);
-    }
-}
-
-
-function orderSubtree(n, order) {
-    var changed = false;
-    ord(n);
-    if (!changed) {
-        order = !order;
-        ord(n);
-    }
-    function ord(n) {
-        if (!n.children) {
-            return;
-        }
-        var c = n.children;
-        var l = c.length;
-        if (l == 2) {
-            var e0 = forester.calcSumOfAllExternalDescendants(c[0]);
-            var e1 = forester.calcSumOfAllExternalDescendants(c[1]);
-            if (e0 !== e1 && e0 < e1 === order) {
-                changed = true;
-                var c0 = c[0];
-                c[0] = c[1];
-                c[1] = c0;
-            }
-        }
-        for (var i = 0; i < l; ++i) {
-            ord(c[i]);
-        }
-    }
-}
-
-function cycleDisplay() {
-    if (this.options.phylogram && !this.options.alignPhylogram) {
-        this.options.alignPhylogram = true;
-
-    }
-    else if (this.options.phylogram && this.options.alignPhylogram) {
-        this.options.phylogram = false;
-        this.options.alignPhylogram = false;
-    }
-    else if (!this.options.phylogram && !this.options.alignPhylogram) {
-        this.options.phylogram = true;
-    }
-    setDisplayTypeButtons();
-    update(null, 0);
-}
-
-function setDisplayTypeButtons() {
-    setRadioButtonValue(PHYLOGRAM_BUTTON, this.options.phylogram && !this.options.alignPhylogram);
-    setRadioButtonValue(CLADOGRAM_BUTTON, !this.options.phylogram && !this.options.alignPhylogram);
-    setRadioButtonValue(PHYLOGRAM_ALIGNED_BUTTON, this.options.alignPhylogram && this.options.phylogram);
-    if (!this.basicTreeProperties.branchLengths) {
-        disableCheckbox('#' + PHYLOGRAM_BUTTON);
-        disableCheckbox('#' + PHYLOGRAM_ALIGNED_BUTTON);
-    }
-}
-
-function unCollapseAll(node) {
-    forester.preOrderTraversal(node, function (n) {
-        if (n.this.children) {
-            n.children = n.this.children;
-            n.this.children = null;
-        }
-        if (n[KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL]) {
-            n[KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL] = undefined;
-        }
-    });
-}
-
-function decrDepthCollapseLevel() {
-    this.rank_collapse_level = -1;
-    this.branch_length_collapse_level = -1;
-    resetCollapseByFeature();
-    if (this.root && this.treeData && (this.external_nodes > 2)) {
-        if (this.depth_collapse_level <= 1) {
-            this.depth_collapse_level = forester.calcMaxDepth(this.root);
-            unCollapseAll(this.root);
-        }
-        else {
-            --this.depth_collapse_level;
-            forester.collapseToDepth(this.root, this.depth_collapse_level);
-        }
-    }
-    update(null, 0);
-}
-
-function incrDepthCollapseLevel() {
-    this.rank_collapse_level = -1;
-    this.branch_length_collapse_level = -1;
-    resetCollapseByFeature();
-    if ((this.root && this.treeData) && (this.external_nodes > 2)) {
-        var max = forester.calcMaxDepth(this.root);
-        if (this.depth_collapse_level >= max) {
-            this.depth_collapse_level = 1;
-        }
-        else {
-            unCollapseAll(this.root);
-            ++this.depth_collapse_level;
-        }
-        forester.collapseToDepth(this.root, this.depth_collapse_level);
-    }
-    update(null, 0);
-}
-
-function decrBlCollapseLevel() {
-    this.rank_collapse_level = -1;
-    this.depth_collapse_level = -1;
-    resetCollapseByFeature();
-    if (this.root && this.treeData && (this.external_nodes > 2)) {
-        if (this.branch_length_collapse_level <= this.branch_length_collapse_data.min) {
-            this.branch_length_collapse_level = this.branch_length_collapse_data.max;
-        }
-        this.branch_length_collapse_level -= this.branch_length_collapse_data.step;
-        forester.collapseToBranchLength(this.root, this.branch_length_collapse_level);
-    }
-    update(null, 0);
-}
-
-function incrBlCollapseLevel() {
-    this.rank_collapse_level = -1;
-    this.depth_collapse_level = -1;
-    resetCollapseByFeature();
-    if ((this.root && this.treeData) && (this.external_nodes > 2)) {
-        if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max
-            || this.branch_length_collapse_level < 0) {
-            this.branch_length_collapse_level = this.branch_length_collapse_data.min;
-        }
-        this.branch_length_collapse_level += this.branch_length_collapse_data.step;
-        if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max) {
-            unCollapseAll(this.root);
-        }
-        else {
-            forester.collapseToBranchLength(this.root, this.branch_length_collapse_level);
-        }
-    }
-    update(null, 0);
-}
-
-function decrMsaResidueVisCurrResPos() {
-    if (this.msa_residue_vis_curr_res_pos <= 0) {
-        this.msa_residue_vis_curr_res_pos = this.basicTreeProperties.maxMolSeqLength - 1;
-    }
-    else {
-        this.msa_residue_vis_curr_res_pos -= 1;
-    }
-    updateMsaResidueVisCurrResPosSliderValue();
-    showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
-    update(null, 0, true);
-}
-
-function incrMsaResidueVisCurrResPos() {
-    if (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties.maxMolSeqLength - 1)) {
-        this.msa_residue_vis_curr_res_pos = 0;
-    }
-    else {
-        this.msa_residue_vis_curr_res_pos += 1;
-    }
-    updateMsaResidueVisCurrResPosSliderValue();
-    showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
-    update(null, 0, true);
-}
-
-function showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown() {
-
-    if ((this.currentLabelColorVisualization == null || this.currentLabelColorVisualization === DEFAULT)
-        && (this.currentNodeFillColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeBorderColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeShapeVisualization != MSA_RESIDUE)
-        && isCanDoMsaResidueVisualizations()) {
-
-        this.currentLabelColorVisualization = MSA_RESIDUE;
-        $('#' + LABEL_COLOR_SELECT_MENU).val(MSA_RESIDUE);
-        addLegend(LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
-        if (this.settings.enableBranchVisualizations) {
-            this.options.showBranchVisualizations = true;
-            setCheckboxValue(BRANCH_VIS_CB, this.options.showBranchVisualizations);
-        }
-    }
-    else if ((this.currentLabelColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeFillColorVisualization == null || this.currentNodeFillColorVisualization === DEFAULT)
-        && (this.currentNodeBorderColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeShapeVisualization != MSA_RESIDUE)
-        && isCanDoMsaResidueVisualizations()) {
-        this.currentNodeFillColorVisualization = MSA_RESIDUE;
-        $('#' + NODE_FILL_COLOR_SELECT_MENU).val(MSA_RESIDUE);
-        addLegend(LEGEND_NODE_FILL_COLOR, this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]);
-        if (this.settings.enableBranchVisualizations) {
-            this.options.showBranchVisualizations = true;
-            setCheckboxValue(BRANCH_VIS_CB, this.options.showBranchVisualizations);
-        }
-    }
-    else if ((this.currentLabelColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeFillColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeBorderColorVisualization == null || this.currentNodeBorderColorVisualization === DEFAULT)
-        && (this.currentNodeShapeVisualization != MSA_RESIDUE)
-        && isCanDoMsaResidueVisualizations()) {
-        this.currentNodeBorderColorVisualization = MSA_RESIDUE;
-        $('#' + NODE_BORDER_COLOR_SELECT_MENU).val(MSA_RESIDUE);
-        addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-        if (this.settings.enableBranchVisualizations) {
-            this.options.showBranchVisualizations = true;
-            setCheckboxValue(BRANCH_VIS_CB, this.options.showBranchVisualizations);
-        }
-    }
-    else if ((this.currentLabelColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeFillColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeBorderColorVisualization != MSA_RESIDUE)
-        && (this.currentNodeShapeVisualization == null || this.currentNodeShapeVisualization === DEFAULT)
-        && isCanDoMsaResidueVisualizations()) {
-        this.currentNodeShapeVisualization = MSA_RESIDUE;
-        $('#' + NODE_SHAPE_SELECT_MENU).val(MSA_RESIDUE);
-        addLegend(LEGEND_NODE_SHAPE, this.visualizations.nodeShape[this.currentNodeShapeVisualization]);
-    }
-}
-
-
-function updateDepthCollapseDepthDisplay() {
-    var v = obtainDepthCollapseDepthValue();
-    $('#' + DEPTH_COLLAPSE_LABEL)
-        .val(" " + v);
-}
-
-function updateBranchLengthCollapseBranchLengthDisplay() {
-    var v = obtainBranchLengthCollapseBranchLengthValue();
-    $('#' + BL_COLLAPSE_LABEL)
-        .val(v);
-}
-
-function collapseByFeature(feature) {
-    this.rank_collapse_level = -1;
-    this.depth_collapse_level = -1;
-    this.branch_length_collapse_level = -1;
-    if (feature === SPECIES_FEATURE) {
-        collapseSpecificSubtrees(this.root, null, KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
-    }
-    else if (feature === OFF_FEATURE) {
-        unCollapseAll(this.root)
-    }
-    else {
-        collapseSpecificSubtrees(this.root, feature, KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
-    }
-    update(null, 0);
-}
-
-
-function removeForCollapsedFeatureSpecialLabel(phy, keyForCollapsedFeatureSpecialLabel) {
-    forester.preOrderTraversalAll(phy, function (n) {
-        if (n[keyForCollapsedFeatureSpecialLabel]) {
-            n[keyForCollapsedFeatureSpecialLabel] = undefined;
-        }
-    });
-}
-
-function collapseSpecificSubtrees(phy, nodePropertyRef, keyForCollapsedFeatureSpecialLabel) {
-    unCollapseAll(phy);
-
-    if (nodePropertyRef && nodePropertyRef.length > 0) {
-        forester.preOrderTraversalAll(phy, function (n) {
-            if (n.children && !n.this.children && (n.children.length > 1)) {
-                var pv = forester.getOneDistinctNodePropertyValue(n, nodePropertyRef);
-                if (pv != null) {
-                    forester.collapse(n);
-                    if (keyForCollapsedFeatureSpecialLabel) {
-                        n[keyForCollapsedFeatureSpecialLabel] = '[' + nodePropertyRef + '] ' + pv;
+                if (this.isAddVisualization2() && this.specialVisualizations != null) { //~~
+                    if ('Mutations' in this.specialVisualizations) {
+                        const mutations = this.specialVisualizations['Mutations'];
+                        if (mutations != null) {
+                            c1.append(makeVisualization2(mutations.label));
+                            this.visualizations2_color = mutations.color;
+                            this.visualizations2_applies_to_ref = mutations.applies_to_ref;
+                            this.visualizations2_property_datatype = mutations.property_datatype;
+                            this.visualizations2_property_applies_to = mutations.property_applies_to;
+                            console.log(AP.MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations2_applies_to_ref);
+                            console.log(AP.MESSAGE + 'Setting special visualization property applies to to: ' + this.visualizations2_property_applies_to);
+                            console.log(AP.MESSAGE + 'Setting special visualization property datatype to: ' + this.visualizations2_property_datatype);
+                            console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations2_color);
+                        }
                     }
                 }
-            }
-        });
-    }
-    else {
-        forester.preOrderTraversalAll(phy, function (n) {
-            if (n.children && !n.this.children && (n.children.length > 1)) {
-                var tv = forester.getOneDistinctTaxonomy(n);
-                if (tv != null) {
-                    forester.collapse(n);
-                    if (keyForCollapsedFeatureSpecialLabel) {
-                        n[keyForCollapsedFeatureSpecialLabel] = tv;
+                if (this.isAddVisualization3() && this.specialVisualizations != null) { //~~
+                    if ('Convergent_Mutations' in this.specialVisualizations) {
+                        const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
+                        if (conv_mutations != null) {
+                            c1.append(makeVisualization3(conv_mutations.label));
+                            this.visualizations3_color = conv_mutations.color;
+                            this.visualizations3_applies_to_ref = conv_mutations.applies_to_ref;
+                            this.visualizations3_property_datatype = conv_mutations.property_datatype;
+                            this.visualizations3_property_applies_to = conv_mutations.property_applies_to;
+                            console.log(AP.MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations3_applies_to_ref);
+                            console.log(AP.MESSAGE + 'Setting special visualization property applies to to: ' + this.visualizations3_property_applies_to);
+                            console.log(AP.MESSAGE + 'Setting special visualization property datatype to: ' + this.visualizations3_property_datatype);
+                            console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations3_color);
+                        }
                     }
                 }
+
+                c1.append(makeLegendControl());
             }
-        });
-    }
-
-}
-
-function resetCollapseByFeature() {
-    var s = $('#' + COLLAPSE_BY_FEATURE_SELECT);
-    if (s) {
-        var f = s.val();
-        if (f != OFF_FEATURE) {
-            s.val(OFF_FEATURE);
-            removeForCollapsedFeatureSpecialLabel(this.root, KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
         }
-    }
-}
 
-function updateMsaResidueVisCurrResPosLabel() {
-    $('#' + MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).val(this.msa_residue_vis_curr_res_pos + 1);
-}
+        $<HTMLInputElement>('input:button')
+            .button()
+            .css({
+                'width': '26px',
+                'text-align': 'center',
+                'outline': 'none',
+                'margin': '0px',
+                'font-style': 'normal',
+                'font-weight': 'normal',
+                'text-decoration': 'none'
+            });
 
-function setMsaResidueVisCurrResPos(position) {
-    if (position <= 0) {
-        this.msa_residue_vis_curr_res_pos = 0;
-    }
-    else if (this.basicTreeProperties.maxMolSeqLength && (position >= (this.basicTreeProperties.maxMolSeqLength - 1))) {
-        this.msa_residue_vis_curr_res_pos = this.basicTreeProperties.maxMolSeqLength - 1;
-    }
-    else {
-        this.msa_residue_vis_curr_res_pos = position;
-    }
-}
+        $('#' + AP.ZOOM_IN_Y + ', #' + AP.ZOOM_OUT_Y)
+            .css({
+                'width': '78px'
+            });
 
-function updateButtonEnabledState() {
-    if (this.superTreeRoots && this.superTreeRoots.length > 0) {
-        enableButton($('#' + RETURN_TO_SUPERTREE_BUTTON));
-    }
-    else {
-        disableButton($('#' + RETURN_TO_SUPERTREE_BUTTON));
-    }
+        $('#' + AP.ZOOM_IN_Y + ', #' + AP.ZOOM_OUT_Y + ', #' + AP.ZOOM_TO_FIT + ', #' + AP.ZOOM_IN_X + ', #' + AP.ZOOM_OUT_X)
+            .css({
+                'height': '16px'
+            });
 
-    if (forester.isHasCollapsedNodes(this.root)) {
-        enableButton($('#' + UNCOLLAPSE_ALL_BUTTON));
-    }
-    else {
-        disableButton($('#' + UNCOLLAPSE_ALL_BUTTON));
-    }
-    if ((this.superTreeRoots.length < 1) && ((this.treeData.rerootable === undefined) || (this.treeData.rerootable === true))) {
-        enableButton($('#' + MIDPOINT_ROOT_BUTTON));
-    }
-    else {
-        disableButton($('#' + MIDPOINT_ROOT_BUTTON));
-    }
-    var b = null;
-    if (this.foundNodes0 && !this.searchBox0Empty) {
-        b = $('#' + RESET_SEARCH_A_BTN);
-        if (b) {
-            b.prop('disabled', false);
-            if (this.foundNodes0.size < 1) {
-                b.css('background', '');
-                b.css('color', '');
-            }
-            else {
-                b.css('background', this.options.found0ColorDefault);
-                b.css('color', WHITE);
-            }
-            var nd0 = this.foundNodes0.size === 1 ? 'node' : 'nodes';
-            b.prop('title', 'found ' + this.foundNodes0.size + ' ' + nd0 + ' [click to ' + RESET_SEARCH_A_BTN_TOOLTIP + ']');
-        }
-    }
-    else {
-        b = $('#' + RESET_SEARCH_A_BTN);
-        if (b) {
-            b.prop('disabled', true);
-            b.css('background', this.settings.controlsBackgroundColor);
-            b.css('color', '');
-            b.prop('title', RESET_SEARCH_A_BTN_TOOLTIP);
-        }
-    }
 
-    if (this.foundNodes1 && !this.searchBox1Empty) {
-        b = $('#' + RESET_SEARCH_B_BTN);
-        if (b) {
-            b.prop('disabled', false);
-            if (this.foundNodes1.size < 1) {
-                b.css('background', '');
-                b.css('color', '');
-            }
-            else {
-                b.css('background', this.options.found1ColorDefault);
-                b.css('color', WHITE);
-            }
-            var nd1 = this.foundNodes1.size === 1 ? 'node' : 'nodes';
-            b.prop('title', 'found ' + this.foundNodes1.size + ' ' + nd1 + ' [click to ' + RESET_SEARCH_B_BTN_TOOLTIP + ']');
-        }
-    }
-    else {
-        b = $('#' + RESET_SEARCH_B_BTN);
-        if (b) {
-            b.prop('disabled', true);
-            b.css('background', this.settings.controlsBackgroundColor);
-            b.css('color', '');
-            b.prop('title', RESET_SEARCH_B_BTN_TOOLTIP);
-        }
-    }
-}
+        $('#' + AP.DECR_DEPTH_COLLAPSE_LEVEL + ', #' + AP.INCR_DEPTH_COLLAPSE_LEVEL + ', #' + AP.DECR_BL_COLLAPSE_LEVEL + ', #' + AP.INCR_BL_COLLAPSE_LEVEL)
+            .css({
+                'width': '16px'
+            });
 
-function updateLegendButtonEnabledState() {
-    var b = $('#' + LEGENDS_SHOW_BTN);
-    if (b) {
-        if (this.showLegends) {
-            b.css('background', COLOR_FOR_ACTIVE_ELEMENTS);
-            b.css('color', WHITE);
-        }
-        else {
-            b.css('background', '');
-            b.css('color', '');
-        }
-    }
-    if (this.showLegends && (this.legendColorScales[LEGEND_LABEL_COLOR] ||
-        (this.options.showNodeVisualizations && (this.legendColorScales[LEGEND_NODE_FILL_COLOR] ||
-            this.legendColorScales[LEGEND_NODE_BORDER_COLOR] ||
-            this.legendShapeScales[LEGEND_NODE_SHAPE] ||
-            this.legendSizeScales[LEGEND_NODE_SIZE])))) {
-        enableButton($('#' + LEGENDS_HORIZ_VERT_BTN));
-        enableButton($('#' + LEGENDS_MOVE_UP_BTN));
-        enableButton($('#' + LEGENDS_MOVE_DOWN_BTN));
-        enableButton($('#' + LEGENDS_MOVE_LEFT_BTN));
-        enableButton($('#' + LEGENDS_MOVE_RIGHT_BTN));
-        enableButton($('#' + LEGENDS_RESET_BTN));
-    }
-    else {
-        disableButton($('#' + LEGENDS_HORIZ_VERT_BTN));
-        disableButton($('#' + LEGENDS_MOVE_UP_BTN));
-        disableButton($('#' + LEGENDS_MOVE_DOWN_BTN));
-        disableButton($('#' + LEGENDS_MOVE_LEFT_BTN));
-        disableButton($('#' + LEGENDS_MOVE_RIGHT_BTN));
-        disableButton($('#' + LEGENDS_RESET_BTN));
-    }
-}
+        $('#' + AP.LEGENDS_MOVE_UP_BTN + ', #' + AP.LEGENDS_MOVE_DOWN_BTN)
+            .css({
+                'width': '72px'
+            });
 
-function disableCheckbox(cb) {
-    if (cb) {
-        var b = $(cb);
-        if (b) {
-            b.checkboxradio({
-                disabled: true
+        $('#' + AP.LEGENDS_RESET_BTN + ', #' + AP.LEGENDS_MOVE_LEFT_BTN + ', #' + AP.LEGENDS_MOVE_RIGHT_BTN)
+            .css({
+                'width': '24px'
+            });
+
+        $('#' + AP.LEGENDS_SHOW_BTN + ', #' + AP.LEGENDS_HORIZ_VERT_BTN)
+            .css({
+                'width': '36px'
+            });
+
+        $('#' + AP.LEGENDS_MOVE_UP_BTN + ', #' + AP.LEGENDS_MOVE_DOWN_BTN + ', #' +
+            AP.LEGENDS_RESET_BTN + ', #' + AP.LEGENDS_MOVE_LEFT_BTN + ', #' + AP.LEGENDS_MOVE_RIGHT_BTN +
+            ', #' + AP.LEGENDS_SHOW_BTN + ', #' + AP.LEGENDS_HORIZ_VERT_BTN
+        )
+            .css({
+                'height': '16px'
+            });
+
+
+        var downloadButton = $('#' + AP.DOWNLOAD_BUTTON);
+
+        if (downloadButton) {
+            downloadButton.css({
+                'width': '60px',
+                'margin-bottom': '3px'
             });
         }
-    }
-}
 
-function disableButton(b) {
-    if (b) {
-        b.prop('disabled', true);
-        b.css('background', this.settings.controlsBackgroundColor);
-    }
-}
+        $<HTMLInputElement>(':radio').checkboxradio({
+            icon: false
+        });
 
-function enableButton(b) {
-    if (b) {
-        b.prop('disabled', false);
-        b.css('background', '');
-    }
-}
+        $<HTMLInputElement>(':checkbox').checkboxradio({
+            icon: false
+        });
 
-function obtainDepthCollapseDepthValue() {
-    if (!(this.treeData && this.root)) {
-        return "";
-    }
-    if (this.external_nodes < 3) {
-        return "off";
-    }
-    else if (this.depth_collapse_level < 0) {
-        this.depth_collapse_level = forester.calcMaxDepth(this.root);
-        return "off";
-    }
-    else if (this.depth_collapse_level == forester.calcMaxDepth(this.root)) {
-        return "off";
-    }
-    return this.depth_collapse_level;
-}
+        $('#' + AP.SEARCH_FIELD_0).on('keyup', this.search0);
 
-function obtainBranchLengthCollapseBranchLengthValue() {
-    if (!(this.treeData && this.root)) {
-        return "";
-    }
-    if (!this.branch_length_collapse_data.min) {
-        resetBranchLengthCollapseValue();
+        $('#' + AP.SEARCH_FIELD_1).on('keyup', this.search1);
+
+        $('#' + AP.PHYLOGRAM_BUTTON).on('click', this.toPhylogram);
+
+        $('#' + AP.PHYLOGRAM_ALIGNED_BUTTON).on('click', this.toAlignedPhylogram);
+
+        $('#' + AP.CLADOGRAM_BUTTON).on('click', this.toCladegram);
+
+        $('#' + AP.NODE_NAME_CB).on('click', this.nodeNameCbClicked);
+
+        $('#' + AP.TAXONOMY_CB).on('click', this.taxonomyCbClicked);
+
+        $('#' + AP.SEQUENCE_CB).on('click', this.sequenceCbClicked);
+
+        $('#' + AP.CONFIDENCE_VALUES_CB).on('click', this.confidenceValuesCbClicked);
+
+        $('#' + AP.BRANCH_LENGTH_VALUES_CB).on('click', this.branchLengthsCbClicked);
+
+        $('#' + AP.NODE_EVENTS_CB).on('click', this.nodeEventsCbClicked);
+
+        $('#' + AP.BRANCH_EVENTS_CB).on('click', this.branchEventsCbClicked);
+
+        $('#' + AP.INTERNAL_LABEL_CB).on('click', this.internalLabelsCbClicked);
+
+        $('#' + AP.EXTERNAL_LABEL_CB).on('click', this.externalLabelsCbClicked);
+
+        $('#' + AP.INTERNAL_NODES_CB).on('click', this.internalNodesCbClicked);
+
+        $('#' + AP.EXTERNAL_NODES_CB).on('click', this.externalNodesCbClicked);
+
+        $('#' + AP.NODE_VIS_CB).on('click', this.nodeVisCbClicked);
+
+        $('#' + AP.BRANCH_VIS_CB).on('click', this.branchVisCbClicked);
+
+        $('#' + AP.BRANCH_COLORS_CB).on('click', this.branchColorsCbClicked);
+
+        $('#' + AP.DYNAHIDE_CB).on('click', this.dynaHideCbClicked);
+
+        $('#' + AP.SHORTEN_NODE_NAME_CB).on('click', this.shortenCbClicked);
+
+        $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU).on('change', function () {
+            const v = this.value;
+            if (self.isAddVisualization2()) {
+                self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_2, AP.DEFAULT);
+            }
+            if (self.isAddVisualization3()) {
+                self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_3, AP.DEFAULT);
+            }
+
+            if (v && v != AP.DEFAULT) {
+                self.currentLabelColorVisualization = v;
+                if (self.visualizations && self.visualizations.labelColor && self.visualizations.labelColor[self.currentLabelColorVisualization] != null) {
+                    self.addLegend(AP.LEGEND_LABEL_COLOR, self.visualizations.labelColor[self.currentLabelColorVisualization]);
+                }
+            }
+            else {
+                self.currentLabelColorVisualization = null;
+                self.removeLegend(AP.LEGEND_LABEL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+        $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU_2).on('change', function () {
+            const v = this.value;
+            self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU, AP.DEFAULT);
+            if (self.isAddVisualization3()) {
+                self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_3, AP.DEFAULT);
+            }
+            if (v && v != AP.DEFAULT) {
+                self.currentLabelColorVisualization = v;
+                options.showNodeName = true;
+                self.setCheckboxValue(AP.NODE_NAME_CB, true);
+                options.showExternalLabels = true;
+                self.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+                options.showInternalLabels = true;
+                self.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
+            }
+            else {
+                self.currentLabelColorVisualization = null;
+                self.removeLegend(AP.LEGEND_LABEL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+
+        $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU_3).on('change', function () {
+            const v = this.value;
+            self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU, AP.DEFAULT);
+            if (self.isAddVisualization2()) {
+                self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_2, AP.DEFAULT);
+            }
+            if (v && v != AP.DEFAULT) {
+                self.currentLabelColorVisualization = v;
+                options.showNodeName = true;
+                self.setCheckboxValue(AP.NODE_NAME_CB, true);
+                options.showExternalLabels = true;
+                self.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+                options.showInternalLabels = true;
+                self.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
+
+            }
+            else {
+                self.currentLabelColorVisualization = null;
+                self.removeLegend(AP.LEGEND_LABEL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+        $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU).on('change', function () {
+            var v = this.value;
+            if (self.isAddVisualization2()) {
+                self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_2, AP.DEFAULT);
+            }
+            if (self.isAddVisualization3()) {
+                self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_3, AP.DEFAULT);
+            }
+            if (v && v != AP.DEFAULT) {
+                if (!options.showExternalNodes && !options.showInternalNodes
+                    && (self.currentNodeShapeVisualization == null)) {
+                    options.showExternalNodes = true;
+                    self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+                }
+                options.showNodeVisualizations = true;
+                self.setCheckboxValue(AP.NODE_VIS_CB, true);
+                self.currentNodeFillColorVisualization = v;
+                if (self.visualizations && self.visualizations.nodeFillColor && self.visualizations.nodeFillColor[self.currentNodeFillColorVisualization] != null) {
+                    self.addLegend(AP.LEGEND_NODE_FILL_COLOR, self.visualizations.nodeFillColor[self.currentNodeFillColorVisualization]);
+                }
+            }
+            else {
+                self.currentNodeFillColorVisualization = null;
+                self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+
+        $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).on('change', function () {
+            const v = this.value;
+            self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU, AP.DEFAULT);
+            if (self.isAddVisualization3()) {
+                self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_3, AP.DEFAULT);
+            }
+            if (v && v != AP.DEFAULT) {
+                options.showExternalNodes = true;
+                self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+                options.showInternalNodes = true;
+                self.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
+
+                options.showNodeVisualizations = true;
+                self.setCheckboxValue(AP.NODE_VIS_CB, true);
+                self.currentNodeFillColorVisualization = v;
+
+            }
+            else {
+                self.currentNodeFillColorVisualization = null;
+                self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+        $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).on('change', function () {
+            const v = this.value;
+            self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU, AP.DEFAULT);
+            if (self.isAddVisualization2()) {
+                self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_2, AP.DEFAULT);
+            }
+            if (v && v != AP.DEFAULT) {
+                options.showExternalNodes = true;
+                self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+                options.showInternalNodes = true;
+                self.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
+
+                options.showNodeVisualizations = true;
+                self.setCheckboxValue(AP.NODE_VIS_CB, true);
+                self.currentNodeFillColorVisualization = v;
+
+            }
+            else {
+                self.currentNodeFillColorVisualization = null;
+                self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+
+        /*
+         $('#' + NODE_BORDER_COLOR_SELECT_MENU).on('change', function () {
+         const v = this.value;
+         if (isAddVisualization2()) {
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
+         }
+         if (isAddVisualization3()) {
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
+         }
+         if (v && v != DEFAULT) {
+         this.currentNodeBorderColorVisualization = v;
+         if ((v != SAME_AS_FILL ) && (v != NONE)) {
+         addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
+         if (!this.options.showExternalNodes && !this.options.showInternalNodes
+         && ( this.currentNodeShapeVisualization == null )) {
+         this.options.showExternalNodes = true;
+         setCheckboxValue(EXTERNAL_NODES_CB, true);
+         }
+         this.options.showNodeVisualizations = true;
+         setCheckboxValue(NODE_VIS_CB, true);
+         }
+         }
+         else {
+         this.currentNodeBorderColorVisualization = null;
+         }
+         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
+         removeLegend(LEGEND_NODE_BORDER_COLOR);
+         }
+         removeColorPicker();
+         update(null, 0);
+         });
+         */
+
+        /*
+         $('#' + NODE_BORDER_COLOR_SELECT_MENU_2).on('change', function () {
+         const v = this.value;
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
+         if (isAddVisualization3()) {
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
+         }
+         if (v && v != DEFAULT) {
+         this.currentNodeBorderColorVisualization = v;
+         if ((v != SAME_AS_FILL ) && (v != NONE)) {
+         //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
+         //if (!this.options.showExternalNodes && !this.options.showInternalNodes
+         //&& ( this.currentNodeShapeVisualization == null )) {
+         this.options.showExternalNodes = true;
+         setCheckboxValue(EXTERNAL_NODES_CB, true);
+         this.options.showInternalNodes = true;
+         setCheckboxValue(INTERNAL_NODES_CB, true);
+         // }
+         this.options.showNodeVisualizations = true;
+         setCheckboxValue(NODE_VIS_CB, true);
+         }
+         }
+         else {
+         this.currentNodeBorderColorVisualization = null;
+         }
+         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
+         removeLegend(LEGEND_NODE_BORDER_COLOR);
+         }
+         removeColorPicker();
+         update(null, 0);
+         });
+         */
+
+        /*
+         $('#' + NODE_BORDER_COLOR_SELECT_MENU_3).on('change', function () {
+         const v = this.value;
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
+         if (isAddVisualization2()) {
+         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
+         }
+         if (v && v != DEFAULT) {
+         this.currentNodeBorderColorVisualization = v;
+         if ((v != SAME_AS_FILL ) && (v != NONE)) {
+         //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
+         //if (!this.options.showExternalNodes && !this.options.showInternalNodes
+         //&& ( this.currentNodeShapeVisualization == null )) {
+         this.options.showExternalNodes = true;
+         setCheckboxValue(EXTERNAL_NODES_CB, true);
+         this.options.showInternalNodes = true;
+         setCheckboxValue(INTERNAL_NODES_CB, true);
+         // }
+         this.options.showNodeVisualizations = true;
+         setCheckboxValue(NODE_VIS_CB, true);
+         }
+         }
+         else {
+         this.currentNodeBorderColorVisualization = null;
+         }
+         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
+         removeLegend(LEGEND_NODE_BORDER_COLOR);
+         }
+         removeColorPicker();
+         update(null, 0);
+         });
+         */
+
+        $<HTMLSelectElement>('#' + AP.NODE_SHAPE_SELECT_MENU).on('change', function () {
+            var v = this.value;
+            if (v && v != AP.DEFAULT) {
+                self.currentNodeShapeVisualization = v;
+                options.showNodeVisualizations = true;
+                self.setCheckboxValue(AP.NODE_VIS_CB, true);
+                if (self.visualizations && self.visualizations.nodeShape && self.visualizations.nodeShape[self.currentNodeShapeVisualization] != null) {
+                    self.addLegend(AP.LEGEND_NODE_FILL_COLOR, self.visualizations.nodeShape[self.currentNodeShapeVisualization]);
+                }
+            }
+            else {
+                self.currentNodeShapeVisualization = null;
+                self.removeLegendForShapes(AP.LEGEND_NODE_SHAPE);
+            }
+            self.removeColorPicker();
+            self.resetVis();
+            self.update(undefined, 0);
+            //self.update(null, 0); // BM 6?
+        });
+
+        $<HTMLSelectElement>('#' + AP.NODE_SIZE_SELECT_MENU).on('change', function () {
+            var v = this.value;
+            if (v && v != AP.DEFAULT) {
+                self.currentNodeSizeVisualization = v;
+                if (self.visualizations && self.visualizations.nodeSize && self.visualizations.nodeSize[self.currentNodeSizeVisualization] != null) {
+                    self.addLegend(AP.LEGEND_NODE_FILL_COLOR, self.visualizations.nodeSize[self.currentNodeSizeVisualization]);
+                }
+                if (!options.showExternalNodes && !options.showInternalNodes
+                    && (self.currentNodeShapeVisualization == null)) {
+                    options.showExternalNodes = true;
+                    self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+                }
+                options.showNodeVisualizations = true;
+                self.setCheckboxValue(AP.NODE_VIS_CB, true);
+            }
+            else {
+                self.currentNodeSizeVisualization = null;
+                self.removeLegendForSizes(AP.LEGEND_NODE_SIZE);
+            }
+            self.removeColorPicker();
+            self.update(undefined, 0);
+        });
+
+        $('#' + AP.NODE_SIZE_SLIDER).slider({
+            min: AP.NODE_SIZE_MIN,
+            max: AP.NODE_SIZE_MAX,
+            step: AP.SLIDER_STEP,
+            value: this.options.nodeSizeDefault,
+            animate: 'fast',
+            slide: this.changeNodeSize,
+            change: this.changeNodeSize
+        });
+
+        $('#' + AP.BRANCH_WIDTH_SLIDER).slider({
+            min: AP.BRANCH_WIDTH_MIN,
+            max: AP.BRANCH_WIDTH_MAX,
+            step: AP.SLIDER_STEP,
+            value: this.options.branchWidthDefault,
+            animate: 'fast',
+            slide: this.changeBranchWidth,
+            change: this.changeBranchWidth
+        });
+
+        $('#' + AP.EXTERNAL_FONT_SIZE_SLIDER).slider({
+            min: AP.FONT_SIZE_MIN,
+            max: AP.FONT_SIZE_MAX,
+            step: AP.SLIDER_STEP,
+            value: +this.options.externalNodeFontSize,
+            animate: 'fast',
+            slide: this.changeExternalFontSize,
+            change: this.changeExternalFontSize
+        });
+
+        $('#' + AP.INTERNAL_FONT_SIZE_SLIDER).slider({
+            min: AP.FONT_SIZE_MIN,
+            max: AP.FONT_SIZE_MAX,
+            step: AP.SLIDER_STEP,
+            value: +this.options.internalNodeFontSize,
+            animate: 'fast',
+            slide: this.changeInternalFontSize,
+            change: this.changeInternalFontSize
+        });
+
+        $('#' + AP.BRANCH_DATA_FONT_SIZE_SLIDER).slider({
+            min: AP.FONT_SIZE_MIN,
+            max: AP.FONT_SIZE_MAX,
+            step: AP.SLIDER_STEP,
+            value: +this.options.branchDataFontSize,
+            animate: 'fast',
+            slide: this.changeBranchDataFontSize,
+            change: this.changeBranchDataFontSize
+        });
+
+        $('#' + AP.SEARCH_FIELD_0 + ', #' + AP.SEARCH_FIELD_1)
+            .off('keydown')
+            .off('mouseenter')
+            .off('mousedown')
+            .css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'left',
+                'outline': 'none',
+                'cursor': 'text',
+                'width': this.settings.searchFieldWidth,
+                'height': this.settings.textFieldHeight
+            });
+
+        $('#' + AP.DEPTH_COLLAPSE_LABEL + ', #' + AP.BL_COLLAPSE_LABEL)
+            .button()
+            .off('keydown')
+            .off('mouseenter')
+            .off('mousedown')
+            .attr('disabled', 'disabled')
+            .css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'center',
+                'outline': 'none',
+                'cursor': 'text',
+                'width': this.settings.collapseLabelWidth
+            });
+
+        $('#' + AP.ZOOM_IN_Y).mousedown(() => {
+            this.zoomInY();
+            this.intervalId = window.setInterval(this.zoomInY, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.ZOOM_OUT_Y).mousedown(() => {
+            this.zoomOutY();
+            this.intervalId = window.setInterval(this.zoomOutY, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.ZOOM_IN_X).mousedown(() => {
+            this.zoomInX();
+            this.intervalId = window.setInterval(this.zoomInX, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.ZOOM_OUT_X).mousedown(() => {
+            this.zoomOutX();
+            this.intervalId = window.setInterval(this.zoomOutX, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.DECR_DEPTH_COLLAPSE_LEVEL).mousedown(() => {
+            this.decrDepthCollapseLevel();
+            this.intervalId = window.setInterval(this.decrDepthCollapseLevel, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+        $('#' + AP.INCR_DEPTH_COLLAPSE_LEVEL).mousedown(() => {
+            this.incrDepthCollapseLevel();
+            this.intervalId = window.setInterval(this.incrDepthCollapseLevel, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+        $('#' + AP.DECR_BL_COLLAPSE_LEVEL).mousedown(() => {
+            this.decrBlCollapseLevel();
+            this.intervalId = window.setInterval(this.decrBlCollapseLevel, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+        $('#' + AP.INCR_BL_COLLAPSE_LEVEL).mousedown(() => {
+            this.incrBlCollapseLevel();
+            this.intervalId = window.setInterval(this.incrBlCollapseLevel, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.ZOOM_TO_FIT).mousedown(this.zoomToFit);
+
+        $('#' + AP.RETURN_TO_SUPERTREE_BUTTON).mousedown(this.returnToSupertreeButtonPressed);
+
+        $('#' + AP.ORDER_BUTTON).mousedown(this.orderButtonPressed);
+
+        $('#' + AP.UNCOLLAPSE_ALL_BUTTON).mousedown(this.uncollapseAllButtonPressed);
+
+        $('#' + AP.MIDPOINT_ROOT_BUTTON).mousedown(this.midpointRootButtonPressed);
+
+        // Search Controls
+        // ---------------
+
+        $('#' + AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB).click(this.searchOptionsCaseSenstiveCbClicked);
+        $('#' + AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB).click(this.searchOptionsCompleteTermsOnlyCbClicked);
+        $('#' + AP.SEARCH_OPTIONS_REGEX_CB).click(this.searchOptionsRegexCbClicked);
+        $('#' + AP.SEARCH_OPTIONS_NEGATE_RES_CB).click(this.searchOptionsNegateResultCbClicked);
+
+        $('#' + AP.RESET_SEARCH_A_BTN).mousedown(this.resetSearch0);
+        $('#' + AP.RESET_SEARCH_B_BTN).mousedown(this.resetSearch1);
+
+        // Visualization Legends
+        // ---------------------
+
+        $('#' + AP.LEGENDS_MOVE_UP_BTN).mousedown(() => {
+            this.legendMoveUp(2);
+            this.intervalId = window.setInterval(this.legendMoveUp, AP.MOVE_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.LEGENDS_MOVE_DOWN_BTN).mousedown(() => {
+            this.legendMoveDown(2);
+            this.intervalId = window.setInterval(this.legendMoveDown, AP.MOVE_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.LEGENDS_MOVE_LEFT_BTN).mousedown(() => {
+            this.legendMoveLeft(2);
+            this.intervalId = window.setInterval(this.legendMoveLeft, AP.MOVE_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.LEGENDS_MOVE_RIGHT_BTN).mousedown(() => {
+            this.legendMoveRight(2);
+            this.intervalId = window.setInterval(this.legendMoveRight, AP.MOVE_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.LEGENDS_HORIZ_VERT_BTN).click(this.legendHorizVertClicked);
+        $('#' + AP.LEGENDS_SHOW_BTN).click(this.legendShowClicked);
+        $('#' + AP.LEGENDS_RESET_BTN).click(this.legendResetClicked);
+
+        // ----------------
+
+        if (downloadButton) {
+            downloadButton.mousedown(this.downloadButtonPressed);
+        }
+
+        // Collapse
+        // ---------------
+
+        $('#' + AP.COLLAPSE_BY_FEATURE_SELECT)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.EXPORT_FORMAT_SELECT)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.COLLAPSE_BY_FEATURE_SELECT).on('change', () => {
+            var s = $('#' + AP.COLLAPSE_BY_FEATURE_SELECT);
+            if (s) {
+                var f = s.val();
+                if (f && typeof (f) === 'string') {
+                    this.collapseByFeature(f);
+                }
+            }
+        });
+
+
+        // ---------------
+
+        // Visualizations
+        // ---------------
+
+        $('#' + AP.LABEL_COLOR_SELECT_MENU)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_FILL_COLOR_SELECT_MENU)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_SHAPE_SELECT_MENU)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_SIZE_SELECT_MENU)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+
+        $('#' + AP.LABEL_COLOR_SELECT_MENU_2) //~~
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_FILL_COLOR_SELECT_MENU_2)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.LABEL_COLOR_SELECT_MENU_3) //~~~
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_FILL_COLOR_SELECT_MENU_3)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+        $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3)
+            .select()
+            .css({
+                'font': 'inherit',
+                'color': 'inherit'
+            });
+
+
+        // MSA residue visualization: Position control
+        // -------------------------------------------
+        $('#' + AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN + ', #' + AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN)
+            .css({
+                'width': '18px'
+            });
+
+        $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL)
+            .off('keydown')
+            .off('mouseenter')
+            .off('mousedown')
+            .css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'center',
+                'outline': 'none',
+                'cursor': 'text',
+                'width': '28px',
+                'height': this.settings.textFieldHeight
+            });
+
+        $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).keyup((e: JQuery.KeyUpEvent<HTMLElement, null, HTMLElement, HTMLElement>) => {
+            var keycode = e.keyCode;
+            if ((((keycode >= AP.VK_0) && (keycode <= AP.VK_9)) || ((keycode >= AP.VK_0_NUMPAD)) && (keycode <= AP.VK_9_NUMPAD)) || (keycode === AP.VK_BACKSPACE) || (keycode === AP.VK_DELETE)) {
+                var i = 0;
+                if ((((keycode >= AP.VK_0) && (keycode <= AP.VK_9))
+                    || ((keycode >= AP.VK_0_NUMPAD) && (keycode <= AP.VK_9_NUMPAD)))
+                    && this.basicTreeProperties
+                    && this.basicTreeProperties.maxMolSeqLength
+                    && (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties.maxMolSeqLength - 1))) {
+                    if (((keycode >= AP.VK_0) && (keycode <= AP.VK_9))) {
+                        i = keycode - 48;
+                    }
+                    else {
+                        i = keycode - 96;
+                    }
+                }
+                else {
+                    var x = ($('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).val() as string).trim();
+                    if (x === '') {
+                        return;
+                    }
+                    i = parseInt(x);
+                    if ((i === null) || (i === undefined) || isNaN(i) || (i < 0)) {
+                        i = 0;
+                    }
+                }
+                this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
+                this.setMsaResidueVisCurrResPos(i - 1);
+                this.updateMsaResidueVisCurrResPosLabel();
+                this.updateMsaResidueVisCurrResPosSliderValue();
+                this.update(undefined, 0, true);
+            }
+            else {
+                this.update(undefined, 0, true);
+            }
+        });
+
+        $('#' + AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN).mousedown(() => {
+            this.decrMsaResidueVisCurrResPos();
+            this.intervalId = window.setInterval(this.decrMsaResidueVisCurrResPos, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+        $('#' + AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN).mousedown(() => {
+            this.incrMsaResidueVisCurrResPos();
+            this.intervalId = window.setInterval(this.incrMsaResidueVisCurrResPos, AP.ZOOM_INTERVAL);
+        }).bind('mouseup mouseleave', () => {
+            window.clearTimeout(this.intervalId);
+        });
+
+
+        // -------------------------------------------
+
+        $(document).keyup((e) => {
+            if (e.altKey) {
+                switch (e.keyCode) {
+                    case AP.VK_0: this.orderButtonPressed(); break;
+                    case AP.VK_R: this.returnToSupertreeButtonPressed(); break;
+                    case AP.VK_U: this.uncollapseAllButtonPressed(); break;
+                    case AP.VK_M: this.midpointRootButtonPressed(); break;
+                    case AP.VK_P: this.cycleDisplay(); break;
+                    case AP.VK_L: this.toggleAlignPhylogram(); break;
+                    case AP.VK_OPEN_BRACKET:
+                        if (this.isCanDoMsaResidueVisualizations()) {
+                            this.decrMsaResidueVisCurrResPos();
+                        }
+                        break;
+                    case AP.VK_CLOSE_BRACKET:
+                        if (this.isCanDoMsaResidueVisualizations()) {
+                            this.incrMsaResidueVisCurrResPos();
+                        }
+                        break;
+                    case AP.VK_ESC: this.escPressed(); break;
+                    case AP.VK_C:
+                    case AP.VK_DELETE:
+                    case AP.VK_BACKSPACE:
+                    case AP.VK_HOME:
+                        this.zoomToFit(); break;
+                    default:
+                }
+
+                /*
+                    if (e.keyCode === AP.VK_O) {
+                        this.orderButtonPressed();
+                    }
+                    else if (e.keyCode === AP.VK_R) {
+                        returnToSupertreeButtonPressed();
+                    }
+                    else if (e.keyCode === VK_U) {
+                        uncollapseAllButtonPressed();
+                    }
+                    else if (e.keyCode === VK_M) {
+                        midpointRootButtonPressed();
+                    }
+                    else if (e.keyCode === VK_C || e.keyCode === VK_DELETE
+                        || e.keyCode === VK_BACKSPACE || e.keyCode === VK_HOME) {
+                        zoomToFit();
+                    }
+                    else if (e.keyCode === VK_P) {
+                        cycleDisplay();
+                    }
+                    else if (e.keyCode === VK_L) {
+                        toggleAlignPhylogram();
+                    }
+                    else if (e.keyCode === VK_OPEN_BRACKET) {
+                        if (isCanDoMsaResidueVisualizations()) {
+                            decrMsaResidueVisCurrResPos();
+                        }
+                    }
+                    else if (e.keyCode === VK_CLOSE_BRACKET) {
+                        if (isCanDoMsaResidueVisualizations()) {
+                            incrMsaResidueVisCurrResPos();
+                        }
+                    }
+                */
+            }
+            else if (e.keyCode === AP.VK_HOME) {
+                this.zoomToFit();
+            }
+            else if (e.keyCode === AP.VK_ESC) {
+                this.escPressed();
+            }
+        });
+
+        $(document).keydown((e) => {
+            if (e.altKey) {
+                switch (e.keyCode) {
+                    case AP.VK_UP: this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW); break;
+                    case AP.VK_DOWN: this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW); break;
+                    case AP.VK_LEFT: this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW); break;
+                    case AP.VK_RIGHT: this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW); break;
+                    case AP.VK_PLUS:
+                    case AP.VK_PLUS_N:
+                        if (e.shiftKey) {
+                            this.increaseFontSizes();
+                        }
+                        else {
+                            this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
+                            this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
+                        }
+                        break;
+                    case AP.VK_MINUS:
+                    case AP.VK_MINUS_N:
+                        if (e.shiftKey) {
+                            this.decreaseFontSizes();
+                        }
+                        else {
+                            this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                            this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                        }
+                        break;
+                    case AP.VK_A: this.decrDepthCollapseLevel(); break;
+                    case AP.VK_S: this.incrDepthCollapseLevel(); break;
+                    default:
+                }
+                // if (e.keyCode === VK_UP) {
+                //     zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
+                // }
+                // else if (e.keyCode === VK_DOWN) {
+                //     zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                // }
+                // else if (e.keyCode === VK_LEFT) {
+                //     zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                // }
+                // else if (e.keyCode === VK_RIGHT) {
+                //     zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
+                // }
+                // else if (e.keyCode === VK_PLUS || e.keyCode === VK_PLUS_N) {
+                //     if (e.shiftKey) {
+                //         increaseFontSizes();
+                //     }
+                //     else {
+                //         zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
+                //         zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
+                //     }
+                // }
+                // else if (e.keyCode === VK_MINUS || e.keyCode === VK_MINUS_N) {
+                //     if (e.shiftKey) {
+                //         decreaseFontSizes();
+                //     }
+                //     else {
+                //         zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                //         zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                //     }
+                // }
+                // else if (e.keyCode === VK_A) {
+                //     decrDepthCollapseLevel();
+                // }
+                // else if (e.keyCode === VK_S) {
+                //     incrDepthCollapseLevel();
+                // }
+            }
+            if (e.keyCode === AP.VK_PAGE_UP) {
+                this.increaseFontSizes();
+            }
+            else if (e.keyCode === AP.VK_PAGE_DOWN) {
+                this.decreaseFontSizes();
+            }
+        });
+
+
+        $(document).on('mousewheel DOMMouseScroll', (e) => {
+            if (e.shiftKey) {
+                if (e.originalEvent) {
+                    var oe = e.originalEvent as WheelEvent;
+                    if (oe.detail > 0 || oe.deltaY < 0) {
+                        if (e.ctrlKey) {
+                            this.decreaseFontSizes();
+                        }
+                        else if (e.altKey) {
+                            this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                        }
+                        else {
+                            this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
+                        }
+                    }
+                    else {
+                        if (e.ctrlKey) {
+                            this.increaseFontSizes();
+                        }
+                        else if (e.altKey) {
+                            this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
+                        }
+                        else {
+                            this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
+                        }
+                    }
+                }
+                // To prevent page fom scrolling:
+                return false;
+            }
+        });
+
+        // --------------------------------------------------------------
+        // Functions to make GUI elements
+        // --------------------------------------------------------------
+
+        function makeProgramDesc() {
+            var h = "";
+            h = h.concat('<div class=' + AP.PROG_NAME + '>');
+            h = h.concat('<a class="' + AP.PROGNAMELINK + '" href="' + AP.WEBSITE + '" target="this.blank">' + AP.NAME + ' ' + AP.VERSION + '</a>');
+            h = h.concat('</div>');
+            return h;
+        }
+
+        function makePhylogramControl() {
+            var radioGroup = 'phylogram_control_radio';
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<div class="' + AP.PHYLOGRAM_CLADOGRAM_CONTROLGROUP + '">');
+            h = h.concat(makeRadioButton('P', AP.PHYLOGRAM_BUTTON, radioGroup, 'phylogram display (uses branch length values)  (use Alt+P to cycle between display types)'));
+            h = h.concat(makeRadioButton('A', AP.PHYLOGRAM_ALIGNED_BUTTON, radioGroup, 'phylogram display (uses branch length values) with aligned labels  (use Alt+P to cycle between display types)'));
+            h = h.concat(makeRadioButton('C', AP.CLADOGRAM_BUTTON, radioGroup, ' cladogram display (ignores branch length values)  (use Alt+P to cycle between display types)'));
+            h = h.concat('</div>');
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeDisplayControl() {
+            var h = "";
+
+            h = h.concat('<fieldset><legend>Display Data</legend>');
+            h = h.concat('<div class="' + AP.DISPLAY_DATA_CONTROLGROUP + '">');
+            if (self.basicTreeProperties) {
+                if (self.basicTreeProperties.nodeNames) {
+                    h = h.concat(makeCheckboxButton('Node Name', AP.NODE_NAME_CB, 'to show/hide node names (node names usually are the untyped labels found in New Hampshire/Newick formatted trees)'));
+                }
+                if (self.basicTreeProperties.taxonomies) {
+                    h = h.concat(makeCheckboxButton('Taxonomy', AP.TAXONOMY_CB, 'to show/hide node taxonomic information'));
+                }
+                if (self.basicTreeProperties.sequences) {
+                    h = h.concat(makeCheckboxButton('Sequence', AP.SEQUENCE_CB, 'to show/hide node sequence information'));
+                }
+                if (self.basicTreeProperties.confidences) {
+                    h = h.concat(makeCheckboxButton('Confidence', AP.CONFIDENCE_VALUES_CB, 'to show/hide confidence values'));
+                }
+                if (self.basicTreeProperties.branchLengths) {
+                    h = h.concat(makeCheckboxButton('Branch Length', AP.BRANCH_LENGTH_VALUES_CB, 'to show/hide branch length values'));
+                }
+                if (self.basicTreeProperties.nodeEvents) {
+                    h = h.concat(makeCheckboxButton('Node Events', AP.NODE_EVENTS_CB, 'to show speciations and duplications as colored nodes (e.g. speciations green, duplications red)'));
+                }
+                if (self.basicTreeProperties.branchEvents) {
+                    h = h.concat(makeCheckboxButton('Branch Events', AP.BRANCH_EVENTS_CB, 'to show/hide branch events (e.g. mutations)'));
+                }
+                h = h.concat(makeCheckboxButton('External Labels', AP.EXTERNAL_LABEL_CB, 'to show/hide external node labels'));
+                if (self.basicTreeProperties.internalNodeData) {
+                    h = h.concat(makeCheckboxButton('Internal Labels', AP.INTERNAL_LABEL_CB, 'to show/hide internal node labels'));
+                }
+            }
+            h = h.concat(makeCheckboxButton('External Nodes', AP.EXTERNAL_NODES_CB, 'to show external nodes as shapes (usually circles)'));
+            h = h.concat(makeCheckboxButton('Internal Nodes', AP.INTERNAL_NODES_CB, 'to show internal nodes as shapes (usually circles)'));
+            if (self.settings) {
+                if (self.settings.showBranchColorsButton) {
+                    h = h.concat(makeCheckboxButton('Branch Colors', AP.BRANCH_COLORS_CB, 'to use/ignore branch colors (if present in tree file)'));
+                }
+                if (self.settings.enableNodeVisualizations) {
+                    h = h.concat(makeCheckboxButton('Node Vis', AP.NODE_VIS_CB, 'to show/hide node visualizations (colors, shapes, sizes), set with the Visualizations sub-menu'));
+                }
+                if (self.settings.enableBranchVisualizations) {
+                    h = h.concat(makeCheckboxButton('Branch Vis', AP.BRANCH_VIS_CB, 'to show/hide branch visualizations, set with the Visualizations sub-menu'));
+                }
+                if (self.settings.showDynahideButton) {
+                    h = h.concat(makeCheckboxButton('Dyna Hide', AP.DYNAHIDE_CB, 'to hide external labels depending on expected visibility'));
+                }
+                if (self.settings.showShortenNodeNamesButton) {
+                    h = h.concat(makeCheckboxButton('Short Names', AP.SHORTEN_NODE_NAME_CB, 'to shorten long node names'));
+                }
+            }
+            h = h.concat('</div>');
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeZoomControl() {
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Zoom</legend>');
+            h = h.concat(makeButton('Y+', AP.ZOOM_IN_Y, 'zoom in vertically (Alt+Up or Shift+mousewheel)'));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('X-', AP.ZOOM_OUT_X, 'zoom out horizontally (Alt+Left or Shift+Alt+mousewheel)'));
+            h = h.concat(makeButton('F', AP.ZOOM_TO_FIT, 'fit and center tree display (Alt+C, Home, or Esc to re-position controls as well)'));
+            h = h.concat(makeButton('X+', AP.ZOOM_IN_X, 'zoom in horizontally (Alt+Right or Shift+Alt+mousewheel)'));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('Y-', AP.ZOOM_OUT_Y, 'zoom out vertically (Alt+Down or Shift+mousewheel)'));
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeControlButtons() {
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Tools</legend>');
+            h = h.concat('<div>');
+            h = h.concat(makeButton('O', AP.ORDER_BUTTON, 'order all (Alt+O)'));
+            h = h.concat(makeButton('R', AP.RETURN_TO_SUPERTREE_BUTTON, 'return to the supertree (if in subtree) (Alt+R)'));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('U', AP.UNCOLLAPSE_ALL_BUTTON, 'uncollapse all (Alt+U)'));
+            h = h.concat(makeButton('M', AP.MIDPOINT_ROOT_BUTTON, 'midpoint re-root (Alt+M)'));
+            h = h.concat('</div>');
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeDownloadSection() {
+            var h = "";
+            h = h.concat('<form action="#">');
+            h = h.concat('<fieldset>');
+            h = h.concat('<input type="button" value="Download" name="' + AP.DOWNLOAD_BUTTON + '" title="download/export tree in a selected format" id="' + AP.DOWNLOAD_BUTTON + '">'); // BM ??
+            h = h.concat('<br>');
+            h = h.concat('<select name="' + AP.EXPORT_FORMAT_SELECT + '" id="' + AP.EXPORT_FORMAT_SELECT + '">');
+            h = h.concat('<option value="' + AP.PNG_EXPORT_FORMAT + '">' + AP.PNG_EXPORT_FORMAT + '</option>');
+            h = h.concat('<option value="' + AP.SVG_EXPORT_FORMAT + '">' + AP.SVG_EXPORT_FORMAT + '</option>');
+            h = h.concat('<option value="' + AP.PHYLOXML_EXPORT_FORMAT + '">' + AP.PHYLOXML_EXPORT_FORMAT + '</option>');
+            h = h.concat('<option value="' + AP.NH_EXPORT_FORMAT + '">' + AP.NH_EXPORT_FORMAT + '</option>');
+            // h = h.concat('<option value="' + AP.PDF_EXPORT_FORMAT + '">' + AP.PDF_EXPORT_FORMAT + '</option>');
+            h = h.concat('</select>');
+            h = h.concat('</fieldset>');
+            h = h.concat('</form>');
+            return h;
+        }
+
+        function makeSliders() {
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat(makeSlider('External label size:', AP.EXTERNAL_FONT_SIZE_SLIDER));
+            if (self.basicTreeProperties && self.basicTreeProperties.internalNodeData) {
+                h = h.concat(makeSlider('Internal label size:', AP.INTERNAL_FONT_SIZE_SLIDER));
+            }
+            if (self.basicTreeProperties && (self.basicTreeProperties.branchLengths || self.basicTreeProperties.confidences
+                || self.basicTreeProperties.branchEvents)) {
+                h = h.concat(makeSlider('Branch label size:', AP.BRANCH_DATA_FONT_SIZE_SLIDER));
+            }
+            h = h.concat(makeSlider('Node size:', AP.NODE_SIZE_SLIDER));
+            h = h.concat(makeSlider('Branch width:', AP.BRANCH_WIDTH_SLIDER));
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeAutoCollapse() {
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Collapse Depth</legend>');
+            h = h.concat(makeButton('-', AP.DECR_DEPTH_COLLAPSE_LEVEL, 'to decrease the depth threshold (wraps around) (Alt+A)'));
+            h = h.concat(makeTextInput(AP.DEPTH_COLLAPSE_LABEL, 'the current depth threshold'));
+            h = h.concat(makeButton('+', AP.INCR_DEPTH_COLLAPSE_LEVEL, 'to increase the depth threshold (wraps around) (Alt+S)'));
+            h = h.concat('</fieldset>');
+            if (self.settings && self.basicTreeProperties
+                && self.settings.enableCollapseByBranchLenghts
+                && self.basicTreeProperties.branchLengths) {
+                h = h.concat('<fieldset>');
+                h = h.concat('<legend>Collapse Length</legend>');
+                h = h.concat(makeButton('-', AP.DECR_BL_COLLAPSE_LEVEL, 'to decrease the maximal subtree branch length threshold (wraps around)'));
+                h = h.concat(makeTextInput(AP.BL_COLLAPSE_LABEL, 'the current maximal subtree branch length threshold'));
+                h = h.concat(makeButton('+', AP.INCR_BL_COLLAPSE_LEVEL, 'to increase the maximal subtree branch length threshold (wraps around)'));
+                h = h.concat('</fieldset>');
+            }
+
+
+            if (self.settings && self.settings.enableCollapseByFeature) {
+                h = h.concat('<fieldset>');
+                h = h.concat('<legend>Collapse Feature</legend>');
+                h = h.concat('<select name="' + AP.COLLAPSE_BY_FEATURE_SELECT + '" id="' + AP.COLLAPSE_BY_FEATURE_SELECT + '">');
+                h = h.concat('<option value="' + AP.OFF_FEATURE + '">' + AP.OFF_FEATURE + '</option>');
+                if (self.basicTreeProperties && self.basicTreeProperties.taxonomies) {
+                    h = h.concat('<option value="' + AP.SPECIES_FEATURE + '">' + AP.SPECIES_FEATURE + '</option>');
+                }
+                var refs = self.treeData && forester.collectPropertyRefs(self.treeData, 'node', false);
+                if (refs) {
+                    refs.forEach(function (v) {
+                        var label = v;
+                        label = label.replace(/^.+:/, '');
+                        if (self.settings && (!self.settings.propertiesToIgnoreForNodeVisualization || (self.settings.propertiesToIgnoreForNodeVisualization.indexOf(label) < 0))) {
+                            if (label.length > (AP.MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL + 2)) {
+                                label = label.substring(0, AP.MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL) + "..";
+                            }
+                            h = h.concat('<option value="' + v + '">' + label + '</option>');
+                        }
+                    });
+                }
+                h = h.concat('</select>');
+                h = h.concat('</fieldset>');
+            }
+            return h;
+        }
+
+        // --------------------------------------------------------------
+        // Functions to make search-related elements
+        // --------------------------------------------------------------
+        function makeSearchBoxes() {
+
+            var tooltip = "enter text to search for (use ',' for logical OR and '+' for logical AND," +
+                " use expressions in form of XX:term for typed search -- e.g. NN:node name, TC:taxonomy code," +
+                " TS:taxonomy scientific name, SN:sequence name, GN:gene name, SS:sequence symbol, MS:molecular sequence, ...)";
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Search</legend>');
+            h = h.concat(makeTextInput(AP.SEARCH_FIELD_0, tooltip));
+            h = h.concat(makeButton('R', AP.RESET_SEARCH_A_BTN, AP.RESET_SEARCH_A_BTN_TOOLTIP));
+            h = h.concat('<br>');
+            h = h.concat(makeTextInput(AP.SEARCH_FIELD_1, tooltip));
+            h = h.concat(makeButton('R', AP.RESET_SEARCH_B_BTN, AP.RESET_SEARCH_B_BTN_TOOLTIP));
+            h = h.concat('<br>');
+            h = h.concat(makeSearchControls());
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeSearchControls() {
+            var h = "";
+            h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
+            h = h.concat(makeCheckboxButton('Cas', AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'));
+            h = h.concat(makeCheckboxButton('Wrd', AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)'));
+            h = h.concat('</div>');
+            h = h.concat('<br>');
+            h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
+            h = h.concat(makeCheckboxButton('Neg', AP.SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
+            h = h.concat(makeCheckboxButton('Reg', AP.SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
+            h = h.concat('</div>');
+            return h;
+        }
+
+        function makeSearchControlsCompact() {
+            var h = "";
+            h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
+            h = h.concat(makeCheckboxButton('C', AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'));
+            h = h.concat(makeCheckboxButton('W', AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)'));
+            h = h.concat(makeCheckboxButton('N', AP.SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
+            h = h.concat(makeCheckboxButton('R', AP.SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
+            h = h.concat('</div>');
+            return h;
+        }
+
+
+        // --------------------------------------------------------------
+        // Functions to make visualization controls
+        // --------------------------------------------------------------
+        function makeVisualControls() {
+            var h = "";
+            h = h.concat('<form action="#">');
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Visualizations</legend>');
+            h = h.concat(makeSelectMenu('Label Color:', '<br>', AP.LABEL_COLOR_SELECT_MENU, 'colorize the node label according to a property'));
+            h = h.concat('<br>');
+            h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', AP.NODE_FILL_COLOR_SELECT_MENU, 'colorize the node fill according to a property'));
+            h = h.concat('<br>');
+            //  h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU, 'colorize the node border according to a property'));
+            //  h = h.concat('<br>');
+            h = h.concat(makeSelectMenu('Node Shape:', '<br>', AP.NODE_SHAPE_SELECT_MENU, 'change the node shape according to a property'));
+            h = h.concat('<br>');
+            h = h.concat(makeSelectMenu('Node Size:', '<br>', AP.NODE_SIZE_SELECT_MENU, 'change the node size according to a property'));
+            h = h.concat('</fieldset>');
+            h = h.concat('</form>');
+            return h;
+        }
+
+        function makeVisualization2(title: string) { //~~
+            var h = "";
+            h = h.concat('<form action="#">');
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>' + title + '</legend>');
+            h = h.concat(makeSelectMenu('Label Color:', '<br>', AP.LABEL_COLOR_SELECT_MENU_2, 'colorize the node label according to a property'));
+            h = h.concat('<br>');
+            h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', AP.NODE_FILL_COLOR_SELECT_MENU_2, 'colorize the node fill according to a property'));
+            //  h = h.concat('<br>');
+            // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_2, 'colorize the node border according to a property'));
+            h = h.concat('</fieldset>');
+            h = h.concat('</form>');
+            return h;
+        }
+
+        function makeVisualization3(title: string): HTMLstring { //~~~
+            var h = "";
+            h = h.concat('<form action="#">');
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>' + title + '</legend>');
+            h = h.concat(makeSelectMenu('Label Color:', '<br>', AP.LABEL_COLOR_SELECT_MENU_3, 'colorize the node label according to a property'));
+            h = h.concat('<br>');
+            h = h.concat(makeSelectMenu('Node Fill Color:', '<br>', AP.NODE_FILL_COLOR_SELECT_MENU_3, 'colorize the node fill according to a property'));
+            // h = h.concat('<br>');
+            // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_3, 'colorize the node border according to a property'));
+            h = h.concat('</fieldset>');
+            h = h.concat('</form>');
+            return h;
+        }
+
+        function makeMsaResidueVisCurrResPositionControl() {
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>MSA Residue Pos.</legend>');
+            h = h.concat(makeSlider(null, AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1));
+            h = h.concat(makeButton('-', AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN, 'to decrease current MSA residue position by 1 (wraps around) (Alt+[)'));
+            h = h.concat(makeTextInput(AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL, 'the current MSA residue position'));
+            h = h.concat(makeButton('+', AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN, 'to increase current MSA residue position by 1 (wraps around) (Alt+])'));
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+        function makeLegendControl() {
+            var mouseTip = ' (alternatively, place legend with mouse using shift+left-mouse-button click, or alt+left-mouse-button click)';
+            var h = "";
+            h = h.concat('<fieldset>');
+            h = h.concat('<legend>Vis Legend</legend>');
+            h = h.concat(makeButton('Show', AP.LEGENDS_SHOW_BTN, 'to show/hide legend(s)'));
+            h = h.concat(makeButton('Dir', AP.LEGENDS_HORIZ_VERT_BTN, 'to toggle between vertical and horizontal alignment of (multiple) legends'));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('^', AP.LEGENDS_MOVE_UP_BTN, 'move legend(s) up' + mouseTip));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('<', AP.LEGENDS_MOVE_LEFT_BTN, 'move legend(s) left' + mouseTip));
+            h = h.concat(makeButton('R', AP.LEGENDS_RESET_BTN, 'return legend(s) to original position' + mouseTip));
+            h = h.concat(makeButton('>', AP.LEGENDS_MOVE_RIGHT_BTN, 'move legend(s) right' + mouseTip));
+            h = h.concat('<br>');
+            h = h.concat(makeButton('v', AP.LEGENDS_MOVE_DOWN_BTN, 'move legend(s) down' + mouseTip));
+            h = h.concat('</fieldset>');
+            return h;
+        }
+
+
+        // --------------------------------------------------------------
+        // Functions to make individual GUI components
+        // --------------------------------------------------------------
+        function makeButton(label: string, id: string, tooltip: string) {
+            return '<input type="button" value="' + label + '" name="' + id + '" id="' + id + '" title="' + tooltip + '">';
+        }
+
+        function makeCheckboxButton(label: string, id: string, tooltip: string) {
+            return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label><input type="checkbox" name="' + id + '" id="' + id + '">';
+        }
+
+        function makeRadioButton(label: string, id: string, radioGroup: string, tooltip: string): HTMLstring {
+            return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label><input type="radio" name="' + radioGroup + '" id="' + id + '">';
+        }
+
+        function makeSelectMenu(label: string, sep: string, id: string, tooltip: string) {
+            return '<label for="' + id + '" title="' + tooltip + '">' + label + '</label>' + sep + '<select name="' + id + '" id="' + id + '"></select>';
+        }
+
+        function makeSlider(label: string | null | undefined, id: string) {
+            if (label) {
+                return label + '<div id="' + id + '"></div>';
+            }
+            return '<div id="' + id + '"></div>';
+        }
+
+        function makeTextInput(id: string, tooltip: string) {
+            return '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
+        }
+
+        function makeTextInputWithLabel(label: string, sep: string, id: string, tooltip: string) {
+            return label + sep + '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
+        }
+
+    } // function createGui()
+
+    initializeGui = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        this.setDisplayTypeButtons();
+
+        this.setCheckboxValue(AP.NODE_NAME_CB, this.options.showNodeName);
+        this.setCheckboxValue(AP.TAXONOMY_CB, this.options.showTaxonomy);
+        this.setCheckboxValue(AP.SEQUENCE_CB, this.options.showSequence);
+        this.setCheckboxValue(AP.CONFIDENCE_VALUES_CB, this.options.showConfidenceValues);
+        this.setCheckboxValue(AP.BRANCH_LENGTH_VALUES_CB, this.options.showBranchLengthValues);
+        this.setCheckboxValue(AP.NODE_EVENTS_CB, this.options.showNodeEvents);
+        this.setCheckboxValue(AP.BRANCH_EVENTS_CB, this.options.showBranchEvents);
+        this.setCheckboxValue(AP.INTERNAL_LABEL_CB, this.options.showInternalLabels);
+        this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, this.options.showExternalLabels);
+        this.setCheckboxValue(AP.INTERNAL_NODES_CB, this.options.showInternalNodes);
+        this.setCheckboxValue(AP.EXTERNAL_NODES_CB, this.options.showExternalNodes);
+        this.setCheckboxValue(AP.BRANCH_COLORS_CB, this.options.showBranchColors);
+        this.setCheckboxValue(AP.NODE_VIS_CB, this.options.showNodeVisualizations);
+        this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        this.setCheckboxValue(AP.DYNAHIDE_CB, this.options.dynahide);
+        this.setCheckboxValue(AP.SHORTEN_NODE_NAME_CB, this.options.shortenNodeNames);
+        this.initializeVisualizationMenu();
+        this.initializeSearchOptions();
+        this.makeBackgorund();
     }
 
-    if (this.external_nodes < 3) {
-        return "off";
+    makeBackgorund = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        this.baseSvg.append('rect')
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .style('opacity', 1)
+            .attr('class', AP.BASE_BACKGROUND)
+            .attr('fill', this.options.backgroundColorDefault);
     }
-    else if (this.branch_length_collapse_level <= this.branch_length_collapse_data.min) {
-        return "off";
-    }
-    else if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max) {
-        return "off";
-    }
-    return this.branch_length_collapse_level;
-}
 
 
-function resetDepthCollapseDepthValue() {
-    this.depth_collapse_level = -1;
-}
+    initializeVisualizationMenu = () => {
 
-function resetRankCollapseRankValue() {
-    this.rank_collapse_level = -1;
-}
+        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
+            .val(AP.NONE)
+            .html('none')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
+            .val(AP.SAME_AS_FILL)
+            .html('same as fill')
+        );
 
-function resetBranchLengthCollapseValue() {
-    this.branch_length_collapse_level = -1;
-    this.branch_length_collapse_data.min = Number.MAX_VALUE;
-    this.branch_length_collapse_data.max = 0;
+        $('select#' + AP.NODE_SHAPE_SELECT_MENU).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_SIZE_SELECT_MENU).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.LABEL_COLOR_SELECT_MENU).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
 
-    if (this.root) {
-        forester.removeMaxBranchLength(this.root);
-        var stats = forester.calcBranchLengthSimpleStatistics(this.root);
-        this.branch_length_collapse_data.min = stats.min;
-        this.branch_length_collapse_data.max = stats.max;
-        this.branch_length_collapse_data.max = 0.25 * ((3 * this.branch_length_collapse_data.max) + this.branch_length_collapse_data.min);
-        var x = stats.n < 200 ? (stats.n / 4) : 50;
-        this.branch_length_collapse_data.step = (this.branch_length_collapse_data.max - this.branch_length_collapse_data.min) / x;
+        //~~
+        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
+            .val(AP.NONE)
+            .html('none')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
+            .val(AP.SAME_AS_FILL)
+            .html('same as fill')
+        );
+
+        $('select#' + AP.LABEL_COLOR_SELECT_MENU_2).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+
+        //
+
+        //~~
+        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
+            .val(AP.NONE)
+            .html('none')
+        );
+        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
+            .val(AP.SAME_AS_FILL)
+            .html('same as fill')
+        );
+
+        $('select#' + AP.LABEL_COLOR_SELECT_MENU_3).append($('<option>')
+            .val(AP.DEFAULT)
+            .html('default')
+        );
+
+        //
+
+        if (this.visualizations) {
+            if (this.visualizations.labelColor) {
+                for (var key in this.visualizations.labelColor) {
+                    if (this.visualizations.labelColor.hasOwnProperty(key)) {
+                        $('select#' + AP.LABEL_COLOR_SELECT_MENU).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+            if (this.visualizations.nodeShape) {
+                for (var key in this.visualizations.nodeShape) {
+                    if (this.visualizations.nodeShape.hasOwnProperty(key)) {
+                        $('select#' + AP.NODE_SHAPE_SELECT_MENU).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+            if (this.visualizations.nodeFillColor) {
+                for (var key in this.visualizations.nodeFillColor) {
+                    if (this.visualizations.nodeFillColor.hasOwnProperty(key)) {
+                        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+            if (this.visualizations.nodeBorderColor) {
+                for (var key in this.visualizations.nodeBorderColor) {
+                    if (this.visualizations.nodeBorderColor.hasOwnProperty(key)) {
+                        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+            if (this.visualizations.nodeSize) {
+                for (var key in this.visualizations.nodeSize) {
+                    if (this.visualizations.nodeSize.hasOwnProperty(key)) {
+                        $('select#' + AP.NODE_SIZE_SELECT_MENU).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+        }
+
+        if (this.specialVisualizations != null) {
+            //~~
+            if ('Mutations' in this.specialVisualizations) {
+                const mutations = this.specialVisualizations['Mutations'];
+                if (mutations != null && mutations.property_values != null) {
+                    const properties = mutations.property_values;
+                    const arrayLength = properties.length;
+                    for (var i = 0; i < arrayLength; i++) {
+                        const key = properties[i];
+                        $('select#' + AP.LABEL_COLOR_SELECT_MENU_2).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+
+            if ('Convergent_Mutations' in this.specialVisualizations) {
+                const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
+
+                if (conv_mutations != null && conv_mutations.property_values != null) {
+                    const properties = conv_mutations.property_values;
+                    const arrayLength = properties.length;
+                    for (var i = 0; i < arrayLength; i++) {
+                        const key = properties[i];
+                        $('select#' + AP.LABEL_COLOR_SELECT_MENU_3).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                        $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                        $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>')
+                            .val(key)
+                            .html(key)
+                        );
+                    }
+                }
+            }
+        }
+
+
+        $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1).slider({
+            min: 1,
+            max: (this.basicTreeProperties && this.basicTreeProperties.maxMolSeqLength) || 1,
+            step: 1,
+            value: 1,
+            animate: 'fast',
+            slide: this.updateMsaResidueVisCurrResPosFromSlider,
+            change: this.updateMsaResidueVisCurrResPosFromSlider
+        });
 
     }
-}
 
-function getTreeAsSvg() {
-    var container = this.id.replace('#', '');
-    var wrapper = document.getElementById(container);
-    var svg = wrapper.querySelector('svg');
-    var svgTree = null;
-    if (typeof window.XMLSerializer !== 'undefined') {
-        svgTree = (new XMLSerializer()).serializeToString(svg);
-    }
-    else if (typeof svg.xml !== 'undefined') {
-        svgTree = svg.xml;
-    }
-    return svgTree;
-}
+    initializeSearchOptions() {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
 
-function downloadTree(format) {
-    if (format === PNG_EXPORT_FORMAT) {
-        changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
-        downloadAsPng();
-        changeBaseBackgoundColor(this.options.backgroundColorDefault);
-    }
-    else if (format === SVG_EXPORT_FORMAT) {
-        changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
-        downloadAsSVG();
-        changeBaseBackgoundColor(this.options.backgroundColorDefault);
-    }
-    else if (format === NH_EXPORT_FORMAT) {
-        downloadAsNH();
-    }
-    else if (format === PHYLOXML_EXPORT_FORMAT) {
-        downloadAsPhyloXml();
-    }
-    else if (format === PDF_EXPORT_FORMAT) {
-        changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
-        downloadAsPdf();
-        changeBaseBackgoundColor(this.options.backgroundColorDefault);
-    }
-}
+        if (this.options.searchUsesRegex === true) {
+            this.options.searchIsPartial = true;
+        }
+        if (this.options.searchIsPartial === false) {
+            this.options.searchUsesRegex = false;
+        }
+        this.options.searchNegateResult = false;
+        this.setCheckboxValue(AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, this.options.searchIsCaseSensitive);
+        this.setCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, !this.options.searchIsPartial);
+        this.setCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB, this.options.searchUsesRegex);
+        this.setCheckboxValue(AP.SEARCH_OPTIONS_NEGATE_RES_CB, this.options.searchNegateResult);
 
-function downloadAsPhyloXml() {
-    var x = phyloXml.toPhyloXML(this.root, 9);
-    saveAs(new Blob([x], { type: "application/xml" }), this.options.nameForPhyloXmlDownload);
-}
-
-function downloadAsNH() {
-    var nh = forester.toNewHampshire(this.root, 9, this.settings.nhExportReplaceIllegalChars, this.settings.nhExportWriteConfidences);
-    saveAs(new Blob([nh], { type: "application/txt" }), this.options.nameForNhDownload);
-}
-
-function downloadAsSVG() {
-    var svg = getTreeAsSvg();
-    saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
-}
-
-function downloadAsPdf() {
-}
-
-function downloadAsPng() {
-    var svg = getTreeAsSvg();
-    var canvas = document.createElement('canvas');
-    canvg(canvas, svg);
-    canvas.toBlob(function (blob) {
-        saveAs(blob, this.options.nameForPngDownload);
-    });
-}
-
-// --------------------------------------------------------------
-// Convenience methods for loading tree on HTML page
-// --------------------------------------------------------------
-
-/**
- * Convenience method for loading tree on HTML page
- *
- * @param location
- * @param data
- * @param newHamphshireConfidenceValuesInBrackets
- * @param newHamphshireConfidenceValuesAsInternalNames
- * @returns {*}
- */
-archaeopteryx.parseTree = function (location,
-    data,
-    newHamphshireConfidenceValuesInBrackets,
-    newHamphshireConfidenceValuesAsInternalNames) {
-    if (newHamphshireConfidenceValuesInBrackets == undefined) {
-        newHamphshireConfidenceValuesInBrackets = true;
+        if (this.options.searchAinitialValue) {
+            $('#' + AP.SEARCH_FIELD_0).val(this.options.searchAinitialValue);
+        }
+        if (this.options.searchBinitialValue) {
+            $('#' + AP.SEARCH_FIELD_1).val(this.options.searchBinitialValue);
+        }
     }
-    if (newHamphshireConfidenceValuesAsInternalNames == undefined) {
-        newHamphshireConfidenceValuesAsInternalNames = false;
-    }
-    var tree = null;
-    if (location.substr(-3, 3).toLowerCase() === 'xml') {
-        tree = archaeopteryx.parsePhyloXML(data);
-    }
-    else {
-        tree = archaeopteryx.parseNewHampshire(data,
-            newHamphshireConfidenceValuesInBrackets,
-            newHamphshireConfidenceValuesAsInternalNames);
-    }
-    return tree;
-};
 
-/**
- *
- *
- * @param label
- * @param location
- * @param data
- * @param options
- * @param settings
- * @param newHamphshireConfidenceValuesInBrackets
- * @param newHamphshireConfidenceValuesAsInternalNames
- * @param nodeVisualizations
- */
-archaeopteryx.launchArchaeopteryx = function (label,
-    location,
-    data,
-    options,
-    settings,
-    newHamphshireConfidenceValuesInBrackets,
-    newHamphshireConfidenceValuesAsInternalNames,
-    nodeVisualizations) {
-    var tree = null;
-    try {
-        tree = archaeopteryx.parseTree(location,
-            data,
-            newHamphshireConfidenceValuesInBrackets,
-            newHamphshireConfidenceValuesAsInternalNames);
+
+    orderSubtree = (n: Alcmonavis.phylo, order: boolean) => {
+        var changed = false;
+        ord(n);
+        if (!changed) {
+            order = !order;
+            ord(n);
+        }
+        function ord(n: Alcmonavis.phylo) {
+            if (!n.children) {
+                return;
+            }
+            var c = n.children;
+            var l = c.length;
+            if (l == 2) {
+                var e0 = forester.calcSumOfAllExternalDescendants(c[0]);
+                var e1 = forester.calcSumOfAllExternalDescendants(c[1]);
+                if (e0 !== e1 && e0 < e1 === order) {
+                    changed = true;
+                    var c0 = c[0];
+                    c[0] = c[1];
+                    c[1] = c0;
+                }
+            }
+            for (var i = 0; i < l; ++i) {
+                ord(c[i]);
+            }
+        }
     }
-    catch (e) {
-        alert(AP.ERROR + 'error while parsing tree: ' + e);
+
+    cycleDisplay = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+
+        if (this.options.phylogram && !this.options.alignPhylogram) {
+            this.options.alignPhylogram = true;
+
+        }
+        else if (this.options.phylogram && this.options.alignPhylogram) {
+            this.options.phylogram = false;
+            this.options.alignPhylogram = false;
+        }
+        else if (!this.options.phylogram && !this.options.alignPhylogram) {
+            this.options.phylogram = true;
+        }
+        this.setDisplayTypeButtons();
+        this.update(undefined, 0);
     }
-    if (tree) {
+
+    setDisplayTypeButtons = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+
+        this.setRadioButtonValue(AP.PHYLOGRAM_BUTTON, this.options.phylogram && !this.options.alignPhylogram);
+        this.setRadioButtonValue(AP.CLADOGRAM_BUTTON, !this.options.phylogram && !this.options.alignPhylogram);
+        this.setRadioButtonValue(AP.PHYLOGRAM_ALIGNED_BUTTON, this.options.alignPhylogram && this.options.phylogram);
+        if (!(this.basicTreeProperties && this.basicTreeProperties.branchLengths)) {
+            this.disableCheckbox('#' + AP.PHYLOGRAM_BUTTON);
+            this.disableCheckbox('#' + AP.PHYLOGRAM_ALIGNED_BUTTON);
+        }
+    }
+
+    unCollapseAll = (node: Alcmonavis.phylo) => {
+        forester.preOrderTraversal(node, function (n) {
+            if (n._children) {
+                n.children = n._children;
+                n._children = null;
+            }
+            if (n[AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL]) {
+                n[AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL] = undefined;
+            }
+        });
+    }
+
+    decrDepthCollapseLevel = () => {
+        this.rank_collapse_level = -1;
+        this.branch_length_collapse_level = -1;
+        this.resetCollapseByFeature();
+        if (this.root && this.treeData && (this.external_nodes > 2)) {
+            if (this.depth_collapse_level <= 1) {
+                this.depth_collapse_level = forester.calcMaxDepth(this.root);
+                this.unCollapseAll(this.root);
+            }
+            else {
+                --this.depth_collapse_level;
+                forester.collapseToDepth(this.root, this.depth_collapse_level);
+            }
+        }
+        this.update(undefined, 0);
+    }
+
+    incrDepthCollapseLevel = () => {
+        this.rank_collapse_level = -1;
+        this.branch_length_collapse_level = -1;
+        this.resetCollapseByFeature();
+        if ((this.root && this.treeData) && (this.external_nodes > 2)) {
+            var max = forester.calcMaxDepth(this.root);
+            if (this.depth_collapse_level >= max) {
+                this.depth_collapse_level = 1;
+            }
+            else {
+                this.unCollapseAll(this.root);
+                ++this.depth_collapse_level;
+            }
+            forester.collapseToDepth(this.root, this.depth_collapse_level);
+        }
+        this.update(undefined, 0);
+    }
+
+    decrBlCollapseLevel = () => {
+        this.rank_collapse_level = -1;
+        this.depth_collapse_level = -1;
+        this.resetCollapseByFeature();
+        if (this.root && this.treeData && (this.external_nodes > 2)) {
+            if (this.branch_length_collapse_level <= this.branch_length_collapse_data.min) {
+                this.branch_length_collapse_level = this.branch_length_collapse_data.max;
+            }
+            this.branch_length_collapse_level -= this.branch_length_collapse_data.step;
+            forester.collapseToBranchLength(this.root, this.branch_length_collapse_level);
+        }
+        this.update(undefined, 0);
+    }
+
+    incrBlCollapseLevel = () => {
+        this.rank_collapse_level = -1;
+        this.depth_collapse_level = -1;
+        this.resetCollapseByFeature();
+        if ((this.root && this.treeData) && (this.external_nodes > 2)) {
+            if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max
+                || this.branch_length_collapse_level < 0) {
+                this.branch_length_collapse_level = this.branch_length_collapse_data.min;
+            }
+            this.branch_length_collapse_level += this.branch_length_collapse_data.step;
+            if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max) {
+                this.unCollapseAll(this.root);
+            }
+            else {
+                forester.collapseToBranchLength(this.root, this.branch_length_collapse_level);
+            }
+        }
+        this.update(undefined, 0);
+    }
+
+    decrMsaResidueVisCurrResPos = () => {
+        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree Properties not set";
+        if (this.msa_residue_vis_curr_res_pos <= 0) {
+            this.msa_residue_vis_curr_res_pos = this.basicTreeProperties.maxMolSeqLength - 1;
+        }
+        else {
+            this.msa_residue_vis_curr_res_pos -= 1;
+        }
+        this.updateMsaResidueVisCurrResPosSliderValue();
+        this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
+        this.update(undefined, 0, true);
+    }
+
+    incrMsaResidueVisCurrResPos = () => {
+        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree Properties not set";
+        if (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties.maxMolSeqLength - 1)) {
+            this.msa_residue_vis_curr_res_pos = 0;
+        }
+        else {
+            this.msa_residue_vis_curr_res_pos += 1;
+        }
+        this.updateMsaResidueVisCurrResPosSliderValue();
+        this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
+        this.update(undefined, 0, true);
+    }
+
+    showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+
+        if ((this.currentLabelColorVisualization == null || this.currentLabelColorVisualization === AP.DEFAULT)
+            && (this.currentNodeFillColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeBorderColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeShapeVisualization != AP.MSA_RESIDUE)
+            && this.isCanDoMsaResidueVisualizations()) {
+
+            this.currentLabelColorVisualization = AP.MSA_RESIDUE;
+            $('#' + AP.LABEL_COLOR_SELECT_MENU).val(AP.MSA_RESIDUE);
+            if (this.visualizations && this.visualizations.labelColor && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
+                this.addLegend(AP.LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
+            }
+            if (this.settings.enableBranchVisualizations) {
+                this.options.showBranchVisualizations = true;
+                this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+            }
+        }
+        else if ((this.currentLabelColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeFillColorVisualization == null || this.currentNodeFillColorVisualization === AP.DEFAULT)
+            && (this.currentNodeBorderColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeShapeVisualization != AP.MSA_RESIDUE)
+            && this.isCanDoMsaResidueVisualizations()) {
+            this.currentNodeFillColorVisualization = AP.MSA_RESIDUE;
+            $('#' + AP.NODE_FILL_COLOR_SELECT_MENU).val(AP.MSA_RESIDUE);
+            if (this.visualizations && this.visualizations.nodeFillColor && this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]) {
+                this.addLegend(AP.LEGEND_NODE_FILL_COLOR, this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization]);
+            }
+            if (this.settings.enableBranchVisualizations) {
+                this.options.showBranchVisualizations = true;
+                this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+            }
+        }
+        else if ((this.currentLabelColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeFillColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeBorderColorVisualization == null || this.currentNodeBorderColorVisualization === AP.DEFAULT)
+            && (this.currentNodeShapeVisualization != AP.MSA_RESIDUE)
+            && this.isCanDoMsaResidueVisualizations()) {
+            this.currentNodeBorderColorVisualization = AP.MSA_RESIDUE;
+            $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU).val(AP.MSA_RESIDUE);
+            if (this.visualizations && this.visualizations.nodeBorderColor && this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]) {
+                this.addLegend(AP.LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
+            }
+            if (this.settings.enableBranchVisualizations) {
+                this.options.showBranchVisualizations = true;
+                this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+            }
+        }
+        else if ((this.currentLabelColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeFillColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeBorderColorVisualization != AP.MSA_RESIDUE)
+            && (this.currentNodeShapeVisualization == null || this.currentNodeShapeVisualization === AP.DEFAULT)
+            && this.isCanDoMsaResidueVisualizations()) {
+            this.currentNodeShapeVisualization = AP.MSA_RESIDUE;
+            $('#' + AP.NODE_SHAPE_SELECT_MENU).val(AP.MSA_RESIDUE);
+            if (this.visualizations && this.visualizations.nodeShape && this.visualizations.nodeShape[this.currentNodeShapeVisualization]) {
+                this.addLegend(AP.LEGEND_NODE_SHAPE, this.visualizations.nodeShape[this.currentNodeShapeVisualization]);
+            }
+        }
+    }
+
+
+    updateDepthCollapseDepthDisplay = () => {
+        var v = this.obtainDepthCollapseDepthValue();
+        $('#' + AP.DEPTH_COLLAPSE_LABEL)
+            .val(" " + v);
+    }
+
+    updateBranchLengthCollapseBranchLengthDisplay = () => {
+        var v = this.obtainBranchLengthCollapseBranchLengthValue();
+        $('#' + AP.BL_COLLAPSE_LABEL)
+            .val(v);
+    }
+
+    collapseByFeature = (feature: string) => {
+        this.rank_collapse_level = -1;
+        this.depth_collapse_level = -1;
+        this.branch_length_collapse_level = -1;
+        if (feature === AP.SPECIES_FEATURE) {
+            this.collapseSpecificSubtrees(this.root, null, AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
+        }
+        else if (feature === AP.OFF_FEATURE) {
+            this.unCollapseAll(this.root)
+        }
+        else {
+            this.collapseSpecificSubtrees(this.root, feature, AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
+        }
+        this.update(undefined, 0);
+    }
+
+
+    removeForCollapsedFeatureSpecialLabel = (phy: Alcmonavis.phylo, keyForCollapsedFeatureSpecialLabel: keyof Alcmonavis.specialLabels) => {
+        forester.preOrderTraversalAll(phy, function (n) {
+            if (n[keyForCollapsedFeatureSpecialLabel]) {
+                n[keyForCollapsedFeatureSpecialLabel] = undefined;
+            }
+        });
+    }
+
+    collapseSpecificSubtrees = (phy: Alcmonavis.phylo, nodePropertyRef: string | null, keyForCollapsedFeatureSpecialLabel: keyof Alcmonavis.specialLabels) => {
+        this.unCollapseAll(phy);
+
+        if (nodePropertyRef && nodePropertyRef.length > 0) {
+            forester.preOrderTraversalAll(phy, function (n) {
+                if (n.children && !n._children && (n.children.length > 1)) {
+                    var pv = forester.getOneDistinctNodePropertyValue(n, nodePropertyRef);
+                    if (pv != null) {
+                        forester.collapse(n);
+                        if (keyForCollapsedFeatureSpecialLabel) {
+                            n[keyForCollapsedFeatureSpecialLabel] = '[' + nodePropertyRef + '] ' + pv;
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            forester.preOrderTraversalAll(phy, function (n) {
+                if (n.children && !n._children && (n.children.length > 1)) {
+                    var tv = forester.getOneDistinctTaxonomy(n);
+                    if (tv != null) {
+                        forester.collapse(n);
+                        if (keyForCollapsedFeatureSpecialLabel) {
+                            n[keyForCollapsedFeatureSpecialLabel] = tv;
+                        }
+                    }
+                }
+            });
+        }
+
+    }
+
+    resetCollapseByFeature = () => {
+        var s = $('#' + AP.COLLAPSE_BY_FEATURE_SELECT);
+        if (s) {
+            var f = s.val();
+            if (f != AP.OFF_FEATURE) {
+                s.val(AP.OFF_FEATURE);
+                this.removeForCollapsedFeatureSpecialLabel(this.root, AP.KEY_FOR_COLLAPSED_FEATURES_SPECIAL_LABEL);
+            }
+        }
+    }
+
+    updateMsaResidueVisCurrResPosLabel = () => {
+        $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).val(this.msa_residue_vis_curr_res_pos + 1);
+    }
+
+    setMsaResidueVisCurrResPos = (position: number) => {
+        if (position <= 0) {
+            this.msa_residue_vis_curr_res_pos = 0;
+        }
+        else if (this.basicTreeProperties && this.basicTreeProperties.maxMolSeqLength && (position >= (this.basicTreeProperties.maxMolSeqLength - 1))) {
+            this.msa_residue_vis_curr_res_pos = this.basicTreeProperties.maxMolSeqLength - 1;
+        }
+        else {
+            this.msa_residue_vis_curr_res_pos = position;
+        }
+    }
+
+    updateButtonEnabledState = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+
+        if (this.superTreeRoots && this.superTreeRoots.length > 0) {
+            this.enableButton($('#' + AP.RETURN_TO_SUPERTREE_BUTTON));
+        }
+        else {
+            this.disableButton($('#' + AP.RETURN_TO_SUPERTREE_BUTTON));
+        }
+
+        if (forester.isHasCollapsedNodes(this.root)) {
+            this.enableButton($('#' + AP.UNCOLLAPSE_ALL_BUTTON));
+        }
+        else {
+            this.disableButton($('#' + AP.UNCOLLAPSE_ALL_BUTTON));
+        }
+        if ((this.superTreeRoots.length < 1) && this.treeData && ((this.treeData.rerootable === undefined) || (this.treeData.rerootable === true))) {
+            this.enableButton($('#' + AP.MIDPOINT_ROOT_BUTTON));
+        }
+        else {
+            this.disableButton($('#' + AP.MIDPOINT_ROOT_BUTTON));
+        }
+        var b = null;
+        if (this.foundNodes0 && !this.searchBox0Empty) {
+            b = $('#' + AP.RESET_SEARCH_A_BTN);
+            if (b) {
+                b.prop('disabled', false);
+                if (this.foundNodes0.size < 1) {
+                    b.css('background', '');
+                    b.css('color', '');
+                }
+                else {
+                    b.css('background', this.options.found0ColorDefault);
+                    b.css('color', AP.WHITE);
+                }
+                var nd0 = this.foundNodes0.size === 1 ? 'node' : 'nodes';
+                b.prop('title', 'found ' + this.foundNodes0.size + ' ' + nd0 + ' [click to ' + AP.RESET_SEARCH_A_BTN_TOOLTIP + ']');
+            }
+        }
+        else {
+            b = $('#' + AP.RESET_SEARCH_A_BTN);
+            if (b) {
+                b.prop('disabled', true);
+                b.css('background', this.settings.controlsBackgroundColor);
+                b.css('color', '');
+                b.prop('title', AP.RESET_SEARCH_A_BTN_TOOLTIP);
+            }
+        }
+
+        if (this.foundNodes1 && !this.searchBox1Empty) {
+            b = $('#' + AP.RESET_SEARCH_B_BTN);
+            if (b) {
+                b.prop('disabled', false);
+                if (this.foundNodes1.size < 1) {
+                    b.css('background', '');
+                    b.css('color', '');
+                }
+                else {
+                    b.css('background', this.options.found1ColorDefault);
+                    b.css('color', AP.WHITE);
+                }
+                var nd1 = this.foundNodes1.size === 1 ? 'node' : 'nodes';
+                b.prop('title', 'found ' + this.foundNodes1.size + ' ' + nd1 + ' [click to ' + AP.RESET_SEARCH_B_BTN_TOOLTIP + ']');
+            }
+        }
+        else {
+            b = $('#' + AP.RESET_SEARCH_B_BTN);
+            if (b) {
+                b.prop('disabled', true);
+                b.css('background', this.settings.controlsBackgroundColor);
+                b.css('color', '');
+                b.prop('title', AP.RESET_SEARCH_B_BTN_TOOLTIP);
+            }
+        }
+    }
+
+    updateLegendButtonEnabledState = () => {
+        var b = $('#' + AP.LEGENDS_SHOW_BTN);
+        if (b) {
+            if (this.showLegends) {
+                b.css('background', AP.COLOR_FOR_ACTIVE_ELEMENTS);
+                b.css('color', AP.WHITE);
+            }
+            else {
+                b.css('background', '');
+                b.css('color', '');
+            }
+        }
+        if (this.showLegends && (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+            (this.options && this.options.showNodeVisualizations && (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+                this.legendSizeScales[AP.LEGEND_NODE_SIZE])))) {
+            this.enableButton($('#' + AP.LEGENDS_HORIZ_VERT_BTN));
+            this.enableButton($('#' + AP.LEGENDS_MOVE_UP_BTN));
+            this.enableButton($('#' + AP.LEGENDS_MOVE_DOWN_BTN));
+            this.enableButton($('#' + AP.LEGENDS_MOVE_LEFT_BTN));
+            this.enableButton($('#' + AP.LEGENDS_MOVE_RIGHT_BTN));
+            this.enableButton($('#' + AP.LEGENDS_RESET_BTN));
+        }
+        else {
+            this.disableButton($('#' + AP.LEGENDS_HORIZ_VERT_BTN));
+            this.disableButton($('#' + AP.LEGENDS_MOVE_UP_BTN));
+            this.disableButton($('#' + AP.LEGENDS_MOVE_DOWN_BTN));
+            this.disableButton($('#' + AP.LEGENDS_MOVE_LEFT_BTN));
+            this.disableButton($('#' + AP.LEGENDS_MOVE_RIGHT_BTN));
+            this.disableButton($('#' + AP.LEGENDS_RESET_BTN));
+        }
+    }
+
+    disableCheckbox = (cb: string) => {
+        if (cb) {
+            var b = $<HTMLInputElement>(cb);
+            if (b) {
+                b.checkboxradio({
+                    disabled: true
+                });
+            }
+        }
+    }
+
+    disableButton = (b: JQuery<HTMLButtonElement>) => {
+        if (b) {
+            b.prop('disabled', true);
+            b.css('background', (this.settings && this.settings.controlsBackgroundColor) || AP.WHITE);
+        }
+    }
+
+    enableButton = (b: JQuery<HTMLButtonElement>) => {
+        if (b) {
+            b.prop('disabled', false);
+            b.css('background', '');
+        }
+    }
+
+    obtainDepthCollapseDepthValue = () => {
+        if (!(this.treeData && this.root)) {
+            return "";
+        }
+        if (this.external_nodes < 3) {
+            return "off";
+        }
+        else if (this.depth_collapse_level < 0) {
+            this.depth_collapse_level = forester.calcMaxDepth(this.root);
+            return "off";
+        }
+        else if (this.depth_collapse_level == forester.calcMaxDepth(this.root)) {
+            return "off";
+        }
+        return this.depth_collapse_level;
+    }
+
+    obtainBranchLengthCollapseBranchLengthValue = () => {
+        if (!(this.treeData && this.root)) {
+            return "";
+        }
+        if (!this.branch_length_collapse_data.min) {  // BM what is collapse data?
+            this.resetBranchLengthCollapseValue();
+        }
+
+        if (this.external_nodes < 3) {
+            return "off";
+        }
+        else if (this.branch_length_collapse_level <= this.branch_length_collapse_data.min) {
+            return "off";
+        }
+        else if (this.branch_length_collapse_level >= this.branch_length_collapse_data.max) {
+            return "off";
+        }
+        return this.branch_length_collapse_level;
+    }
+
+
+    resetDepthCollapseDepthValue = () => {
+        this.depth_collapse_level = -1;
+    }
+
+    resetRankCollapseRankValue = () => {
+        this.rank_collapse_level = -1;
+    }
+
+    resetBranchLengthCollapseValue = () => {
+        this.branch_length_collapse_level = -1;
+        this.branch_length_collapse_data.min = Number.MAX_VALUE;
+        this.branch_length_collapse_data.max = 0;
+
+        if (this.root) {
+            forester.removeMaxBranchLength(this.root);
+            var stats = forester.calcBranchLengthSimpleStatistics(this.root);
+            this.branch_length_collapse_data.min = stats.min;
+            this.branch_length_collapse_data.max = stats.max;
+            this.branch_length_collapse_data.max = 0.25 * ((3 * this.branch_length_collapse_data.max) + this.branch_length_collapse_data.min);
+            var x = stats.n < 200 ? (stats.n / 4) : 50;
+            this.branch_length_collapse_data.step = (this.branch_length_collapse_data.max - this.branch_length_collapse_data.min) / x;
+
+        }
+    }
+
+    getTreeAsSvg = () => {
+        var container = this.id.replace('#', '');
+        var wrapper = document.getElementById(container);
+        var svg = wrapper && wrapper.querySelector('svg');
+        if (svg && typeof window.XMLSerializer !== 'undefined') {
+            return (new XMLSerializer()).serializeToString(svg);
+        }
+        throw "Cannot process SVG, browser doesn't support XMLSerializer";
+    }
+
+    downloadTree = (format: string) => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (format === AP.PNG_EXPORT_FORMAT) {
+            this.changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
+            this.downloadAsPng();
+            this.changeBaseBackgoundColor(this.options.backgroundColorDefault);
+        }
+        else if (format === AP.SVG_EXPORT_FORMAT) {
+            this.changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
+            this.downloadAsSVG();
+            this.changeBaseBackgoundColor(this.options.backgroundColorDefault);
+        }
+        else if (format === AP.NH_EXPORT_FORMAT) {
+            this.downloadAsNH();
+        }
+        else if (format === AP.PHYLOXML_EXPORT_FORMAT) {
+            this.downloadAsPhyloXml();
+        }
+        else if (format === AP.PDF_EXPORT_FORMAT) {
+            this.changeBaseBackgoundColor(this.options.backgroundColorForPrintExportDefault);
+            this.downloadAsPdf();
+            this.changeBaseBackgoundColor(this.options.backgroundColorDefault);
+        }
+    }
+
+    downloadAsPhyloXml = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        var x = phyloXml.toPhyloXML(this.root, 9);
+        saveAs(new Blob([x], { type: "application/xml" }), this.options.nameForPhyloXmlDownload);
+    }
+
+    downloadAsNH = () => {
+        if (!OptionsDeclared(this.options)) throw "Options not set";
+        if (!SettingsDeclared(this.settings)) throw "Settings not set";
+        var nh = forester.toNewHampshire(this.root, 9, this.settings.nhExportReplaceIllegalChars, this.settings.nhExportWriteConfidences);
+        saveAs(new Blob([nh], { type: "application/txt" }), this.options.nameForNhDownload);
+    }
+
+    downloadAsSVG = () => {
+        var svg = this.getTreeAsSvg();
+        saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
+    }
+
+    downloadAsPdf = () => {
+    }
+
+    downloadAsPng = () => {
+        var svg = this.getTreeAsSvg();
+        var canvas = document.createElement('canvas');
+        canvg(canvas, svg);
+        canvas.toBlob((blob) => {
+            saveAs(blob, this.options.nameForPngDownload);
+        });
+    }
+
+    // --------------------------------------------------------------
+    // Convenience methods for loading tree on HTML page
+    // --------------------------------------------------------------
+
+    /**
+     * Convenience method for loading tree on HTML page
+     *
+     * @param location
+     * @param data
+     * @param newHamphshireConfidenceValuesInBrackets
+     * @param newHamphshireConfidenceValuesAsInternalNames
+     * @returns {*}
+     */
+    public parseTree = (location: string,
+        data: string,
+        newHamphshireConfidenceValuesInBrackets?: boolean,
+        newHamphshireConfidenceValuesAsInternalNames?: boolean): any => {
+        if (newHamphshireConfidenceValuesInBrackets == undefined) {
+            newHamphshireConfidenceValuesInBrackets = true;
+        }
+        if (newHamphshireConfidenceValuesAsInternalNames == undefined) {
+            newHamphshireConfidenceValuesAsInternalNames = false;
+        }
+        var tree = null;
+        if (location.substr(-3, 3).toLowerCase() === 'xml') {
+            tree = this.parsePhyloXML(data);
+        }
+        else {
+            tree = this.parseNewHampshire(data,
+                newHamphshireConfidenceValuesInBrackets,
+                newHamphshireConfidenceValuesAsInternalNames);
+        }
+        return tree;
+    };
+
+    /**
+     *
+     *
+     * @param label
+     * @param location
+     * @param data
+     * @param options
+     * @param settings
+     * @param newHamphshireConfidenceValuesInBrackets
+     * @param newHamphshireConfidenceValuesAsInternalNames
+     * @param nodeVisualizations
+     */
+    public launchArchaeopteryx = (label: string,
+        location: string,
+        data: string,
+        options: Alcmonavis.Options | undefined | null,
+        settings: Alcmonavis.Settings,
+        newHamphshireConfidenceValuesInBrackets?: boolean,
+        newHamphshireConfidenceValuesAsInternalNames?: boolean,
+        nodeVisualizations?: Dict<Alcmonavis.NodeVisualisation>) => {
+        var tree = null;
         try {
-            archaeopteryx.launch(label, tree, options, settings, nodeVisualizations);
+            tree = this.parseTree(location,
+                data,
+                newHamphshireConfidenceValuesInBrackets,
+                newHamphshireConfidenceValuesAsInternalNames);
         }
         catch (e) {
-            alert(AP.ERROR + 'error while launching archaeopteryx: ' + e);
+            alert(AP.ERROR + 'error while parsing tree: ' + e);
         }
-    }
-};
+        if (tree) {
+            try {
+                this.launch(label, tree, options, settings, nodeVisualizations);
+            }
+            catch (e) {
+                alert(AP.ERROR + 'error while launching alcmonavis: ' + e);
+            }
+        }
+    };
 }
 
-function SettingsDeclared(settings: Alcmonavis.Settings | null): settings is Required<Alcmonavis.Settings> {
+function SettingsDeclared(settings: Alcmonavis.Settings | null | undefined): settings is Required<Alcmonavis.Settings> {
     return true;
 }
 
-function OptionsDeclared(options: Alcmonavis.Options | null): options is Required<Alcmonavis.Options> {
+function OptionsDeclared(options: Alcmonavis.Options | null | undefined): options is Required<Alcmonavis.Options> {
     return true;
 }
 
-function TreePropertyDeclared(treeProperty: Forester.TreeProperty | null): treeProperty is Required<Forester.TreeProperty> {
+function TreePropertyDeclared(treeProperty: Forester.TreeProperty | null | undefined): treeProperty is Required<Forester.TreeProperty> {
     return true;
 }
 
-function ElementInDict<T>(dict: Dict<T> | null | undefined, key: string | null | undefined): dict is Dict<T> {
-    return x.dict && x.key && x.key in x.dict;
+function VisulisationDeclared(vis: Alcmonavis.Visualisations | null | undefined): vis is Alcmonavis.Visualisations {
+    return true;
 }
