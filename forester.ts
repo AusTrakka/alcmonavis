@@ -963,7 +963,7 @@
             return nodes;
 
 
-            function matcher(node: Forester.phylo) {
+            function matcher(node: T) {
                 var mqueries = [];
                 if (!regex && (q.indexOf("+") >= 0)) {
                     mqueries = q.split("+");
@@ -1613,7 +1613,7 @@
 
         },
 
-        getOneDistinctTaxonomy: (node: Forester.phylo) => {
+        getOneDistinctTaxonomy: (node: Forester.phylo) => { // Needs to return something
             var id: string | null = null;
             var code: string | null = null;
             var sn: string | null = null;
@@ -1697,7 +1697,7 @@
             return null;
         },
 
-        getOneDistinctNodePropertyValue: (node: Forester.phylo, propertyRef: string) => {
+        getOneDistinctNodePropertyValue: (node: Forester.phylo, propertyRef: string) => { // Also needs to return something.
             var propValue: string | null = null;
             var result = true;
             forester.preOrderTraversalAll(node, function (n) {

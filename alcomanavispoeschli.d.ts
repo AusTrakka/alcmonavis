@@ -21,10 +21,17 @@ declare namespace Forester {
         parent?: this;
         children?: this[];
         _children?: this[] | null;
-        events: any;
+        events: PhyloEvents;
         max?: number;
         hide?: boolean;
         id?: string;
+    }
+
+    interface PhyloEvents {
+        speciations?: number;
+        duplications?: number;
+        losses?: number;
+        type?: string
     }
 
     interface Confidence {
@@ -133,7 +140,20 @@ declare namespace Alcmonavis {
         colorsAlt?: number[];
     }
 
-    interface phylo extends Forester.phylo {
+    interface SpecialVisulaisation {
+        label: string;
+        color: string;
+        applies_to_ref: string; //?
+        property_datatype: string; //?
+        property_applies_to: string; //?
+        property_values?: string[];
+    }
+
+    interface specialLabels {
+        collapsed_spec_label?: string;
+    }
+
+    interface phylo extends Forester.phylo, specialLabels {
         distributions?: Distributrion[];
         date?: Distributrion; // BM ??
         distToRoot: number;
@@ -142,13 +162,17 @@ declare namespace Alcmonavis {
         y0: number;
         avg: number;
         rerootable?: boolean;
-        collapsed_spec_label?: string;
     }
 
     interface Distributrion {
         desc: string
     }
 
+    interface CollapseData {
+        min: number;
+        max: number;
+        step: number;
+    }
 
 
     interface Options {
@@ -192,8 +216,8 @@ declare namespace Alcmonavis {
         branchDataFontSize?: string | number;
         collapsedLabelLength?: number;
         nodeLabelGap?: number;
-        minBranchLengthValueToShow?: number; //?
-        minConfidenceValueToShow?: number; //?
+        minBranchLengthValueToShow?: number | null; //?
+        minConfidenceValueToShow?: number | null; //?
         searchIsCaseSensitive?: boolean;
         searchIsPartial?: boolean;
         searchNegateResult?: boolean;
@@ -256,10 +280,10 @@ declare namespace Alcmonavis {
         zoomToFitUponWindowResize?: boolean;
         dynamicallyAddNodeVisualizations?: boolean;
         readSimpleCharacteristics?: boolean;
-        propertiesToIgnoreForNodeVisualization?: string[] //?
-        valuesToIgnoreForNodeVisualization?: Dict<string> //?
-        groupSpecies?: RefMapping;
-        groupYears?: GroupMapping;
+        propertiesToIgnoreForNodeVisualization?: string[] | null //?
+        valuesToIgnoreForNodeVisualization?: Dict<string> | null //?
+        groupSpecies?: RefMapping | null;
+        groupYears?: GroupMapping | null;
 
         // Actually Optional
         border?: string;
@@ -270,7 +294,9 @@ declare namespace Alcmonavis {
         legendLabel: string;
         legendDescription: string;
         clickedName: string;
-        targetScale: d3.scale.Ordinal<string, string>
+        clickedIndex: number;''
+        targetScale: d3.scale.Ordinal<string, string>;
+        clickedOrigColor: string;
     }
 
     interface RefMapping {
@@ -285,6 +311,7 @@ declare namespace Alcmonavis {
 
     interface CustomCluster<T> extends d3.layout.Cluster<T> {
         visData?: ClusterVisData;
+        clickEvent?: (this: EventTarget) => void;
     }
 
     interface ClusterVisData {
@@ -295,5 +322,11 @@ declare namespace Alcmonavis {
 }
 
 type voidFn<T> = (_: T) => void;
+type Fn<T, K> = (_: T) => K;
 type Dict<T> = { [k: string]: T }
+type HTMLstring = string;
 type MappingFunction = d3.scale.Ordinal<string, string> | d3.scale.Linear<string, string>;
+
+interface CustomD3Prototype<T> extends d3.Selection<any> {
+    moveToFront: (this: d3.Selection<T>) => void;
+}
