@@ -294,8 +294,8 @@ declare namespace Alcmonavis {
         legendLabel: string;
         legendDescription: string;
         clickedName: string;
-        clickedIndex: number;''
-        targetScale: d3.scale.Ordinal<string, string>;
+        clickedIndex: number;
+        targetScale: MappingFunction;
         clickedOrigColor: string;
     }
 
@@ -325,7 +325,7 @@ type voidFn<T> = (_: T) => void;
 type Fn<T, K> = (_: T) => K;
 type Dict<T> = { [k: string]: T }
 type HTMLstring = string;
-type MappingFunction = d3.scale.Ordinal<string, string> | d3.scale.Linear<string, string>;
+type MappingFunction = d3.scale.Ordinal<string, string> | d3.scale.Linear<number, number>;
 
 interface CustomD3Prototype<T> extends d3.Selection<any> {
     moveToFront: (this: d3.Selection<T>) => void;

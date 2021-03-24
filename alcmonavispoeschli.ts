@@ -1,11 +1,13 @@
 require("./Blob.js");
 require("./canvas-toBlob.js");
 import { forester, isString } from "./forester"
-import d3, { svg, ZoomEvent } from "d3";
+import d3 from "d3";
 import * as AP from "./constants"
-import { category50b } from "./constants";
 import 'jquery-ui'
 
+const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (d: number | string) => typeof (d) === 'number'
+    ? (scale as d3.scale.Linear<number, number>)(d)
+    : (scale as d3.scale.Ordinal<string, string>)(d);
 export default class alcmonavispoeschli {
     // ---------------------------
     // "Instance variables"
@@ -121,7 +123,7 @@ export default class alcmonavispoeschli {
     }
 
     zoom = () => {
-        const event: ZoomEvent = (d3.event as ZoomEvent);
+        const event: d3.ZoomEvent = (d3.event as d3.ZoomEvent);
         if (event.sourceEvent && (event.sourceEvent as KeyboardEvent).shiftKey) {
             if (this.scale === null) {
                 this.scale = this.zoomListener.scale();
@@ -216,9 +218,9 @@ export default class alcmonavispoeschli {
         cladePropertyRef: string | null | undefined, //?
         isRegex: boolean,
         mapping: Dict<string> | null | undefined,
-        mappingFn: d3.scale.Ordinal<string, string> | undefined, // mappingFn is a scale
+        mappingFn: MappingFunction | null | undefined, // mappingFn is a scale
         scaleType: string,
-        altMappingFn?: d3.scale.Linear<string, string>) => {
+        altMappingFn?: d3.scale.Linear<number, number> | null | undefined) => {
         // if (arguments.length < 8) {
         //     throw( 'expected at least 8 arguments, got ' + arguments.length);
         // }
@@ -330,8 +332,8 @@ export default class alcmonavispoeschli {
                             // TODO: Not dealing with nodeVisualization.field, yet.
                             if ((nodeVisualization.cladeRef && nodeProperties[nodeVisualization.cladeRef] && forester.setToArray(nodeProperties[nodeVisualization.cladeRef]).length > 0)
                                 || (nodeVisualization.label === AP.MSA_RESIDUE)) {
-                                var colorScale = null;
-                                var altColorScale = null;
+                                var colorScale: MappingFunction | null = null;
+                                var altColorScale: d3.scale.Linear<number, number> | null = null;
 
                                 if (Array.isArray(nodeVisualization.colors)) {
                                     scaleType = AP.LINEAR_SCALE;
@@ -395,17 +397,17 @@ export default class alcmonavispoeschli {
                                             this.usedColorCategories.add('category10');
                                         }
                                         else if (nodeVisualization.colors === 'category50') {
-                                            colorScale = AP.category50()
+                                            colorScale = AP.category50<string>()
                                                 .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
                                             this.usedColorCategories.add('category50');
                                         }
                                         else if (nodeVisualization.colors === 'category50b') {
-                                            colorScale = AP.category50b()
+                                            colorScale = AP.category50b<string>()
                                                 .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
                                             this.usedColorCategories.add('category50b');
                                         }
                                         else if (nodeVisualization.colors === 'category50c') {
-                                            colorScale = AP.category50c()
+                                            colorScale = AP.category50c<string>()
                                                 .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
                                             this.usedColorCategories.add('category50c');
                                         }
@@ -487,11 +489,11 @@ export default class alcmonavispoeschli {
 
     addNodeSizeVisualization = (label: string,
         description: string,
-        field: keyof Forester.phylo,
+        field: keyof Forester.phylo | null,
         cladePropertyRef: string,
         isRegex: boolean,
-        mapping: Dict<string>,
-        mappingFn: d3.scale.Ordinal<string, string>,
+        mapping: Dict<string> | null,
+        mappingFn: MappingFunction | null | undefined,
         scaleType: string) => {
         // if (arguments.length != 8) {
         //     throw( 'expected 8 arguments, got ' + arguments.length);
@@ -524,9 +526,9 @@ export default class alcmonavispoeschli {
         cladePropertyRef: string | null | undefined,
         isRegex: boolean,
         mapping: Dict<string> | null | undefined,
-        mappingFn: d3.scale.Ordinal<string, string>,
+        mappingFn: MappingFunction | null | undefined,
         scaleType: string,
-        altMappingFn?: d3.scale.Linear<string, string>) => {
+        altMappingFn?: d3.scale.Linear<number, number> | null | undefined) => {
         // if (arguments.length < 8) {
         //     throw( 'expected at least 8 arguments, got ' + arguments.length);
         // }
@@ -560,9 +562,9 @@ export default class alcmonavispoeschli {
         cladePropertyRef: string,
         isRegex: boolean,
         mapping: Dict<string> | null | undefined,
-        mappingFn: d3.scale.Ordinal<string, string>,
+        mappingFn: MappingFunction | null,
         scaleType: string,
-        altMappingFn?: d3.scale.Linear<string, string>) => {
+        altMappingFn?: d3.scale.Linear<number, number> | null | undefined) => {
         // if (arguments.length < 8) {
         //     throw( 'expected at least 8 arguments, got ' + arguments.length);
         // }
@@ -628,9 +630,9 @@ export default class alcmonavispoeschli {
         cladePropertyRef: string | null | undefined,
         isRegex: boolean,
         mapping: Dict<string> | null | undefined,
-        mappingFn: d3.scale.Ordinal<string, string>,
+        mappingFn: MappingFunction,
         scaleType: string,
-        altMappingFn?: d3.scale.Linear<string, string>) => {
+        altMappingFn?: d3.scale.Linear<number, number> | null) => {
         // if (arguments.length < 8) {
         //     throw( 'expected at least 8 arguments, got ' + arguments.length);
         // }
@@ -674,11 +676,12 @@ export default class alcmonavispoeschli {
     makeColorLegend = (id: string,
         xPos: number,
         yPos: number,
-        colorScale,
+        colorScale: d3.scale.Ordinal<string, string> | d3.scale.Linear<number, number>,
         scaleType: string,
         label: string | undefined,
         description: string
     ) => {
+
         if (!SettingsDeclared(this.settings)) throw "Settings not set";
         if (!label) {
             throw 'legend label is missing';
@@ -708,7 +711,7 @@ export default class alcmonavispoeschli {
         var yFactorForDesc = -0.5;
 
         var legend = this.baseSvg.selectAll('g.' + id)
-            .data(colorScale.domain());
+            .data<number | string>(colorScale.domain());
 
         var legendEnter = legend.enter().append('g')
             .attr('class', id);
@@ -753,7 +756,7 @@ export default class alcmonavispoeschli {
 
         var legendUpdate = legend.transition()
             .duration(0)
-            .attr('transform', function (d, i) {
+            .attr('transform', function (_d, i) {
                 ++counter;
                 var height = legendRectSize;
                 var x = xPos;
@@ -764,8 +767,8 @@ export default class alcmonavispoeschli {
         legendUpdate.select('rect')
             .attr('width', legendRectSize)
             .attr('height', legendRectSize)
-            .style('fill', colorScale)
-            .style('stroke', colorScale);
+            .style('fill', scaleSwitch(colorScale))
+            .style('stroke', scaleSwitch(colorScale));
 
         legendUpdate.select('text.' + AP.LEGEND)
             .attr('x', legendRectSize + legendSpacing)
@@ -780,7 +783,7 @@ export default class alcmonavispoeschli {
                         return d + ' (max)';
                     }
                     else if (linearRangeLength === 3 && i === 1) {
-                        return this.preciseRound(d, this.options.decimalsForLinearRangeMeanValue) + ' (mean)';
+                        return this.preciseRound(+d, this.options && this.options.decimalsForLinearRangeMeanValue || 0) + ' (mean)';
                     }
                 }
                 return d;
@@ -791,8 +794,9 @@ export default class alcmonavispoeschli {
             .attr('y', yFactorForLabel * legendRectSize)
             .text(function (d, i) {
                 if (i === 0) {
-                    return label;
+                    return label || '';
                 }
+                return '';
             });
 
         legendUpdate.select('text.' + AP.LEGEND_DESCRIPTION)
@@ -806,6 +810,7 @@ export default class alcmonavispoeschli {
                     }
                     return description;
                 }
+                return '';
             });
 
 
@@ -814,11 +819,11 @@ export default class alcmonavispoeschli {
         return counter;
     }
 
-    makeShapeLegend = (id:string,
-        xPos: number, 
-        yPos: number, 
-        shapeScale, 
-        label: string, 
+    makeShapeLegend = (id: string,
+        xPos: number,
+        yPos: number,
+        shapeScale: MappingFunction,
+        label: string,
         description: string
     ) => {
         if (!SettingsDeclared(this.settings)) throw "Settings not set";
@@ -843,7 +848,7 @@ export default class alcmonavispoeschli {
         var yFactorForDesc = -0.5;
 
         var legend = this.baseSvg.selectAll('g.' + id)
-            .data(shapeScale.domain());
+            .data<string | number>(shapeScale.domain());
 
         var legendEnter = legend.enter().append('g')
             .attr('class', id);
@@ -888,7 +893,7 @@ export default class alcmonavispoeschli {
                 return 'translate(' + x + ',' + y + ')';
             });
 
-        var values = [];
+        var values: (string | number)[] = [];
 
         legendUpdate.select('text.' + AP.LEGEND)
             .attr('x', legendRectSize + legendSpacing)
@@ -929,11 +934,9 @@ export default class alcmonavispoeschli {
                 .size(function () {
                     return 20;
                 })
-                .type(function (d, i) {
-                    return shapeScale(values[i]);
-                }))
+                .type((_, i) => scaleSwitch(shapeScale)(values[i]) as string))
             .style('fill', 'none')
-            .style('stroke', this.options.branchColorDefault);
+            .style('stroke', this.options && this.options.branchColorDefault || AP.WHITE);
 
 
         legend.exit().remove();
@@ -942,12 +945,12 @@ export default class alcmonavispoeschli {
     }
 
 
-    makeSizeLegend = (id: string, 
-        xPos: number, 
-        yPos: number, 
-        sizeScale, 
-        scaleType: string, 
-        label: string, 
+    makeSizeLegend = (id: string,
+        xPos: number,
+        yPos: number,
+        sizeScale: MappingFunction,
+        scaleType: string,
+        label: string,
         description: string) => {
         if (!SettingsDeclared(this.settings)) throw "Settings not set";
 
@@ -972,7 +975,7 @@ export default class alcmonavispoeschli {
         var yFactorForDesc = -0.5;
 
         var legend = this.baseSvg.selectAll('g.' + id)
-            .data(sizeScale.domain());
+            .data<string | number>(sizeScale.domain());
 
         var legendEnter = legend.enter().append('g')
             .attr('class', id);
@@ -1017,7 +1020,7 @@ export default class alcmonavispoeschli {
                 return 'translate(' + x + ',' + y + ')';
             });
 
-        var values = [];
+        var values: (string | number)[] = [];
 
         legendUpdate.select('text.' + AP.LEGEND)
             .attr('x', legendRectSize + legendSpacing)
@@ -1033,7 +1036,7 @@ export default class alcmonavispoeschli {
                         return d + ' (max)';
                     }
                     else if (linearRangeLength === 3 && i === 1) {
-                        return this.preciseRound(d, this.options!.decimalsForLinearRangeMeanValue!) + ' (mean)';
+                        return this.preciseRound(+d, this.options!.decimalsForLinearRangeMeanValue!) + ' (mean)';
                     }
                 }
                 return d;
@@ -1046,6 +1049,7 @@ export default class alcmonavispoeschli {
                 if (i === 0) {
                     return label;
                 }
+                return '';
             });
 
         legendUpdate.select('text.' + AP.LEGEND_DESCRIPTION)
@@ -1055,6 +1059,7 @@ export default class alcmonavispoeschli {
                 if (i === 0 && description) {
                     return description;
                 }
+                return '';
             });
 
         legendUpdate.select('path')
@@ -1064,7 +1069,7 @@ export default class alcmonavispoeschli {
             .attr('d', d3.svg.symbol()
                 .size((d, i) => {
                     var scale = this.zoomListener.scale();
-                    return scale * this.options!.nodeSizeDefault! * sizeScale(values[i]);
+                    return scale * this.options!.nodeSizeDefault! * +scaleSwitch(sizeScale)(values[i]);
                 })
                 .type(() => 'circle'))
             .style('fill', 'none')
@@ -1182,7 +1187,7 @@ export default class alcmonavispoeschli {
 
         if (this.showLegends && this.options.showNodeVisualizations && this.legendShapeScales[AP.LEGEND_NODE_SHAPE]) {
             label = 'Node Shape';
-            desc = this.currentNodeShapeVisualization;
+            desc = this.currentNodeShapeVisualization || '';
             counter = this.makeShapeLegend(AP.LEGEND_NODE_SHAPE, xPos, yPos, this.legendShapeScales[AP.LEGEND_NODE_SHAPE], label, desc);
             xPos += xPosIncr;
             yPos += ((counter * yPosIncr) + yPosIncrConst);
@@ -1246,7 +1251,7 @@ export default class alcmonavispoeschli {
         }
         else if (name === 'category50b') {
             l = 50;
-            colorScale = category50b<number>()
+            colorScale = AP.category50b<number>()
                 .domain(fifty);
         }
         else if (name === 'category50c') {
@@ -1264,14 +1269,16 @@ export default class alcmonavispoeschli {
         return colors;
     }
 
-    addColorPicker = (targetScale: d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string, clickedIndex: number) => {
+    addColorPicker = (targetScale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string | number, clickedIndex: number) => {
         this.colorPickerData = {} as Alcmonavis.ColourPickerData;
         this.colorPickerData.targetScale = targetScale;
         this.colorPickerData.legendLabel = legendLabel;
         this.colorPickerData.legendDescription = legendDescription;
-        this.colorPickerData.clickedName = clickedName;
+        this.colorPickerData.clickedName = clickedName.toString();
         this.colorPickerData.clickedIndex = clickedIndex;
-        this.colorPickerData.clickedOrigColor = targetScale(clickedName);
+        this.colorPickerData.clickedOrigColor = typeof (clickedName) === 'number'
+            ? (targetScale as d3.scale.Linear<number, number>)(clickedName).toString()
+            : (targetScale as d3.scale.Ordinal<string, string>)(clickedName)
         this.showColorPicker = true;
     }
 
@@ -2016,7 +2023,7 @@ export default class alcmonavispoeschli {
                 }
                 if (residue != null && residue != '-' && residue != '.' && residue != '?' && this.visualizations.nodeFillColor) {
                     let vis = this.visualizations.nodeFillColor[AP.MSA_RESIDUE];
-                    return vis.mappingFn ? vis.mappingFn(residue) : vis.mapping[residue];
+                    return vis.mappingFn ? scaleSwitch(vis.mappingFn)(residue) : vis.mapping[residue];
                 }
             }
             else if ((this.isAddVisualization2() || this.isAddVisualization3()) && (this.specialVisualizations != null) && (n.properties != null)) {
@@ -2179,8 +2186,8 @@ export default class alcmonavispoeschli {
     makeNodeVisShape = (node: Alcmonavis.phylo) => {
         const produceVis = (vis: Alcmonavis.Visualisation, key: string) => {
             if (vis.mappingFn) {
-                if (vis.mappingFn(key)) {
-                    return makeShape(node, vis.mappingFn(key));
+                if (typeof scaleSwitch(vis.mappingFn)(key) === 'string') {
+                    return makeShape(node, scaleSwitch(vis.mappingFn)(key) as string);
                 }
             }
             else if (vis.mapping[key]) {
@@ -2194,7 +2201,7 @@ export default class alcmonavispoeschli {
             return d3.svg.symbol<Alcmonavis.phylo>().type(shape).size(this.makeVisNodeSize(node))(node);
         }
 
-        if(!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree properties not set"
+        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree properties not set"
 
         if (this.currentNodeShapeVisualization && this.visualizations && !node._children && this.visualizations.nodeShape
             && this.visualizations.nodeShape[this.currentNodeShapeVisualization] && !this.isNodeFound(node)
@@ -2210,10 +2217,11 @@ export default class alcmonavispoeschli {
                         if (s.mol_seq && s.mol_seq.value && (s.mol_seq.value.length > this.msa_residue_vis_curr_res_pos)) {
                             var res = s.mol_seq.value.charAt(this.msa_residue_vis_curr_res_pos).toUpperCase();
                             if (vis.mappingFn) {
-                                vis.mappingFn.domain(this.basicTreeProperties.molSeqResiduesPerPosition[this.msa_residue_vis_curr_res_pos]);
+                                vis.mappingFn.domain(this.basicTreeProperties.molSeqResiduesPerPosition![this.msa_residue_vis_curr_res_pos]);
                             }
                             if (vis.mapping) {
-                                vis.mapping.domain(this.basicTreeProperties.molSeqResiduesPerPosition[this.msa_residue_vis_curr_res_pos]);
+                                // BM vis.mapping is a Dictionary, not a scale. What is it doing here?
+                                //vis.mapping.domain(this.basicTreeProperties.molSeqResiduesPerPosition![this.msa_residue_vis_curr_res_pos]);
                             }
                             return produceVis(vis, res);
                         }
@@ -2314,7 +2322,7 @@ export default class alcmonavispoeschli {
                     var res = s.mol_seq.value.charAt(this.msa_residue_vis_curr_res_pos).toUpperCase();
                     if (vis.mappingFn) {
                         vis.mappingFn.domain(this.basicTreeProperties!.molSeqResiduesPerPosition![this.msa_residue_vis_curr_res_pos]);
-                        return vis.mappingFn(res);
+                        return scaleSwitch(vis.mappingFn)(res) as string;
                     }
                     else if (vis.mapping) {
                         //vis.mapping.domain(this.basicTreeProperties.molSeqResiduesPerPosition[this.msa_residue_vis_curr_res_pos]);
@@ -2373,7 +2381,7 @@ export default class alcmonavispoeschli {
         return null;
 
         function produceVis(vis: Alcmonavis.Visualisation, key: string) {
-            return vis.mappingFn ? vis.mappingFn(key) : vis.mapping[key];
+            return vis.mappingFn ? scaleSwitch(vis.mappingFn)(key) + '' : vis.mapping[key];
         }
     };
 
@@ -2458,10 +2466,11 @@ export default class alcmonavispoeschli {
 
     makeVisLabelColorForSubtree = (node: Alcmonavis.phylo) => {
         class InternalColour { // Sometimes, TypeScript sucks
-            private color: string | null | undefined = null;
-            private success: boolean = true;
-            constructor() {
-
+            private color: string | null | undefined;
+            private success: boolean;
+            constructor(s: boolean = true) {
+                this.color = null;
+                this.success = s;
             }
 
             setSuccess = (s: boolean) => this.success = s;
@@ -2500,7 +2509,7 @@ export default class alcmonavispoeschli {
         if (!OptionsDeclared(this.options)) throw "Options not set";
         const options = this.options;
         const produceVis = (vis: Alcmonavis.Visualisation, key: string, correctionFactor?: number) => {
-            const size = vis.mappingFn ? vis.mappingFn(key) : vis.mapping[key]; // BM: MappingFunction returns a number?
+            const size = vis.mappingFn ? scaleSwitch(vis.mappingFn)(key) : vis.mapping[key]; // BM: MappingFunction returns a number? // BM: what scale ends up getting used here?!
             if (size) {
                 if (correctionFactor) {
                     return correctionFactor * +size * options.nodeSizeDefault;
@@ -5178,7 +5187,7 @@ export default class alcmonavispoeschli {
         this.options.visualizationsLegendYpos = this.options.visualizationsLegendYposOrig;
     }
 
-    legendColorRectClicked = (targetScale: d3.scale.Ordinal<string, string>, legendLabel: string, legendDescription: string, clickedName: string, clickedIndex: number) => {
+    legendColorRectClicked = (targetScale: d3.scale.Ordinal<string, string> | d3.scale.Linear<number, number>, legendLabel: string, legendDescription: string, clickedName: string | number, clickedIndex: number) => {
 
         this.addColorPicker(targetScale, legendLabel, legendDescription, clickedName, clickedIndex);
         this.update();
@@ -6291,7 +6300,7 @@ export default class alcmonavispoeschli {
                     case AP.VK_U: this.uncollapseAllButtonPressed(); break;
                     case AP.VK_M: this.midpointRootButtonPressed(); break;
                     case AP.VK_P: this.cycleDisplay(); break;
-                    case AP.VK_L: this.toggleAlignPhylogram(); break;
+                    //case AP.VK_L: this.toggleAlignPhylogram(); break; // BM what is this?
                     case AP.VK_OPEN_BRACKET:
                         if (this.isCanDoMsaResidueVisualizations()) {
                             this.decrMsaResidueVisCurrResPos();
