@@ -45,7 +45,7 @@ declare namespace Forester {
         scientific_name: string;
         common_name: string;
         synonym: string;
-        //synonyms: string[]; //?
+        synonyms: string[]; //?
         id: property;
         rank: string;
     }

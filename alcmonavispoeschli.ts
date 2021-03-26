@@ -1,5 +1,6 @@
-require("./Blob.js");
-require("./canvas-toBlob.js");
+require("./lib/Blob.js");
+require("./lib/canvas-toBlob.js");
+import { phyloXml } from "./lib/phyloXml/phyloxml.js"
 import { forester, isString } from "./forester"
 import d3 from "d3";
 import * as AP from "./constants"
@@ -1520,21 +1521,21 @@ export default class alcmonavispoeschli {
 
 
     colorPickerClicked = (colorPicked: string) => {
-        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
-
-        var vis = this.visualizations.labelColor![this.colorPickerData!.legendDescription];
+        if (!this.visualizations || !this.visualizations.labelColor) throw "Label Colour Visualisations not set";
+        if (!this.colorPickerData) throw "Colour Picker Data not set";
+        var vis = this.visualizations.labelColor[this.colorPickerData.legendDescription];
         var mf = vis.mappingFn;
 
         var scaleType = vis.scaleType;
         if (scaleType === AP.ORDINAL_SCALE) {
-            var ord = this.colorPickerData!.targetScale;
-            var domain = ord.domain();
+            var ord = this.colorPickerData!.targetScale as d3.scale.Ordinal<string, string>;
+            let domain = ord.domain();
             var range = ord.range();
-            var newColorRange = range.slice();
+            let newColorRange = range.slice();
             for (var di = 0, len = range.length; di < len; ++di) {
-                var curName = domain[di];
+                let curName = domain[di];
                 if (curName != undefined) {
-                    if (curName === this.colorPickerData!.clickedName) {
+                    if (curName === this.colorPickerData.clickedName) {
                         newColorRange[di] = colorPicked;
                     }
                     else {
@@ -1545,13 +1546,13 @@ export default class alcmonavispoeschli {
             mf.range(newColorRange);
         }
         else if (scaleType === AP.LINEAR_SCALE) {
-            var lin = this.colorPickerData!.targetScale;
-            var domain = lin.domain();
-            var newColorRange: string[] = [];
+            var lin = this.colorPickerData!.targetScale as d3.scale.Linear<number, number>;
+            let domain = lin.domain();
+            let newColorRange: number[] = [];
             for (var dii = 0, domainLength = domain.length; dii < domainLength; ++dii) {
-                var curName = domain[dii];
-                if (curName === this.colorPickerData!.clickedName) {
-                    newColorRange[dii] = colorPicked;
+                let curName = domain[dii];
+                if (curName === +this.colorPickerData.clickedName) {
+                    newColorRange[dii] = +colorPicked;
                 }
                 else {
                     newColorRange[dii] = lin(curName);
@@ -1988,7 +1989,7 @@ export default class alcmonavispoeschli {
 
     makeBranchColor = (link: d3.layout.cluster.Link<Alcmonavis.phylo>) => {
         if (!OptionsDeclared(this.options)) throw "Options not set";
-        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
+        if (!this.visualizations || !this.visualizations.nodeFillColor) throw "Node Fill Colour Visualisation not set";
 
         //const options = this.options;
 
@@ -2200,9 +2201,6 @@ export default class alcmonavispoeschli {
             node.hasVis = true;
             return d3.svg.symbol<Alcmonavis.phylo>().type(shape).size(this.makeVisNodeSize(node))(node);
         }
-
-        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree properties not set"
-
         if (this.currentNodeShapeVisualization && this.visualizations && !node._children && this.visualizations.nodeShape
             && this.visualizations.nodeShape[this.currentNodeShapeVisualization] && !this.isNodeFound(node)
             && this.options && !(this.options.showNodeEvents && (node.events && (node.events.duplications
@@ -2217,7 +2215,7 @@ export default class alcmonavispoeschli {
                         if (s.mol_seq && s.mol_seq.value && (s.mol_seq.value.length > this.msa_residue_vis_curr_res_pos)) {
                             var res = s.mol_seq.value.charAt(this.msa_residue_vis_curr_res_pos).toUpperCase();
                             if (vis.mappingFn) {
-                                vis.mappingFn.domain(this.basicTreeProperties.molSeqResiduesPerPosition![this.msa_residue_vis_curr_res_pos]);
+                                vis.mappingFn.domain(this.basicTreeProperties!.molSeqResiduesPerPosition![this.msa_residue_vis_curr_res_pos]);
                             }
                             if (vis.mapping) {
                                 // BM vis.mapping is a Dictionary, not a scale. What is it doing here?
@@ -2424,15 +2422,14 @@ export default class alcmonavispoeschli {
     };
 
     makeVisLabelColor = (node: Alcmonavis.phylo) => {
-        if (!VisulisationDeclared(this.visualizations)) throw "Visualisations not set";
+        if (!this.visualizations || !this.visualizations.labelColor) throw "Label Colour Visualisations not set";
         if (!OptionsDeclared(this.options)) throw "Options not set";
 
         if (this.currentLabelColorVisualization === AP.MSA_RESIDUE && this.visualizations.labelColor) {
             return this.makeMsaResidueVisualizationColor(node, this.visualizations.labelColor[AP.MSA_RESIDUE]);
         }
         if (!node._children && this.currentLabelColorVisualization) {
-            if (this.visualizations && this.visualizations.labelColor
-                && this.visualizations.labelColor[this.currentLabelColorVisualization]) {
+            if (this.visualizations.labelColor[this.currentLabelColorVisualization]) {
                 var vis = this.visualizations.labelColor[this.currentLabelColorVisualization];
                 var color = this.makeVisColor(node, vis);
 
@@ -2440,7 +2437,7 @@ export default class alcmonavispoeschli {
                     return color;
                 }
             }
-            else if (node.properties != null) { //~~
+            else if (node.properties !== undefined && node.properties !== null) { //~~
                 //~~~~~
                 const l = node.properties.length;
                 for (var p = 0; p < l; ++p) {
@@ -3676,7 +3673,7 @@ export default class alcmonavispoeschli {
 
     };
 
-    public parsePhyloXML = (data) => {
+    public parsePhyloXML = (data: string) => {
         var phy: Alcmonavis.phylo = phyloXml.parse(data, { trim: true, normalize: true })[0];
         forester.addParents(phy);
         return phy;
@@ -7232,9 +7229,8 @@ export default class alcmonavispoeschli {
     }
 
     decrMsaResidueVisCurrResPos = () => {
-        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree Properties not set";
         if (this.msa_residue_vis_curr_res_pos <= 0) {
-            this.msa_residue_vis_curr_res_pos = this.basicTreeProperties.maxMolSeqLength - 1;
+            this.msa_residue_vis_curr_res_pos = this.basicTreeProperties!.maxMolSeqLength! - 1;
         }
         else {
             this.msa_residue_vis_curr_res_pos -= 1;
@@ -7245,8 +7241,7 @@ export default class alcmonavispoeschli {
     }
 
     incrMsaResidueVisCurrResPos = () => {
-        if (!TreePropertyDeclared(this.basicTreeProperties)) throw "Tree Properties not set";
-        if (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties.maxMolSeqLength - 1)) {
+        if (this.msa_residue_vis_curr_res_pos >= (this.basicTreeProperties!.maxMolSeqLength! - 1)) {
             this.msa_residue_vis_curr_res_pos = 0;
         }
         else {
@@ -7652,33 +7647,35 @@ export default class alcmonavispoeschli {
     }
 
     downloadAsPhyloXml = () => {
-        if (!OptionsDeclared(this.options)) throw "Options not set";
-        var x = phyloXml.toPhyloXML(this.root, 9);
-        saveAs(new Blob([x], { type: "application/xml" }), this.options.nameForPhyloXmlDownload);
+        // if (!OptionsDeclared(this.options)) throw "Options not set";
+        // var x = phyloXml.toPhyloXML(this.root, 9);
+        // saveAs(new Blob([x], { type: "application/xml" }), this.options.nameForPhyloXmlDownload);
     }
 
     downloadAsNH = () => {
-        if (!OptionsDeclared(this.options)) throw "Options not set";
-        if (!SettingsDeclared(this.settings)) throw "Settings not set";
-        var nh = forester.toNewHampshire(this.root, 9, this.settings.nhExportReplaceIllegalChars, this.settings.nhExportWriteConfidences);
-        saveAs(new Blob([nh], { type: "application/txt" }), this.options.nameForNhDownload);
+        // if (!OptionsDeclared(this.options)) throw "Options not set";
+        // if (!SettingsDeclared(this.settings)) throw "Settings not set";
+        // var nh = forester.toNewHampshire(this.root, 9, this.settings.nhExportReplaceIllegalChars, this.settings.nhExportWriteConfidences);
+        // saveAs(new Blob([nh], { type: "application/txt" }), this.options.nameForNhDownload);
     }
 
     downloadAsSVG = () => {
-        var svg = this.getTreeAsSvg();
-        saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
+        // if (!OptionsDeclared(this.options)) throw "Options not set";
+        // var svg = this.getTreeAsSvg();
+        // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
     }
 
     downloadAsPdf = () => {
     }
 
     downloadAsPng = () => {
-        var svg = this.getTreeAsSvg();
-        var canvas = document.createElement('canvas');
-        canvg(canvas, svg);
-        canvas.toBlob((blob) => {
-            saveAs(blob, this.options.nameForPngDownload);
-        });
+        // if (!OptionsDeclared(this.options)) throw "Options not set";
+        // var svg = this.getTreeAsSvg();
+        // var canvas = document.createElement('canvas');
+        // canvg(canvas, svg);
+        // canvas.toBlob((blob) => {
+        //     saveAs(blob, this.options!.nameForPngDownload);
+        // });
     }
 
     // --------------------------------------------------------------
@@ -7758,17 +7755,116 @@ export default class alcmonavispoeschli {
 }
 
 function SettingsDeclared(settings: Alcmonavis.Settings | null | undefined): settings is Required<Alcmonavis.Settings> {
-    return true;
+    return !!(settings
+        //&& settings.border
+        && settings.collapseLabelWidth
+        && settings.controls0
+        && settings.controls0Left
+        && settings.controls0Top
+        && settings.controls1
+        && settings.controls1Left
+        && settings.controls1Top
+        && settings.controls1Width
+        && settings.controlsBackgroundColor
+        && settings.controlsFont
+        && settings.controlsFontColor
+        && settings.controlsFontSize
+        && settings.displayHeight
+        && settings.displayWidth
+        && settings.dynamicallyAddNodeVisualizations
+        && settings.enableAccessToDatabases
+        && settings.enableBranchVisualizations
+        && settings.enableCollapseByBranchLenghts
+        && settings.enableCollapseByFeature
+        && settings.enableCollapseByTaxonomyRank
+        && settings.enableDownloads
+        && settings.enableDynamicSizing
+        && settings.enableMsaResidueVisualizations
+        && settings.enableNodeVisualizations
+        && settings.enableSubtreeDeletion
+        && settings.groupSpecies
+        && settings.groupYears
+        && settings.nhExportReplaceIllegalChars
+        && settings.nhExportWriteConfidences
+        && settings.propertiesToIgnoreForNodeVisualization
+        && settings.readSimpleCharacteristics
+        && settings.rootOffset
+        && settings.searchFieldWidth
+        && settings.showBranchColorsButton
+        && settings.showDynahideButton
+        && settings.showShortenNodeNamesButton
+        //&& settings.specialProcessing
+        && settings.textFieldHeight
+        && settings.valuesToIgnoreForNodeVisualization
+        && settings.zoomToFitUponWindowResize);
 }
 
 function OptionsDeclared(options: Alcmonavis.Options | null | undefined): options is Required<Alcmonavis.Options> {
-    return true;
-}
-
-function TreePropertyDeclared(treeProperty: Forester.TreeProperty | null | undefined): treeProperty is Required<Forester.TreeProperty> {
-    return true;
-}
-
-function VisulisationDeclared(vis: Alcmonavis.Visualisations | null | undefined): vis is Alcmonavis.Visualisations {
-    return true;
+    return !!(options 
+        && options.alignPhylogram
+        && options.backgroundColorDefault
+        && options.backgroundColorForPrintExportDefault
+        && options.branchColorDefault
+        && options.branchDataFontSize
+        && options.branchWidthDefault
+        && options.collapsedLabelLength
+        && options.decimalsForLinearRangeMeanValue
+        && options.defaultFont
+        && options.dynahide
+        && options.externalNodeFontSize
+        && options.found0ColorDefault
+        && options.found0and1ColorDefault
+        && options.found1ColorDefault
+        && options.initialCollapseDepth
+        && options.initialCollapseFeature
+        && options.internalNodeFontSize
+        && options.labelColorDefault
+        && options.minBranchLengthValueToShow
+        && options.minConfidenceValueToShow
+        && options.nameForNhDownload
+        && options.nameForPhyloXmlDownload
+        && options.nameForPngDownload
+        && options.nameForSvgDownload
+        && options.nodeLabelGap
+        && options.nodeSizeDefault
+        && options.nodeVisualizationsOpacity
+        && options.phylogram
+        && options.searchAinitialValue
+        && options.searchBinitialValue
+        && options.searchIsCaseSensitive
+        && options.searchIsPartial
+        && options.searchNegateResult
+        && options.searchProperties
+        && options.searchUsesRegex
+        && options.shortenNodeNames
+        && options.showBranchColors
+        && options.showBranchEvents
+        && options.showBranchLengthValues
+        && options.showBranchVisualizations
+        && options.showConfidenceValues
+        && options.showDistributions
+        && options.showExternalLabels
+        && options.showExternalNodes
+        && options.showInternalLabels
+        && options.showInternalNodes
+        && options.showNodeEvents
+        && options.showNodeName
+        && options.showNodeVisualizations
+        && options.showSequence
+        && options.showSequenceAccession
+        && options.showSequenceGeneSymbol
+        && options.showSequenceName
+        && options.showSequenceSymbol
+        && options.showTaxonomy
+        && options.showTaxonomyCode
+        && options.showTaxonomyCommonName
+        && options.showTaxonomyRank
+        && options.showTaxonomyScientificName
+        && options.showTaxonomySynonyms
+        && options.treeName
+        && options.visualizationsLegendOrientation
+        && options.visualizationsLegendXpos
+        && options.visualizationsLegendXposOrig
+        && options.visualizationsLegendYpos
+        && options.visualizationsLegendYposOrig);
 }

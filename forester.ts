@@ -1320,7 +1320,7 @@
                 (node.properties && node.properties.length > 0));
         },
 
-        removeMaxBranchLengt: (node: Forester.phylo) => {
+        removeMaxBranchLength: (node: Forester.phylo) => {
             forester.preOrderTraversalAll(node, function (n) {
                 if (n.max) {
                     n.max = undefined;
@@ -1356,6 +1356,9 @@
                 collapseToBranchLengthHelper(root.children[0], branchLength);
             }
         },
+
+        // Unsure if this is an alias of collapseToBranchLength, or if it's supposed to have the opposite functionality
+        collapseToDepth: (root: Forester.phylo, branchLength: number) => forester.collapseToBranchLength(root, branchLength),
 
         collapse: (node: Forester.phylo) => {
             if (node.children) {
