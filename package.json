@@ -37,5 +37,6 @@
     "@types/jqueryui": "^1.12.15",
     "@types/node": "^14.14.36",
     "typescript": "^3.9.9"
-  }
+  },
+  "files": ["lib/**/*"]
 }

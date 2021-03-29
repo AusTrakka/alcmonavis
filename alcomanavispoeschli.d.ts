@@ -1,3 +1,4 @@
+import d3 from "d3"
 declare namespace Forester {
     interface branchData {
         width: string;
@@ -237,9 +238,9 @@ declare namespace Alcmonavis {
         nameForSvgDownload?: string;
         visualizationsLegendXpos?: number;
         visualizationsLegendYpos?: number;
-        visualizationsLegendXposOrig: number;
-        visualizationsLegendYposOrig: number;
-        visualizationsLegendOrientation: 'vertical' | 'horizontal'
+        visualizationsLegendXposOrig?: number;
+        visualizationsLegendYposOrig?: number;
+        visualizationsLegendOrientation?: 'vertical' | 'horizontal'
         initialCollapseFeature?: string | null; //?
         initialCollapseDepth?: number;
     }
