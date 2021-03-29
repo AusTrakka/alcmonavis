@@ -28,7 +28,6 @@
   "dependencies": {
     "d3": "^3.5.17",
     "jquery": "^3.6.0",
-    "jQuery": "^1.7.4",
     "jquery-ui": "^1.12.1"
   },
   "devDependencies": {

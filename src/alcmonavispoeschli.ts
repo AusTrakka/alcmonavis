@@ -1,6 +1,6 @@
-require("./lib/Blob.js");
-require("./lib/canvas-toBlob.js");
-import { phyloXml } from "../lib/phyloXml/phyloxml.js"
+require("./Blob.js");
+require(".canvas-toBlob.js");
+import { phyloXml } from "./phyloXml"
 import { forester, isString } from "./forester"
 import d3 from "d3";
 import * as AP from "./constants"
