@@ -8,7 +8,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "npm run clean && tsc && npm run copy-others",
+    "clean": "rimraf ./lib",
+    "copy-others": "copyfiles -f ./src/*.js ./src/*.d.ts ./lib"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,8 @@
     "@types/jquery": "^3.5.5",
     "@types/jqueryui": "^1.12.15",
     "@types/node": "^14.14.36",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2",
     "typescript": "^3.9.9"
   },
   "files": [

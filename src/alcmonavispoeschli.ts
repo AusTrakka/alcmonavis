@@ -1,5 +1,5 @@
 require("./Blob.js");
-require(".canvas-toBlob.js");
+require("./canvas-toBlob.js");
 import { phyloXml } from "./phyloXml"
 import { forester, isString } from "./forester"
 import d3 from "d3";
