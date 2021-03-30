@@ -1,5 +1,5 @@
-import { isString } from "../forester";
+import { isString } from '../forester';
 
 test('is string', () => {
-    expect(isString("string")).toBe(true);
+  expect(isString('string')).toBe(true);
 });
