@@ -1,6 +1,6 @@
 require('./Blob.js');
 require('./canvas-toBlob.js');
-import $ from "jquery"
+import $ from 'jquery';
 import { phyloXml } from './phyloXml';
 import { forester, isString } from './forester';
 import d3 from 'd3';
