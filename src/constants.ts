@@ -1,4 +1,4 @@
-import d3 from "d3"
+import d3 from 'd3';
 
 export const VERSION = '1.0.0';
 export const WEBSITE = 'https://sites.google.com/site/cmzmasek/home/software/archaeopteryx-js';
@@ -72,12 +72,12 @@ export const TEXT_INPUT_FIELD_DEFAULT_HEIGHT = '10px';
 // ------------------------------
 // Various export constants and settings
 // ------------------------------
-export const ACC_GENBANK = "GENBANK";
-export const ACC_REFSEQ = "REFSEQ";
-export const ACC_UNIPROT = "UNIPROT";
-export const ACC_UNIPROTKB = "UNIPROTKB";
-export const ACC_SWISSPROT = "SWISSPROT";
-export const ACC_TREMBL = "TREMBL";
+export const ACC_GENBANK = 'GENBANK';
+export const ACC_REFSEQ = 'REFSEQ';
+export const ACC_UNIPROT = 'UNIPROT';
+export const ACC_UNIPROTKB = 'UNIPROTKB';
+export const ACC_SWISSPROT = 'SWISSPROT';
+export const ACC_TREMBL = 'TREMBL';
 export const BRANCH_EVENT_APPLIES_TO = 'parent_branch';
 export const BRANCH_EVENT_DATATYPE = 'xsd:string';
 export const BRANCH_EVENT_REF = 'aptx:branch_event';
@@ -230,7 +230,6 @@ export const LABEL_COLOR_SELECT_MENU_3 = 'lcs_3_menu'; // SELECT id //~~~
 export const NODE_FILL_COLOR_SELECT_MENU_3 = 'nfcolors_3_menu'; // SELECT id
 export const NODE_BORDER_COLOR_SELECT_MENU_3 = 'nbcolors_3_menu'; // SELECT id
 
-
 // ---------------------------
 // Key codes
 // ---------------------------
@@ -264,13 +263,14 @@ export const VK_PAGE_DOWN = 34;
 export const VK_OPEN_BRACKET = 219;
 export const VK_CLOSE_BRACKET = 221;
 
-
 // ---------------------------
 // Regular Expressions
 // ---------------------------
 
 export const RE_SWISSPROT_TREMBL = new RegExp('^(?=.*[A-Z].*_.*[A-Z].*)[A-Z0-9]{2,10}_[A-Z0-9]{3,5}$');
-export const RE_SWISSPROT_TREMBL_PFAM = new RegExp('^((?=.*[A-Z].*_.*[A-Z].*)[A-Z0-9]{2,10}_[A-Z0-9]{3,5})/[0-9]+-[0-9]+$');
+export const RE_SWISSPROT_TREMBL_PFAM = new RegExp(
+  '^((?=.*[A-Z].*_.*[A-Z].*)[A-Z0-9]{2,10}_[A-Z0-9]{3,5})/[0-9]+-[0-9]+$',
+);
 export const RE_GENBANK_PROT = new RegExp('^[A-Z]{3}[0-9\\\\.]+$');
 export const RE_GENBANK_NUC = new RegExp('^[A-Z]{1,2}[0-9\\\\.]+$');
 export const RE_REFSEQ = new RegExp('^[A-Z]{2}_[0-9\\\\.]+$');
@@ -280,162 +280,239 @@ export const RE_UNIPROTKB = new RegExp('^[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9
 // Colors
 // ---------------------------
 
-
 export const col_category50 = [
-    // 1 Red
-    '#FF1744',
-    // 2 Pink
-    '#F50057',
-    // 3 Purple
-    '#D500F9',
-    // 4 Deep Purple
-    '#651FFF',
-    // 5 Indigo
-    '#3D5AFE',
-    // 6 Blue
-    '#2979FF',
-    // 7 Cyan
-    '#00E5FF',
-    // 8 Teal
-    '#1DE9B6',
-    // 9 Green
-    '#00E676',
-    // 10 Light Green
-    '#76FF03',
-    // 11 Lime
-    '#C6FF00',
-    // 12 Yellow
-    '#FFEA00',
-    // 13 Amber
-    '#FFC400',
-    // 14 Orange
-    '#FF9100',
-    // 15 Deep Orange
-    '#FF3D00',
-    // 16 Brown
-    '#6D4C41',
-    // 17 Grey
-    '#757575',
-    //
-    // 18 Red
-    '#B71C1C',
-    // 19 Pink
-    '#880E4F',
-    // 20 Purple
-    '#4A148C',
-    // 21 Deep Purple
-    '#311B92',
-    // 22 Indigo
-    '#1A237E',
-    // 23 Blue
-    '#0D47A1',
-    // 24 Cyan
-    '#006064',
-    // 25 Teal
-    '#004D40',
-    // 26 Green
-    '#1B5E20',
-    // 27 Light Green
-    '#33691E',
-    // 28 Lime
-    '#827717',
-    // 29 Yellow
-    '#F57F17',
-    // 30 Amber
-    '#FF6F00',
-    // 31 Orange
-    '#E65100',
-    // 32 Deep Orange
-    '#BF360C',
-    // 33 Brown
-    '#4E342E',
-    // 34 Grey
-    '#424242',
-    //
-    // 35 Red
-    '#EF9A9A',
-    // 36 Pink
-    '#F48FB1',
-    // 37 Purple
-    '#CE93D8',
-    // 38 Deep Purple
-    '#B39DDB',
-    // 39 Indigo
-    '#9FA8DA',
-    // 40 Blue
-    '#90CAF9',
-    // 41 Cyan
-    '#80DEEA',
-    // 42 Teal
-    '#80CBC4',
-    // 43 Green
-    '#A5D6A7',
-    // 44 Light Green
-    '#C5E1A5',
-    // 45 Lime
-    '#E6EE9C',
-    // 46 Amber
-    '#FFE082',
-    // 47 Orange
-    '#FFCC80',
-    // 48 Deep Orange
-    '#FFAB91',
-    // 49 Brown
-    '#BCAAA4',
-    // 50 Grey
-    '#E0E0E0'
+  // 1 Red
+  '#FF1744',
+  // 2 Pink
+  '#F50057',
+  // 3 Purple
+  '#D500F9',
+  // 4 Deep Purple
+  '#651FFF',
+  // 5 Indigo
+  '#3D5AFE',
+  // 6 Blue
+  '#2979FF',
+  // 7 Cyan
+  '#00E5FF',
+  // 8 Teal
+  '#1DE9B6',
+  // 9 Green
+  '#00E676',
+  // 10 Light Green
+  '#76FF03',
+  // 11 Lime
+  '#C6FF00',
+  // 12 Yellow
+  '#FFEA00',
+  // 13 Amber
+  '#FFC400',
+  // 14 Orange
+  '#FF9100',
+  // 15 Deep Orange
+  '#FF3D00',
+  // 16 Brown
+  '#6D4C41',
+  // 17 Grey
+  '#757575',
+  //
+  // 18 Red
+  '#B71C1C',
+  // 19 Pink
+  '#880E4F',
+  // 20 Purple
+  '#4A148C',
+  // 21 Deep Purple
+  '#311B92',
+  // 22 Indigo
+  '#1A237E',
+  // 23 Blue
+  '#0D47A1',
+  // 24 Cyan
+  '#006064',
+  // 25 Teal
+  '#004D40',
+  // 26 Green
+  '#1B5E20',
+  // 27 Light Green
+  '#33691E',
+  // 28 Lime
+  '#827717',
+  // 29 Yellow
+  '#F57F17',
+  // 30 Amber
+  '#FF6F00',
+  // 31 Orange
+  '#E65100',
+  // 32 Deep Orange
+  '#BF360C',
+  // 33 Brown
+  '#4E342E',
+  // 34 Grey
+  '#424242',
+  //
+  // 35 Red
+  '#EF9A9A',
+  // 36 Pink
+  '#F48FB1',
+  // 37 Purple
+  '#CE93D8',
+  // 38 Deep Purple
+  '#B39DDB',
+  // 39 Indigo
+  '#9FA8DA',
+  // 40 Blue
+  '#90CAF9',
+  // 41 Cyan
+  '#80DEEA',
+  // 42 Teal
+  '#80CBC4',
+  // 43 Green
+  '#A5D6A7',
+  // 44 Light Green
+  '#C5E1A5',
+  // 45 Lime
+  '#E6EE9C',
+  // 46 Amber
+  '#FFE082',
+  // 47 Orange
+  '#FFCC80',
+  // 48 Deep Orange
+  '#FFAB91',
+  // 49 Brown
+  '#BCAAA4',
+  // 50 Grey
+  '#E0E0E0',
 ];
 
-
 export const col_category50b = [
-    "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059", "#7A4900", "#0000A6", "#63FFAC", "#B79762",
-    "#004D43", "#8FB0FF", "#997D87", "#5A0007", "#809693", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
-    "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#D16100", "#000035", "#7B4F4B", "#A1C299",
-    "#300018", "#0AA6D8", "#013349", "#00846F", "#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2",
-    "#C2FF99", "#001E09", "#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66"
+  '#1CE6FF',
+  '#FF34FF',
+  '#FF4A46',
+  '#008941',
+  '#006FA6',
+  '#A30059',
+  '#7A4900',
+  '#0000A6',
+  '#63FFAC',
+  '#B79762',
+  '#004D43',
+  '#8FB0FF',
+  '#997D87',
+  '#5A0007',
+  '#809693',
+  '#1B4400',
+  '#4FC601',
+  '#3B5DFF',
+  '#4A3B53',
+  '#FF2F80',
+  '#61615A',
+  '#BA0900',
+  '#6B7900',
+  '#00C2A0',
+  '#FFAA92',
+  '#FF90C9',
+  '#D16100',
+  '#000035',
+  '#7B4F4B',
+  '#A1C299',
+  '#300018',
+  '#0AA6D8',
+  '#013349',
+  '#00846F',
+  '#372101',
+  '#FFB500',
+  '#C2FFED',
+  '#A079BF',
+  '#CC0744',
+  '#C0B9B2',
+  '#C2FF99',
+  '#001E09',
+  '#00489C',
+  '#6F0062',
+  '#0CBD66',
+  '#EEC3FF',
+  '#456D75',
+  '#B77B68',
+  '#7A87A1',
+  '#788D66',
 ];
 
 export const col_category50c = [
-    // Red
-    '#FF5252', '#FF1744', '#D50000',
-    // Pink
-    '#FF4081', '#F50057', '#C51162',
-    // Purple
-    '#E040FB', '#D500F9', '#AA00FF',
-    // Deep Purple
-    '#7C4DFF', '#651FFF', '#6200EA',
-    // Indigo
-    '#536DFE', '#3D5AFE', '#304FFE',
-    // Blue
-    '#448AFF', '#2979FF', '#2962FF',
-    // Cyan
-    '#18FFFF', '#00E5FF', '#00B8D4',
-    // Teal
-    '#64FFDA', '#1DE9B6', '#00BFA5',
-    // Green
-    '#69F0AE', '#00E676', '#00C853',
-    // Light Green
-    '#B2FF59', '#76FF03', '#64DD17',
-    // Lime
-    '#EEFF41', '#C6FF00', '#AEEA00',
-    // Yellow
-    '#FFFF00', '#FFEA00', '#FFD600',
-    // Amber
-    '#FFD740', '#FFC400', '#FFAB00',
-    // Orange
-    '#FFAB40', '#FF9100', '#FF6D00',
-    // Deep Orange
-    '#FF6E40', '#FF3D00', '#DD2C00',
-    // Brown
-    '#5D4037', '#4E342E', '#3E2723',
-    // Grey
-    '#9E9E9E', '#616161'];
+  // Red
+  '#FF5252',
+  '#FF1744',
+  '#D50000',
+  // Pink
+  '#FF4081',
+  '#F50057',
+  '#C51162',
+  // Purple
+  '#E040FB',
+  '#D500F9',
+  '#AA00FF',
+  // Deep Purple
+  '#7C4DFF',
+  '#651FFF',
+  '#6200EA',
+  // Indigo
+  '#536DFE',
+  '#3D5AFE',
+  '#304FFE',
+  // Blue
+  '#448AFF',
+  '#2979FF',
+  '#2962FF',
+  // Cyan
+  '#18FFFF',
+  '#00E5FF',
+  '#00B8D4',
+  // Teal
+  '#64FFDA',
+  '#1DE9B6',
+  '#00BFA5',
+  // Green
+  '#69F0AE',
+  '#00E676',
+  '#00C853',
+  // Light Green
+  '#B2FF59',
+  '#76FF03',
+  '#64DD17',
+  // Lime
+  '#EEFF41',
+  '#C6FF00',
+  '#AEEA00',
+  // Yellow
+  '#FFFF00',
+  '#FFEA00',
+  '#FFD600',
+  // Amber
+  '#FFD740',
+  '#FFC400',
+  '#FFAB00',
+  // Orange
+  '#FFAB40',
+  '#FF9100',
+  '#FF6D00',
+  // Deep Orange
+  '#FF6E40',
+  '#FF3D00',
+  '#DD2C00',
+  // Brown
+  '#5D4037',
+  '#4E342E',
+  '#3E2723',
+  // Grey
+  '#9E9E9E',
+  '#616161',
+];
 
-export const category50 = <T extends {toString() : string}>() => 
-    d3.scale.ordinal<T, string>().domain([]).range(col_category50);
+export const category50 = <T extends { toString(): string }>() =>
+  d3.scale.ordinal<T, string>().domain([]).range(col_category50);
 
-export const category50b = <T extends {toString() : string}>() => 
-    d3.scale.ordinal<T, string>().domain([]).range(col_category50b);
+export const category50b = <T extends { toString(): string }>() =>
+  d3.scale.ordinal<T, string>().domain([]).range(col_category50b);
 
-export const category50c = <T extends {toString() : string}>() => 
-    d3.scale.ordinal<T, string>().domain([]).range(col_category50c);
+export const category50c = <T extends { toString(): string }>() =>
+  d3.scale.ordinal<T, string>().domain([]).range(col_category50c);
