@@ -172,9 +172,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-      this.options.nodeLabelGap +
-      AP.LABEL_SIZE_CALC_ADDITION +
-      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+          this.options.nodeLabelGap +
+          AP.LABEL_SIZE_CALC_ADDITION +
+          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -273,14 +273,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-              ': Ordinal scale mapping for ' +
-              label +
-              ' (' +
-              s +
-              '): domain > range: ' +
-              mappingFn.domain().length +
-              ' > ' +
-              mappingFn.range().length,
+                ': Ordinal scale mapping for ' +
+                label +
+                ' (' +
+                s +
+                '): domain > range: ' +
+                mappingFn.domain().length +
+                ' > ' +
+                mappingFn.range().length,
             );
           }
         }
@@ -3951,10 +3951,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-          ' Grouping species from "' +
-          settings.groupSpecies.source +
-          '" to "' +
-          settings.groupSpecies.target,
+            ' Grouping species from "' +
+            settings.groupSpecies.source +
+            '" to "' +
+            settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -3975,14 +3975,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-          ' Grouping years from "' +
-          settings.groupYears.source +
-          '" to "' +
-          settings.groupYears.target +
-          '", ignoring ' +
-          settings.groupYears.ignore +
-          ', range ' +
-          settings.groupYears.groupsize,
+            ' Grouping years from "' +
+            settings.groupYears.source +
+            '" to "' +
+            settings.groupYears.target +
+            '", ignoring ' +
+            settings.groupYears.ignore +
+            ', range ' +
+            settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4181,11 +4181,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-          ' initial value for collapse depth [' +
-          this.depth_collapse_level +
-          '] is larger than or equal to maximum depth [' +
-          max_depth +
-          ']',
+            ' initial value for collapse depth [' +
+            this.depth_collapse_level +
+            '] is larger than or equal to maximum depth [' +
+            max_depth +
+            ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -6101,13 +6101,13 @@ export default class alcmonavispoeschli {
               );
               console.log(
                 AP.MESSAGE +
-                'Setting special visualization property applies to to: ' +
-                this.visualizations2_property_applies_to,
+                  'Setting special visualization property applies to to: ' +
+                  this.visualizations2_property_applies_to,
               );
               console.log(
                 AP.MESSAGE +
-                'Setting special visualization property datatype to: ' +
-                this.visualizations2_property_datatype,
+                  'Setting special visualization property datatype to: ' +
+                  this.visualizations2_property_datatype,
               );
               console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations2_color);
             }
@@ -6128,13 +6128,13 @@ export default class alcmonavispoeschli {
               );
               console.log(
                 AP.MESSAGE +
-                'Setting special visualization property applies to to: ' +
-                this.visualizations3_property_applies_to,
+                  'Setting special visualization property applies to to: ' +
+                  this.visualizations3_property_applies_to,
               );
               console.log(
                 AP.MESSAGE +
-                'Setting special visualization property datatype to: ' +
-                this.visualizations3_property_datatype,
+                  'Setting special visualization property datatype to: ' +
+                  this.visualizations3_property_datatype,
               );
               console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations3_color);
             }
@@ -6161,28 +6161,28 @@ export default class alcmonavispoeschli {
 
     $(
       '#' +
-      AP.ZOOM_IN_Y +
-      ', #' +
-      AP.ZOOM_OUT_Y +
-      ', #' +
-      AP.ZOOM_TO_FIT +
-      ', #' +
-      AP.ZOOM_IN_X +
-      ', #' +
-      AP.ZOOM_OUT_X,
+        AP.ZOOM_IN_Y +
+        ', #' +
+        AP.ZOOM_OUT_Y +
+        ', #' +
+        AP.ZOOM_TO_FIT +
+        ', #' +
+        AP.ZOOM_IN_X +
+        ', #' +
+        AP.ZOOM_OUT_X,
     ).css({
       height: '16px',
     });
 
     $(
       '#' +
-      AP.DECR_DEPTH_COLLAPSE_LEVEL +
-      ', #' +
-      AP.INCR_DEPTH_COLLAPSE_LEVEL +
-      ', #' +
-      AP.DECR_BL_COLLAPSE_LEVEL +
-      ', #' +
-      AP.INCR_BL_COLLAPSE_LEVEL,
+        AP.DECR_DEPTH_COLLAPSE_LEVEL +
+        ', #' +
+        AP.INCR_DEPTH_COLLAPSE_LEVEL +
+        ', #' +
+        AP.DECR_BL_COLLAPSE_LEVEL +
+        ', #' +
+        AP.INCR_BL_COLLAPSE_LEVEL,
     ).css({
       width: '16px',
     });
@@ -6201,19 +6201,19 @@ export default class alcmonavispoeschli {
 
     $(
       '#' +
-      AP.LEGENDS_MOVE_UP_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_DOWN_BTN +
-      ', #' +
-      AP.LEGENDS_RESET_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_LEFT_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_RIGHT_BTN +
-      ', #' +
-      AP.LEGENDS_SHOW_BTN +
-      ', #' +
-      AP.LEGENDS_HORIZ_VERT_BTN,
+        AP.LEGENDS_MOVE_UP_BTN +
+        ', #' +
+        AP.LEGENDS_MOVE_DOWN_BTN +
+        ', #' +
+        AP.LEGENDS_RESET_BTN +
+        ', #' +
+        AP.LEGENDS_MOVE_LEFT_BTN +
+        ', #' +
+        AP.LEGENDS_MOVE_RIGHT_BTN +
+        ', #' +
+        AP.LEGENDS_SHOW_BTN +
+        ', #' +
+        AP.LEGENDS_HORIZ_VERT_BTN,
     ).css({
       height: '16px',
     });
@@ -7186,14 +7186,14 @@ export default class alcmonavispoeschli {
       h = h.concat('<div class=' + AP.PROG_NAME + '>');
       h = h.concat(
         '<a class="' +
-        AP.PROGNAMELINK +
-        '" href="' +
-        AP.WEBSITE +
-        '" target="this.blank">' +
-        AP.NAME +
-        ' ' +
-        AP.VERSION +
-        '</a>',
+          AP.PROGNAMELINK +
+          '" href="' +
+          AP.WEBSITE +
+          '" target="this.blank">' +
+          AP.NAME +
+          ' ' +
+          AP.VERSION +
+          '</a>',
       );
       h = h.concat('</div>');
       return h;
@@ -7381,10 +7381,10 @@ export default class alcmonavispoeschli {
       h = h.concat('<fieldset>');
       h = h.concat(
         '<input type="button" value="Download" name="' +
-        AP.DOWNLOAD_BUTTON +
-        '" title="download/export tree in a selected format" id="' +
-        AP.DOWNLOAD_BUTTON +
-        '">',
+          AP.DOWNLOAD_BUTTON +
+          '" title="download/export tree in a selected format" id="' +
+          AP.DOWNLOAD_BUTTON +
+          '">',
       ); // BM ??
       h = h.concat('<br>');
       h = h.concat('<select name="' + AP.EXPORT_FORMAT_SELECT + '" id="' + AP.EXPORT_FORMAT_SELECT + '">');
@@ -8549,7 +8549,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => { };
+  downloadAsPdf = () => {};
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";
@@ -8684,7 +8684,9 @@ export function SettingsDeclared(
   );
 }
 
-export function OptionsDeclared(options: Alcmonavis.Options | null | undefined): options is Required<Alcmonavis.RequiredOptions> & Alcmonavis.OptionalOptions {
+export function OptionsDeclared(
+  options: Alcmonavis.Options | null | undefined,
+): options is Required<Alcmonavis.RequiredOptions> & Alcmonavis.OptionalOptions {
   return !!(
     options &&
     HasValue(options.alignPhylogram) &&
