@@ -176,12 +176,11 @@ declare namespace Alcmonavis {
     }
 
 
-    interface Options {
+    interface RequiredOptions {
         phylogram?: boolean;
         alignPhylogram?: boolean;
         dynahide?: boolean;
-        searchAinitialValue?: string | null;
-        searchBinitialValue?: string | null;
+
         showBranchLengthValues?: boolean;
         showConfidenceValues?: boolean;
         showNodeName?: boolean;
@@ -217,8 +216,7 @@ declare namespace Alcmonavis {
         branchDataFontSize?: string | number;
         collapsedLabelLength?: number;
         nodeLabelGap?: number;
-        minBranchLengthValueToShow?: number | null; //?
-        minConfidenceValueToShow?: number | null; //?
+
         searchIsCaseSensitive?: boolean;
         searchIsPartial?: boolean;
         searchNegateResult?: boolean;
@@ -231,7 +229,6 @@ declare namespace Alcmonavis {
         nodeVisualizationsOpacity?: number;
         showBranchColors?: boolean;
         decimalsForLinearRangeMeanValue?: number;
-        treeName?: string | null;
         nameForNhDownload?: string;
         nameForPhyloXmlDownload?: string;
         nameForPngDownload?: string;
@@ -241,9 +238,21 @@ declare namespace Alcmonavis {
         visualizationsLegendXposOrig?: number;
         visualizationsLegendYposOrig?: number;
         visualizationsLegendOrientation?: 'vertical' | 'horizontal'
-        initialCollapseFeature?: string | null; //?
+
         initialCollapseDepth?: number;
     }
+
+    interface OptionalOptions {
+        searchAinitialValue?: string | null;
+        searchBinitialValue?: string | null;
+        minBranchLengthValueToShow?: number | null; //?
+        minConfidenceValueToShow?: number | null; //?
+        initialCollapseFeature?: string | null; //?
+        treeName?: string | null;
+
+    }
+
+    interface Options extends RequiredOptions, OptionalOptions {}
 
     interface RequiredSettings {
         controls1Width?: number;
