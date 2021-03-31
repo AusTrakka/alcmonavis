@@ -169,9 +169,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-          this.options.nodeLabelGap +
-          AP.LABEL_SIZE_CALC_ADDITION +
-          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+      this.options.nodeLabelGap +
+      AP.LABEL_SIZE_CALC_ADDITION +
+      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -270,14 +270,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-                ': Ordinal scale mapping for ' +
-                label +
-                ' (' +
-                s +
-                '): domain > range: ' +
-                mappingFn.domain().length +
-                ' > ' +
-                mappingFn.range().length,
+              ': Ordinal scale mapping for ' +
+              label +
+              ' (' +
+              s +
+              '): domain > range: ' +
+              mappingFn.domain().length +
+              ' > ' +
+              mappingFn.range().length,
             );
           }
         }
@@ -3775,8 +3775,8 @@ export default class alcmonavispoeschli {
   };
 
   intitializeDisplaySize = () => {
-    if (!SettingsDeclared(this.settings)) throw 'Settings not set';
-    if (this.settings.enableDynamicSizing) {
+    //if (!SettingsDeclared(this.settings)) throw 'Settings not set';
+    if (this.settings && this.settings.enableDynamicSizing) {
       if (this.baseSvg) {
         this.displayHeight = +this.baseSvg.attr('height');
         this.displayWidth = +this.baseSvg.attr('width');
@@ -3789,8 +3789,8 @@ export default class alcmonavispoeschli {
         this.displayWidth = width;
       }
     } else {
-      this.displayHeight = this.settings.displayHeight;
-      this.displayWidth = this.settings.displayWidth;
+      this.displayHeight = this.settings && this.settings.displayHeight || 0;
+      this.displayWidth = this.settings && this.settings.displayWidth || 0;
     }
   };
 
@@ -3945,10 +3945,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-            ' Grouping species from "' +
-            settings.groupSpecies.source +
-            '" to "' +
-            settings.groupSpecies.target,
+          ' Grouping species from "' +
+          settings.groupSpecies.source +
+          '" to "' +
+          settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -3969,14 +3969,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-            ' Grouping years from "' +
-            settings.groupYears.source +
-            '" to "' +
-            settings.groupYears.target +
-            '", ignoring ' +
-            settings.groupYears.ignore +
-            ', range ' +
-            settings.groupYears.groupsize,
+          ' Grouping years from "' +
+          settings.groupYears.source +
+          '" to "' +
+          settings.groupYears.target +
+          '", ignoring ' +
+          settings.groupYears.ignore +
+          ', range ' +
+          settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4175,11 +4175,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-            ' initial value for collapse depth [' +
-            this.depth_collapse_level +
-            '] is larger than or equal to maximum depth [' +
-            max_depth +
-            ']',
+          ' initial value for collapse depth [' +
+          this.depth_collapse_level +
+          '] is larger than or equal to maximum depth [' +
+          max_depth +
+          ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -6095,13 +6095,13 @@ export default class alcmonavispoeschli {
               );
               console.log(
                 AP.MESSAGE +
-                  'Setting special visualization property applies to to: ' +
-                  this.visualizations2_property_applies_to,
+                'Setting special visualization property applies to to: ' +
+                this.visualizations2_property_applies_to,
               );
               console.log(
                 AP.MESSAGE +
-                  'Setting special visualization property datatype to: ' +
-                  this.visualizations2_property_datatype,
+                'Setting special visualization property datatype to: ' +
+                this.visualizations2_property_datatype,
               );
               console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations2_color);
             }
@@ -6122,13 +6122,13 @@ export default class alcmonavispoeschli {
               );
               console.log(
                 AP.MESSAGE +
-                  'Setting special visualization property applies to to: ' +
-                  this.visualizations3_property_applies_to,
+                'Setting special visualization property applies to to: ' +
+                this.visualizations3_property_applies_to,
               );
               console.log(
                 AP.MESSAGE +
-                  'Setting special visualization property datatype to: ' +
-                  this.visualizations3_property_datatype,
+                'Setting special visualization property datatype to: ' +
+                this.visualizations3_property_datatype,
               );
               console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations3_color);
             }
@@ -6155,28 +6155,28 @@ export default class alcmonavispoeschli {
 
     $(
       '#' +
-        AP.ZOOM_IN_Y +
-        ', #' +
-        AP.ZOOM_OUT_Y +
-        ', #' +
-        AP.ZOOM_TO_FIT +
-        ', #' +
-        AP.ZOOM_IN_X +
-        ', #' +
-        AP.ZOOM_OUT_X,
+      AP.ZOOM_IN_Y +
+      ', #' +
+      AP.ZOOM_OUT_Y +
+      ', #' +
+      AP.ZOOM_TO_FIT +
+      ', #' +
+      AP.ZOOM_IN_X +
+      ', #' +
+      AP.ZOOM_OUT_X,
     ).css({
       height: '16px',
     });
 
     $(
       '#' +
-        AP.DECR_DEPTH_COLLAPSE_LEVEL +
-        ', #' +
-        AP.INCR_DEPTH_COLLAPSE_LEVEL +
-        ', #' +
-        AP.DECR_BL_COLLAPSE_LEVEL +
-        ', #' +
-        AP.INCR_BL_COLLAPSE_LEVEL,
+      AP.DECR_DEPTH_COLLAPSE_LEVEL +
+      ', #' +
+      AP.INCR_DEPTH_COLLAPSE_LEVEL +
+      ', #' +
+      AP.DECR_BL_COLLAPSE_LEVEL +
+      ', #' +
+      AP.INCR_BL_COLLAPSE_LEVEL,
     ).css({
       width: '16px',
     });
@@ -6195,19 +6195,19 @@ export default class alcmonavispoeschli {
 
     $(
       '#' +
-        AP.LEGENDS_MOVE_UP_BTN +
-        ', #' +
-        AP.LEGENDS_MOVE_DOWN_BTN +
-        ', #' +
-        AP.LEGENDS_RESET_BTN +
-        ', #' +
-        AP.LEGENDS_MOVE_LEFT_BTN +
-        ', #' +
-        AP.LEGENDS_MOVE_RIGHT_BTN +
-        ', #' +
-        AP.LEGENDS_SHOW_BTN +
-        ', #' +
-        AP.LEGENDS_HORIZ_VERT_BTN,
+      AP.LEGENDS_MOVE_UP_BTN +
+      ', #' +
+      AP.LEGENDS_MOVE_DOWN_BTN +
+      ', #' +
+      AP.LEGENDS_RESET_BTN +
+      ', #' +
+      AP.LEGENDS_MOVE_LEFT_BTN +
+      ', #' +
+      AP.LEGENDS_MOVE_RIGHT_BTN +
+      ', #' +
+      AP.LEGENDS_SHOW_BTN +
+      ', #' +
+      AP.LEGENDS_HORIZ_VERT_BTN,
     ).css({
       height: '16px',
     });
@@ -7180,14 +7180,14 @@ export default class alcmonavispoeschli {
       h = h.concat('<div class=' + AP.PROG_NAME + '>');
       h = h.concat(
         '<a class="' +
-          AP.PROGNAMELINK +
-          '" href="' +
-          AP.WEBSITE +
-          '" target="this.blank">' +
-          AP.NAME +
-          ' ' +
-          AP.VERSION +
-          '</a>',
+        AP.PROGNAMELINK +
+        '" href="' +
+        AP.WEBSITE +
+        '" target="this.blank">' +
+        AP.NAME +
+        ' ' +
+        AP.VERSION +
+        '</a>',
       );
       h = h.concat('</div>');
       return h;
@@ -7375,10 +7375,10 @@ export default class alcmonavispoeschli {
       h = h.concat('<fieldset>');
       h = h.concat(
         '<input type="button" value="Download" name="' +
-          AP.DOWNLOAD_BUTTON +
-          '" title="download/export tree in a selected format" id="' +
-          AP.DOWNLOAD_BUTTON +
-          '">',
+        AP.DOWNLOAD_BUTTON +
+        '" title="download/export tree in a selected format" id="' +
+        AP.DOWNLOAD_BUTTON +
+        '">',
       ); // BM ??
       h = h.concat('<br>');
       h = h.concat('<select name="' + AP.EXPORT_FORMAT_SELECT + '" id="' + AP.EXPORT_FORMAT_SELECT + '">');
@@ -8543,7 +8543,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => {};
+  downloadAsPdf = () => { };
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";
@@ -8636,121 +8636,114 @@ export default class alcmonavispoeschli {
   };
 }
 
-function SettingsDeclared(settings: Alcmonavis.Settings | null | undefined): settings is Required<Alcmonavis.Settings> {
+const HasValue = (v: any | null | undefined): boolean => v !== null && v !== undefined;
+
+function SettingsDeclared(settings: Alcmonavis.Settings | null | undefined): settings is Required<Alcmonavis.RequiredSettings> & Alcmonavis.OptionalSettings {
   return !!(
     settings &&
-    //&& settings.border
-    settings.collapseLabelWidth &&
-    settings.controls0 &&
-    settings.controls0Left &&
-    settings.controls0Top &&
-    settings.controls1 &&
-    settings.controls1Left &&
-    settings.controls1Top &&
-    settings.controls1Width &&
-    settings.controlsBackgroundColor &&
-    settings.controlsFont &&
-    settings.controlsFontColor &&
-    settings.controlsFontSize &&
-    settings.displayHeight &&
-    settings.displayWidth &&
-    settings.dynamicallyAddNodeVisualizations &&
-    settings.enableAccessToDatabases &&
-    settings.enableBranchVisualizations &&
-    settings.enableCollapseByBranchLenghts &&
-    settings.enableCollapseByFeature &&
-    settings.enableCollapseByTaxonomyRank &&
-    settings.enableDownloads &&
-    settings.enableDynamicSizing &&
-    settings.enableMsaResidueVisualizations &&
-    settings.enableNodeVisualizations &&
-    settings.enableSubtreeDeletion &&
-    settings.groupSpecies &&
-    settings.groupYears &&
-    settings.nhExportReplaceIllegalChars &&
-    settings.nhExportWriteConfidences &&
-    settings.propertiesToIgnoreForNodeVisualization &&
-    settings.readSimpleCharacteristics &&
-    settings.rootOffset &&
-    settings.searchFieldWidth &&
-    settings.showBranchColorsButton &&
-    settings.showDynahideButton &&
-    settings.showShortenNodeNamesButton &&
-    //&& settings.specialProcessing
-    settings.textFieldHeight &&
-    settings.valuesToIgnoreForNodeVisualization &&
-    settings.zoomToFitUponWindowResize
+    HasValue(settings.collapseLabelWidth) &&
+    HasValue(settings.controls0) &&
+    HasValue(settings.controls0Left) &&
+    HasValue(settings.controls0Top) &&
+    HasValue(settings.controls1) &&
+    HasValue(settings.controls1Top) &&
+    HasValue(settings.controls1Width) &&
+    HasValue(settings.controlsBackgroundColor) &&
+    HasValue(settings.controlsFont) &&
+    HasValue(settings.controlsFontColor) &&
+    HasValue(settings.controlsFontSize) &&
+    HasValue(settings.dynamicallyAddNodeVisualizations) &&
+    HasValue(settings.enableAccessToDatabases) &&
+    HasValue(settings.enableBranchVisualizations) &&
+    HasValue(settings.enableCollapseByBranchLenghts) &&
+    HasValue(settings.enableCollapseByFeature) &&
+    HasValue(settings.enableCollapseByTaxonomyRank) &&
+    HasValue(settings.enableDownloads) &&
+    HasValue(settings.enableDynamicSizing) &&
+    HasValue(settings.enableNodeVisualizations) &&
+    HasValue(settings.enableSubtreeDeletion) &&
+    HasValue(settings.groupSpecies) &&
+    HasValue(settings.groupYears) &&
+    HasValue(settings.nhExportReplaceIllegalChars) &&
+    HasValue(settings.nhExportWriteConfidences) &&
+    HasValue(settings.rootOffset) &&
+    HasValue(settings.searchFieldWidth) &&
+    HasValue(settings.showBranchColorsButton) &&
+    HasValue(settings.showDynahideButton) &&
+    HasValue(settings.showShortenNodeNamesButton) &&
+    HasValue(settings.textFieldHeight) &&
+    HasValue(settings.zoomToFitUponWindowResize)
   );
 }
 
 function OptionsDeclared(options: Alcmonavis.Options | null | undefined): options is Required<Alcmonavis.Options> {
   return !!(
     options &&
-    options.alignPhylogram &&
-    options.backgroundColorDefault &&
-    options.backgroundColorForPrintExportDefault &&
-    options.branchColorDefault &&
-    options.branchDataFontSize &&
-    options.branchWidthDefault &&
-    options.collapsedLabelLength &&
-    options.decimalsForLinearRangeMeanValue &&
-    options.defaultFont &&
-    options.dynahide &&
-    options.externalNodeFontSize &&
-    options.found0ColorDefault &&
-    options.found0and1ColorDefault &&
-    options.found1ColorDefault &&
-    options.initialCollapseDepth &&
-    options.initialCollapseFeature &&
-    options.internalNodeFontSize &&
-    options.labelColorDefault &&
-    options.minBranchLengthValueToShow &&
-    options.minConfidenceValueToShow &&
-    options.nameForNhDownload &&
-    options.nameForPhyloXmlDownload &&
-    options.nameForPngDownload &&
-    options.nameForSvgDownload &&
-    options.nodeLabelGap &&
-    options.nodeSizeDefault &&
-    options.nodeVisualizationsOpacity &&
-    options.phylogram &&
-    options.searchAinitialValue &&
-    options.searchBinitialValue &&
-    options.searchIsCaseSensitive &&
-    options.searchIsPartial &&
-    options.searchNegateResult &&
-    options.searchProperties &&
-    options.searchUsesRegex &&
-    options.shortenNodeNames &&
-    options.showBranchColors &&
-    options.showBranchEvents &&
-    options.showBranchLengthValues &&
-    options.showBranchVisualizations &&
-    options.showConfidenceValues &&
-    options.showDistributions &&
-    options.showExternalLabels &&
-    options.showExternalNodes &&
-    options.showInternalLabels &&
-    options.showInternalNodes &&
-    options.showNodeEvents &&
-    options.showNodeName &&
-    options.showNodeVisualizations &&
-    options.showSequence &&
-    options.showSequenceAccession &&
-    options.showSequenceGeneSymbol &&
-    options.showSequenceName &&
-    options.showSequenceSymbol &&
-    options.showTaxonomy &&
-    options.showTaxonomyCode &&
-    options.showTaxonomyCommonName &&
-    options.showTaxonomyRank &&
-    options.showTaxonomyScientificName &&
-    options.showTaxonomySynonyms &&
-    options.treeName &&
-    options.visualizationsLegendOrientation &&
-    options.visualizationsLegendXpos &&
-    options.visualizationsLegendXposOrig &&
-    options.visualizationsLegendYpos &&
-    options.visualizationsLegendYposOrig
+    HasValue(options.alignPhylogram) &&
+    HasValue(options.backgroundColorDefault) &&
+    HasValue(options.backgroundColorForPrintExportDefault) &&
+    HasValue(options.branchColorDefault) &&
+    HasValue(options.branchDataFontSize) &&
+    HasValue(options.branchWidthDefault) &&
+    HasValue(options.collapsedLabelLength) &&
+    HasValue(options.decimalsForLinearRangeMeanValue) &&
+    HasValue(options.defaultFont) &&
+    HasValue(options.dynahide) &&
+    HasValue(options.externalNodeFontSize) &&
+    HasValue(options.found0ColorDefault) &&
+    HasValue(options.found0and1ColorDefault) &&
+    HasValue(options.found1ColorDefault) &&
+    HasValue(options.initialCollapseDepth) &&
+    HasValue(options.initialCollapseFeature) &&
+    HasValue(options.internalNodeFontSize) &&
+    HasValue(options.labelColorDefault) &&
+    HasValue(options.minBranchLengthValueToShow) &&
+    HasValue(options.minConfidenceValueToShow) &&
+    HasValue(options.nameForNhDownload) &&
+    HasValue(options.nameForPhyloXmlDownload) &&
+    HasValue(options.nameForPngDownload) &&
+    HasValue(options.nameForSvgDownload) &&
+    HasValue(options.nodeLabelGap) &&
+    HasValue(options.nodeSizeDefault) &&
+    HasValue(options.nodeVisualizationsOpacity) &&
+    HasValue(options.phylogram) &&
+    HasValue(options.searchAinitialValue) &&
+    HasValue(options.searchBinitialValue) &&
+    HasValue(options.searchIsCaseSensitive) &&
+    HasValue(options.searchIsPartial) &&
+    HasValue(options.searchNegateResult) &&
+    HasValue(options.searchProperties) &&
+    HasValue(options.searchUsesRegex) &&
+    HasValue(options.shortenNodeNames) &&
+    HasValue(options.showBranchColors) &&
+    HasValue(options.showBranchEvents) &&
+    HasValue(options.showBranchLengthValues) &&
+    HasValue(options.showBranchVisualizations) &&
+    HasValue(options.showConfidenceValues) &&
+    HasValue(options.showDistributions) &&
+    HasValue(options.showExternalLabels) &&
+    HasValue(options.showExternalNodes) &&
+    HasValue(options.showInternalLabels) &&
+    HasValue(options.showInternalNodes) &&
+    HasValue(options.showNodeEvents) &&
+    HasValue(options.showNodeName) &&
+    HasValue(options.showNodeVisualizations) &&
+    HasValue(options.showSequence) &&
+    HasValue(options.showSequenceAccession) &&
+    HasValue(options.showSequenceGeneSymbol) &&
+    HasValue(options.showSequenceName) &&
+    HasValue(options.showSequenceSymbol) &&
+    HasValue(options.showTaxonomy) &&
+    HasValue(options.showTaxonomyCode) &&
+    HasValue(options.showTaxonomyCommonName) &&
+    HasValue(options.showTaxonomyRank) &&
+    HasValue(options.showTaxonomyScientificName) &&
+    HasValue(options.showTaxonomySynonyms) &&
+    HasValue(options.treeName) &&
+    HasValue(options.visualizationsLegendOrientation) &&
+    HasValue(options.visualizationsLegendXpos) &&
+    HasValue(options.visualizationsLegendXposOrig) &&
+    HasValue(options.visualizationsLegendYpos) &&
+    HasValue(options.visualizationsLegendYposOrig)
   );
 }

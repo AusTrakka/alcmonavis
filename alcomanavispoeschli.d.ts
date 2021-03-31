@@ -245,12 +245,10 @@ declare namespace Alcmonavis {
         initialCollapseDepth?: number;
     }
 
-    interface Settings {
+    interface RequiredSettings {
         controls1Width?: number;
         rootOffset?: number;
         enableDynamicSizing?: boolean;
-        displayWidth?: number;
-        displayHeight?: number;
         controlsFontSize?: number | string;
         controlsFontColor?: string;
         controlsFont?: string[];
@@ -277,19 +275,24 @@ declare namespace Alcmonavis {
         nhExportReplaceIllegalChars?: boolean;
         enableSubtreeDeletion?: boolean;
         enableAccessToDatabases?: boolean;
-        enableMsaResidueVisualizations?: boolean;
         zoomToFitUponWindowResize?: boolean;
         dynamicallyAddNodeVisualizations?: boolean;
-        readSimpleCharacteristics?: boolean;
+    }
+    // Actually Optional    
+    interface OptionalSettings {
+        displayWidth?: number;
+        displayHeight?: number;
+        enableMsaResidueVisualizations?: boolean;
         propertiesToIgnoreForNodeVisualization?: string[] | null //?
         valuesToIgnoreForNodeVisualization?: Dict<string> | null //?
         groupSpecies?: RefMapping | null;
         groupYears?: GroupMapping | null;
-
-        // Actually Optional
         border?: string;
         specialProcessing?: string;
+        readSimpleCharacteristics?: boolean;
     }
+
+    interface Settings extends RequiredSettings, OptionalSettings { }
 
     interface ColourPickerData {
         legendLabel: string;
