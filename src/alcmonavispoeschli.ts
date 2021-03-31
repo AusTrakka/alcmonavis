@@ -8670,8 +8670,6 @@ export function SettingsDeclared(
     HasValue(settings.enableDynamicSizing) &&
     HasValue(settings.enableNodeVisualizations) &&
     HasValue(settings.enableSubtreeDeletion) &&
-    HasValue(settings.groupSpecies) &&
-    HasValue(settings.groupYears) &&
     HasValue(settings.nhExportReplaceIllegalChars) &&
     HasValue(settings.nhExportWriteConfidences) &&
     HasValue(settings.rootOffset) &&
