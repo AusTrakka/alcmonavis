@@ -5,11 +5,25 @@ import { phyloXml } from './phyloXml';
 import { forester, isString } from './forester';
 import d3 from 'd3';
 import * as AP from './constants';
-
-(window as any).jQuery = $;
-require('jquery-ui');
-
 import { Alcmonavis, CustomD3Prototype, Dict, Forester, HTMLstring, MappingFunction } from '../alcomanavispoeschli';
+
+require('jquery-ui/ui/version');
+require('jquery-ui/ui/widget');
+require('jquery-ui/ui/ie');
+require('jquery-ui/ui/data');
+require('jquery-ui/ui/plugin');
+require('jquery-ui/ui/safe-active-element');
+require('jquery-ui/ui/safe-blur');
+require('jquery-ui/ui/scroll-parent');
+require('jquery-ui/ui/form');
+require('jquery-ui/ui/escape-selector');
+require('jquery-ui/ui/labels');
+require('jquery-ui/ui/form-reset-mixin');
+require('jquery-ui/ui/widgets/mouse');
+require('jquery-ui/ui/widgets/checkboxradio');
+require('jquery-ui/ui/widgets/controlgroup');
+require('jquery-ui/ui/widgets/draggable');
+
 
 const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (
   d: number | string,
