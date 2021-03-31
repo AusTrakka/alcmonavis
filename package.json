@@ -1,6 +1,6 @@
 {
   "name": "alcmonavis-poeschli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A packaged version of Christain M. Zmasek's archaeopteryx.js phylogenetic tree viewer",
   "main": "lib/alcmonavispoeschli.js",
   "types": "lib/alcmonavispoeschli.d.ts",
