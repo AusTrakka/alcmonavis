@@ -19,10 +19,12 @@ require('jquery-ui/ui/form');
 require('jquery-ui/ui/escape-selector');
 require('jquery-ui/ui/labels');
 require('jquery-ui/ui/form-reset-mixin');
+require('jquery-ui/ui/keycode');
 require('jquery-ui/ui/widgets/mouse');
 require('jquery-ui/ui/widgets/checkboxradio');
 require('jquery-ui/ui/widgets/controlgroup');
 require('jquery-ui/ui/widgets/draggable');
+require('jquery-ui/ui/widgets/button');
 
 const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (
   d: number | string,
