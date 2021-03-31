@@ -25,6 +25,7 @@ require('jquery-ui/ui/widgets/checkboxradio');
 require('jquery-ui/ui/widgets/controlgroup');
 require('jquery-ui/ui/widgets/draggable');
 require('jquery-ui/ui/widgets/button');
+require('jquery-ui/ui/widgets/slider');
 
 const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (
   d: number | string,
