@@ -4804,7 +4804,7 @@ export default class alcmonavispoeschli {
           .style('text-decoration', 'none')
           .text(function (d) {
             if (d.parent && d.parent.parent) {
-              if (d.this.children) {
+              if (d._children) {
                 textSum += textInc;
                 return 'Uncollapse';
               } else if (d.children) {
@@ -4845,7 +4845,7 @@ export default class alcmonavispoeschli {
                 ++cc;
               }
             });
-            if (cc > 1 || (cc == 1 && !d.this.children)) {
+            if (cc > 1 || (cc == 1 && !d._children)) {
               textSum += textInc;
               return 'Uncollapse All';
             }
@@ -5125,10 +5125,10 @@ export default class alcmonavispoeschli {
             .text(function (d) {
               if (d.parent && d.parent.parent && d.parent.parent.parent && self.superTreeRoots.length < 1) {
                 textSum += textInc;
-                if (d.children || d.this.children) {
+                if (d.children || d._children) {
                   if (d.children && d.children.length > 1) {
                     return 'Delete Subtree';
-                  } else if (d.this.children && d.this.children.length > 1) {
+                  } else if (d._children && d._children.length > 1) {
                     return 'Delete Collapsed Subtree';
                   }
                 } else {
