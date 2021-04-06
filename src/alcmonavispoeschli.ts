@@ -2443,7 +2443,7 @@ export default class alcmonavispoeschli {
 
   makeBranchColor = (link: d3.layout.cluster.Link<Alcmonavis.phylo>) => {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
-    if (!this.visualizations || !this.visualizations.nodeFillColor) throw 'Node Fill Colour Visualisation not set';
+    //if (!this.visualizations || !this.visualizations.nodeFillColor) throw 'Node Fill Colour Visualisation not set';
 
     //const options = this.options;
 
@@ -2480,6 +2480,7 @@ export default class alcmonavispoeschli {
           residue != '-' &&
           residue != '.' &&
           residue != '?' &&
+          this.visualizations &&
           this.visualizations.nodeFillColor
         ) {
           let vis = this.visualizations.nodeFillColor[AP.MSA_RESIDUE];
@@ -2520,7 +2521,8 @@ export default class alcmonavispoeschli {
           } else if (
             n.properties[p].ref === 'vipr:PANGO_Lineage' &&
             n.properties[p].datatype === 'xsd:string' &&
-            n.properties[p].applies_to === 'node'
+            n.properties[p].applies_to === 'node' &&
+            this.visualizations
           ) {
             let vis: Alcmonavis.Visualisation | null | undefined = null;
             if (
