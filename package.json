@@ -8,6 +8,7 @@
     "test": "test"
   },
   "scripts": {
+    "build-test": "echo \"testing\" && exit 0",
     "test": "jest --config jestconfig.json",
     "build": "npm run clean && tsc && npm run copy-others",
     "clean": "rimraf ./lib",
