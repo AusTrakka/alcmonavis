@@ -5,28 +5,7 @@ import { phyloXml } from './phyloXml';
 import { forester, isString } from './forester';
 import d3 from 'd3';
 import * as AP from './constants';
-import { Alcmonavis, CustomD3Prototype, Dict, Forester, HTMLstring, MappingFunction } from '../alcomanavispoeschli';
-
-(window as any).jQuery = $;
-require('jquery-ui/ui/version');
-require('jquery-ui/ui/widget');
-require('jquery-ui/ui/ie');
-require('jquery-ui/ui/data');
-require('jquery-ui/ui/plugin');
-require('jquery-ui/ui/safe-active-element');
-require('jquery-ui/ui/safe-blur');
-require('jquery-ui/ui/scroll-parent');
-require('jquery-ui/ui/form');
-require('jquery-ui/ui/escape-selector');
-require('jquery-ui/ui/labels');
-require('jquery-ui/ui/form-reset-mixin');
-require('jquery-ui/ui/keycode');
-require('jquery-ui/ui/widgets/mouse');
-require('jquery-ui/ui/widgets/checkboxradio');
-require('jquery-ui/ui/widgets/controlgroup');
-require('jquery-ui/ui/widgets/draggable');
-require('jquery-ui/ui/widgets/button');
-require('jquery-ui/ui/widgets/slider');
+import { Alcmonavis, CustomD3Prototype, Dict, Forester, MappingFunction } from '../alcomanavispoeschli';
 
 const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (
   d: number | string,
@@ -101,6 +80,8 @@ export default class alcmonavispoeschli {
   visualizations2_property_applies_to!: string;
   visualizations3_property_applies_to!: string;
 
+  eventhandlers: Dict<((val?: string | number | boolean) => void)[]> = {};
+
   constructor(
     id: string,
     phylo: Alcmonavis.phylo | undefined | null,
@@ -120,7 +101,30 @@ export default class alcmonavispoeschli {
         }
       }
     });
+
+    const self = this;
+
     this.launch(id, phylo, options, settings, nodeVisualizations, specialVisualizations);
+  }
+
+  AddHandler = (event: string, handler: (val?: string | number | boolean) => void) => {
+    if (!~this.eventhandlers[event].indexOf(handler)) {
+      this.eventhandlers[event].push(handler);
+    }
+  }
+
+  RemoveHandler = (event: string, handler?: (val?: string | number | boolean) => void) => {
+    if (handler && !!~this.eventhandlers[event].indexOf(handler)) {
+      const index = this.eventhandlers[event].indexOf(handler)
+      this.eventhandlers[event].splice(index, 1);
+    }
+    else {
+      (this.eventhandlers[event]).length = 0;
+    }
+  }
+
+  TriggerHandler = (event: string, value?: string | number | boolean) => {
+    this.eventhandlers[event].forEach(h => h(value));
   }
 
   branchLengthScaling = (nodes: Alcmonavis.phylo[], width: number) => {
@@ -4105,7 +4109,7 @@ export default class alcmonavispoeschli {
       this.initializeNodeVisualizations(nodeProperties);
     }
 
-    this.createGui();
+    //this.createGui();
 
     if (settings.enableNodeVisualizations || settings.enableBranchVisualizations) {
       d3.select(window).on('mousedown', this.mouseDown);
@@ -4170,7 +4174,8 @@ export default class alcmonavispoeschli {
     this.root.x0 = this.displayHeight / 2;
     this.root.y0 = 0;
 
-    this.initializeGui();
+    //this.initializeGui();
+    this.makeBackground();
 
     this.svgGroup = this.baseSvg.append('g');
 
@@ -5503,21 +5508,24 @@ export default class alcmonavispoeschli {
   toPhylogram = () => {
     this.options!.phylogram = true;
     this.options!.alignPhylogram = false;
-    this.setDisplayTypeButtons();
+    //this.setDisplayTypeButtons();
+    this.TriggerHandler("displayType");
     this.update(undefined, 0);
   };
 
   toAlignedPhylogram = () => {
     this.options!.phylogram = true;
     this.options!.alignPhylogram = true;
-    this.setDisplayTypeButtons();
+    //this.setDisplayTypeButtons();
+    this.TriggerHandler("displayType");
     this.update(undefined, 0);
   };
 
   toCladegram = () => {
     this.options!.phylogram = false;
     this.options!.alignPhylogram = false;
-    this.setDisplayTypeButtons();
+    //this.setDisplayTypeButtons();
+    this.TriggerHandler("displayType");
     this.update(undefined, 0);
   };
 
@@ -5525,7 +5533,7 @@ export default class alcmonavispoeschli {
     this.options!.showNodeName = this.getCheckboxValue(AP.NODE_NAME_CB);
     if (this.options!.showNodeName) {
       this.options!.showExternalLabels = true;
-      this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
     }
     this.update();
   };
@@ -5534,7 +5542,7 @@ export default class alcmonavispoeschli {
     this.options!.showTaxonomy = this.getCheckboxValue(AP.TAXONOMY_CB);
     if (this.options!.showTaxonomy) {
       this.options!.showExternalLabels = true;
-      this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
     }
     this.update();
   };
@@ -5543,7 +5551,7 @@ export default class alcmonavispoeschli {
     this.options!.showSequence = this.getCheckboxValue(AP.SEQUENCE_CB);
     if (this.options!.showSequence) {
       this.options!.showExternalLabels = true;
-      this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
     }
     this.update();
   };
@@ -5652,8 +5660,8 @@ export default class alcmonavispoeschli {
     ) {
       this.options!.showInternalNodes = true;
       this.options!.showExternalNodes = true;
-      this.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
-      this.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+      this.TriggerHandler("showInternalNodes", this.options!.showInternalNodes)
+      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
     }
     this.update(undefined, 0, true);
   };
@@ -5690,7 +5698,8 @@ export default class alcmonavispoeschli {
     this.options!.searchIsPartial = !this.getCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB);
     if (this.options!.searchIsPartial === false) {
       this.options!.searchUsesRegex = false;
-      this.setCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB, this.options!.searchUsesRegex);
+      this.TriggerHandler("searchUsesRegex", this.options!.searchUsesRegex)
+
     }
     this.search0();
     this.search1();
@@ -5700,7 +5709,8 @@ export default class alcmonavispoeschli {
     this.options!.searchUsesRegex = this.getCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB);
     if (this.options!.searchUsesRegex === true) {
       this.options!.searchIsPartial = true;
-      this.setCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, !this.options!.searchIsPartial);
+      this.TriggerHandler("searchIsComplete", !this.options!.searchIsPartial)
+
     }
     this.search0();
     this.search1();
@@ -5819,22 +5829,6 @@ export default class alcmonavispoeschli {
     this.update();
   };
 
-  setRadioButtonValue = (id: string, value: boolean) => {
-    var radio = $<HTMLInputElement>('input#' + id); // BM
-    if (radio) {
-      radio[0].checked = value;
-      radio.button('refresh');
-    }
-  };
-
-  setCheckboxValue = (id: string, value: boolean) => {
-    var cb = $<HTMLInputElement>('#' + id);
-    if (cb && cb[0]) {
-      cb[0].checked = value;
-      cb.button('refresh');
-    }
-  };
-
   setSelectMenuValue = (id: string, valueToSelect: string) => {
     const element = document.getElementById(id) as HTMLSelectElement;
     if (element != null) {
@@ -5923,12 +5917,132 @@ export default class alcmonavispoeschli {
     }
   };
 
-  createGui = () => {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-    if (!SettingsDeclared(this.settings)) throw 'Settings not set';
-    const options = this.options,
-      settings = this.settings;
+  setLabelColorMenu = (value: string, style: "legend" | "check") => {
+    if (value && value != AP.DEFAULT) {
+      this.currentLabelColorVisualization = value;
+      if (style = "legend") {
+        if (
+          this.visualizations &&
+          this.visualizations.labelColor &&
+          this.visualizations.labelColor[this.currentLabelColorVisualization] != null
+        ) {
+          this.addLegend(AP.LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
+        }
+      }
+      else {
+        this.options = this.options || {};
+        this.options.showNodeName = true;
+        this.options.showExternalLabels = true;
+        this.options.showInternalLabels = true;
+        this.TriggerHandler("showNodeName", this.options.showNodeName);
+        this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
+        this.TriggerHandler("showInternalLabels", this.options.showInternalLabels);
+        //this.setCheckboxValue(AP.NODE_NAME_CB, true);
+        //this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
+        //this.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
+      }
+    } else {
+      this.currentLabelColorVisualization = null;
+      this.removeLegend(AP.LEGEND_LABEL_COLOR);
+    }
+    this.removeColorPicker();
+    this.update(undefined, 0);
+  }
 
+  setFillColorMenu = (value: string, style: "legend" | "check") => {
+    this.options = this.options || {};
+    if (value && value != AP.DEFAULT) {
+      if (style = "legend") {
+        if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+          this.options.showExternalNodes = true;
+          this.TriggerHandler("showExternalNodes", this.options.showExternalNodes);
+          //alcmonavis.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
+        }
+        this.options.showNodeVisualizations = true;
+        this.TriggerHandler("showNodeVisualizations", this.options.showExternalNodes);
+        // alcmonavis.setCheckboxValue(AP.NODE_VIS_CB, true);
+        this.currentNodeFillColorVisualization = value;
+        if (
+          this.visualizations &&
+          this.visualizations.nodeFillColor &&
+          this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization] != null
+        ) {
+          this.addLegend(
+            AP.LEGEND_NODE_FILL_COLOR,
+            this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization],
+          );
+        }
+      }
+      else {
+        this.options.showExternalNodes = true;
+        this.options.showInternalNodes = true;
+        this.options.showNodeVisualizations = true;
+        this.TriggerHandler("showExternalNodes", this.options.showNodeName);
+        this.TriggerHandler("showInternalNodes", this.options.showExternalLabels);
+        this.TriggerHandler("showNodeVisualizations", this.options.showInternalLabels);
+      }
+    }
+    else {
+      this.currentNodeFillColorVisualization = null;
+      this.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
+    }
+    this.removeColorPicker();
+    this.update(undefined, 0);
+  }
+
+  setShapeSelectMenu = (value: string) => {
+    this.options = this.options || {};
+    if (value && value != AP.DEFAULT) {
+      this.currentNodeShapeVisualization = value;
+      this.options.showNodeVisualizations = true;
+      this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
+
+      if (
+        this.visualizations &&
+        this.visualizations.nodeShape &&
+        this.visualizations.nodeShape[this.currentNodeShapeVisualization] != null
+      ) {
+        this.addLegend(AP.LEGEND_NODE_FILL_COLOR, this.visualizations.nodeShape[this.currentNodeShapeVisualization]);
+      }
+    } else {
+      this.currentNodeShapeVisualization = null;
+      this.removeLegendForShapes(AP.LEGEND_NODE_SHAPE);
+    }
+    this.removeColorPicker();
+    this.resetVis();
+    this.update(undefined, 0);
+  }
+
+  setSizeSelectMenu = (value: string) => {
+    this.options = this.options || {};
+    if (value && value != AP.DEFAULT) {
+      this.currentNodeSizeVisualization = value;
+      if (
+        this.visualizations &&
+        this.visualizations.nodeSize &&
+        this.visualizations.nodeSize[this.currentNodeSizeVisualization] != null
+      ) {
+        this.addLegend(AP.LEGEND_NODE_FILL_COLOR, this.visualizations.nodeSize[this.currentNodeSizeVisualization]);
+      }
+      if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+        this.options.showExternalNodes = true;
+        this.TriggerHandler("showExternalNodes", this.options.showNodeName);
+      }
+      this.options.showNodeVisualizations = true;
+      this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
+
+    }
+    else {
+      this.currentNodeSizeVisualization = null;
+      this.removeLegendForSizes(AP.LEGEND_NODE_SIZE);
+    }
+    this.removeColorPicker();
+    this.update(undefined, 0);
+  }
+
+  getPropertyRefs = () => this.treeData && forester.collectPropertyRefs(this.treeData, 'node', false);
+
+  createGui = () => {
     const self: alcmonavispoeschli = this;
 
     var d3selectId = d3.select(this.id);
@@ -5956,1877 +6070,10 @@ export default class alcmonavispoeschli {
       .attr('class', 'node_mouseover_tooltip')
       .style('opacity', 1e-6);
 
-    var c0 = $('#' + this.settings.controls0);
 
-    if (c0) {
-      c0.css({
-        position: 'absolute',
-        left: this.settings.controls0Left,
-        top: this.settings.controls0Top + this.offsetTop,
-        'text-align': 'left',
-        padding: '0px',
-        margin: '0 0 0 0',
-        opacity: 0.8,
-        'background-color': this.settings.controlsBackgroundColor,
-        color: this.settings.controlsFontColor,
-        'font-size': this.settings.controlsFontSize,
-        'font-family': this.settings.controlsFont
-          .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-          .reduce((p, v) => p + ', ' + v),
-        'font-style': 'normal',
-        'font-weight': 'normal',
-        'text-decoration': 'none',
-      });
-
-      c0.draggable({ containment: 'parent' });
-
-      c0.append(makeProgramDesc());
-
-      c0.append(makePhylogramControl());
-
-      c0.append(makeDisplayControl());
-
-      c0.append(makeZoomControl());
-
-      var pn = $('.' + AP.PROG_NAME);
-      if (pn) {
-        pn.css({
-          'text-align': 'center',
-          'padding-top': '3px',
-          'padding-bottom': '5px',
-          'font-size': this.settings.controlsFontSize,
-          'font-family': this.settings.controlsFont
-            .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-            .reduce((p, v) => p + ', ' + v),
-          'font-style': 'italic',
-          'font-weight': 'bold',
-          'text-decoration': 'none',
-        });
-      }
-      var pnl = $('.' + AP.PROGNAMELINK);
-      if (pnl) {
-        pnl.css({
-          color: AP.COLOR_FOR_ACTIVE_ELEMENTS,
-          'font-size': this.settings.controlsFontSize,
-          'font-family': this.settings.controlsFont
-            .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-            .reduce((p, v) => p + ', ' + v),
-          'font-style': 'italic',
-          'font-weight': 'bold',
-          'text-decoration': 'none',
-          border: 'none',
-        });
-        $('.' + AP.PROGNAMELINK + ':hover').css({
-          color: AP.COLOR_FOR_ACTIVE_ELEMENTS,
-          'font-size': this.settings.controlsFontSize,
-          'font-family': this.settings.controlsFont
-            .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-            .reduce((p, v) => p + ', ' + v),
-          'font-style': 'italic',
-          'font-weight': 'bold',
-          'text-decoration': 'none',
-          border: 'none',
-        });
-        $('.' + AP.PROGNAMELINK + ':link').css({
-          color: AP.COLOR_FOR_ACTIVE_ELEMENTS,
-          'font-size': this.settings.controlsFontSize,
-          'font-family': this.settings.controlsFont
-            .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-            .reduce((p, v) => p + ', ' + v),
-          'font-style': 'italic',
-          'font-weight': 'bold',
-          'text-decoration': 'none',
-          border: 'none',
-        });
-        $('.' + AP.PROGNAMELINK + ':visited').css({
-          color: AP.COLOR_FOR_ACTIVE_ELEMENTS,
-          'font-size': this.settings.controlsFontSize,
-          'font-family': this.settings.controlsFont
-            .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-            .reduce((p, v) => p + ', ' + v),
-          'font-style': 'italic',
-          'font-weight': 'bold',
-          'text-decoration': 'none',
-          border: 'none',
-        });
-      }
-
-      $('.' + AP.PHYLOGRAM_CLADOGRAM_CONTROLGROUP).controlgroup({
-        direction: 'horizontal',
-      });
-
-      $('.' + AP.DISPLAY_DATA_CONTROLGROUP).controlgroup({
-        direction: 'vertical',
-      });
-
-      c0.append(makeControlButtons());
-
-      c0.append(makeSliders());
-
-      c0.append(makeSearchBoxes());
-
-      $('.' + AP.SEARCH_OPTIONS_GROUP).controlgroup({
-        direction: 'horizontal',
-      });
-
-      c0.append(makeAutoCollapse());
-
-      if (this.settings.enableDownloads) {
-        c0.append(makeDownloadSection());
-      }
-    }
-
-    var c1 = $('#' + this.settings.controls1);
-    if (c1) {
-      c1.css({
-        position: 'absolute',
-        left: this.settings.controls1Left,
-        top: this.settings.controls1Top + this.offsetTop,
-        'text-align': 'left',
-        padding: '0px',
-        margin: '0 0 0 0',
-        opacity: 0.8,
-        'background-color': this.settings.controlsBackgroundColor,
-        color: this.settings.controlsFontColor,
-        'font-size': this.settings.controlsFontSize,
-        'font-family': this.settings.controlsFont
-          .map((v) => (/\s/.test(v) ? '"' + v + '"' : v))
-          .reduce((p, v) => p + ', ' + v),
-        'font-style': 'normal',
-        'font-weight': 'normal',
-        'text-decoration': 'none',
-      });
-
-      c1.draggable({ containment: 'parent' });
-
-      if (this.settings.enableNodeVisualizations && this.nodeVisualizations) {
-        c1.append(makeVisualControls());
-        if (this.isCanDoMsaResidueVisualizations()) {
-          c1.append(makeMsaResidueVisCurrResPositionControl());
-        }
-
-        if (this.isAddVisualization2() && this.specialVisualizations != null) {
-          //~~
-          if ('Mutations' in this.specialVisualizations) {
-            const mutations = this.specialVisualizations['Mutations'];
-            if (mutations != null) {
-              c1.append(makeVisualization2(mutations.label));
-              this.visualizations2_color = mutations.color;
-              this.visualizations2_applies_to_ref = mutations.applies_to_ref;
-              this.visualizations2_property_datatype = mutations.property_datatype;
-              this.visualizations2_property_applies_to = mutations.property_applies_to;
-              console.log(
-                AP.MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations2_applies_to_ref,
-              );
-              console.log(
-                AP.MESSAGE +
-                'Setting special visualization property applies to to: ' +
-                this.visualizations2_property_applies_to,
-              );
-              console.log(
-                AP.MESSAGE +
-                'Setting special visualization property datatype to: ' +
-                this.visualizations2_property_datatype,
-              );
-              console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations2_color);
-            }
-          }
-        }
-        if (this.isAddVisualization3() && this.specialVisualizations != null) {
-          //~~
-          if ('Convergent_Mutations' in this.specialVisualizations) {
-            const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
-            if (conv_mutations != null) {
-              c1.append(makeVisualization3(conv_mutations.label));
-              this.visualizations3_color = conv_mutations.color;
-              this.visualizations3_applies_to_ref = conv_mutations.applies_to_ref;
-              this.visualizations3_property_datatype = conv_mutations.property_datatype;
-              this.visualizations3_property_applies_to = conv_mutations.property_applies_to;
-              console.log(
-                AP.MESSAGE + 'Setting special visualization property ref to: ' + this.visualizations3_applies_to_ref,
-              );
-              console.log(
-                AP.MESSAGE +
-                'Setting special visualization property applies to to: ' +
-                this.visualizations3_property_applies_to,
-              );
-              console.log(
-                AP.MESSAGE +
-                'Setting special visualization property datatype to: ' +
-                this.visualizations3_property_datatype,
-              );
-              console.log(AP.MESSAGE + 'Setting special visualization color to: ' + this.visualizations3_color);
-            }
-          }
-        }
-
-        c1.append(makeLegendControl());
-      }
-    }
-
-    $<HTMLInputElement>('input:button').button().css({
-      width: '26px',
-      'text-align': 'center',
-      outline: 'none',
-      margin: '0px',
-      'font-style': 'normal',
-      'font-weight': 'normal',
-      'text-decoration': 'none',
-    });
-
-    $('#' + AP.ZOOM_IN_Y + ', #' + AP.ZOOM_OUT_Y).css({
-      width: '78px',
-    });
-
-    $(
-      '#' +
-      AP.ZOOM_IN_Y +
-      ', #' +
-      AP.ZOOM_OUT_Y +
-      ', #' +
-      AP.ZOOM_TO_FIT +
-      ', #' +
-      AP.ZOOM_IN_X +
-      ', #' +
-      AP.ZOOM_OUT_X,
-    ).css({
-      height: '16px',
-    });
-
-    $(
-      '#' +
-      AP.DECR_DEPTH_COLLAPSE_LEVEL +
-      ', #' +
-      AP.INCR_DEPTH_COLLAPSE_LEVEL +
-      ', #' +
-      AP.DECR_BL_COLLAPSE_LEVEL +
-      ', #' +
-      AP.INCR_BL_COLLAPSE_LEVEL,
-    ).css({
-      width: '16px',
-    });
-
-    $('#' + AP.LEGENDS_MOVE_UP_BTN + ', #' + AP.LEGENDS_MOVE_DOWN_BTN).css({
-      width: '72px',
-    });
-
-    $('#' + AP.LEGENDS_RESET_BTN + ', #' + AP.LEGENDS_MOVE_LEFT_BTN + ', #' + AP.LEGENDS_MOVE_RIGHT_BTN).css({
-      width: '24px',
-    });
-
-    $('#' + AP.LEGENDS_SHOW_BTN + ', #' + AP.LEGENDS_HORIZ_VERT_BTN).css({
-      width: '36px',
-    });
-
-    $(
-      '#' +
-      AP.LEGENDS_MOVE_UP_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_DOWN_BTN +
-      ', #' +
-      AP.LEGENDS_RESET_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_LEFT_BTN +
-      ', #' +
-      AP.LEGENDS_MOVE_RIGHT_BTN +
-      ', #' +
-      AP.LEGENDS_SHOW_BTN +
-      ', #' +
-      AP.LEGENDS_HORIZ_VERT_BTN,
-    ).css({
-      height: '16px',
-    });
-
-    var downloadButton = $('#' + AP.DOWNLOAD_BUTTON);
-
-    if (downloadButton) {
-      downloadButton.css({
-        width: '60px',
-        'margin-bottom': '3px',
-      });
-    }
-
-    $<HTMLInputElement>(':radio').checkboxradio({
-      icon: false,
-    });
-
-    $<HTMLInputElement>(':checkbox').checkboxradio({
-      icon: false,
-    });
-
-    $('#' + AP.SEARCH_FIELD_0).on('keyup', this.search0);
-
-    $('#' + AP.SEARCH_FIELD_1).on('keyup', this.search1);
-
-    $('#' + AP.PHYLOGRAM_BUTTON).on('click', this.toPhylogram);
-
-    $('#' + AP.PHYLOGRAM_ALIGNED_BUTTON).on('click', this.toAlignedPhylogram);
-
-    $('#' + AP.CLADOGRAM_BUTTON).on('click', this.toCladegram);
-
-    $('#' + AP.NODE_NAME_CB).on('click', this.nodeNameCbClicked);
-
-    $('#' + AP.TAXONOMY_CB).on('click', this.taxonomyCbClicked);
-
-    $('#' + AP.SEQUENCE_CB).on('click', this.sequenceCbClicked);
-
-    $('#' + AP.CONFIDENCE_VALUES_CB).on('click', this.confidenceValuesCbClicked);
-
-    $('#' + AP.BRANCH_LENGTH_VALUES_CB).on('click', this.branchLengthsCbClicked);
-
-    $('#' + AP.NODE_EVENTS_CB).on('click', this.nodeEventsCbClicked);
-
-    $('#' + AP.BRANCH_EVENTS_CB).on('click', this.branchEventsCbClicked);
-
-    $('#' + AP.INTERNAL_LABEL_CB).on('click', this.internalLabelsCbClicked);
-
-    $('#' + AP.EXTERNAL_LABEL_CB).on('click', this.externalLabelsCbClicked);
-
-    $('#' + AP.INTERNAL_NODES_CB).on('click', this.internalNodesCbClicked);
-
-    $('#' + AP.EXTERNAL_NODES_CB).on('click', this.externalNodesCbClicked);
-
-    $('#' + AP.NODE_VIS_CB).on('click', this.nodeVisCbClicked);
-
-    $('#' + AP.BRANCH_VIS_CB).on('click', this.branchVisCbClicked);
-
-    $('#' + AP.BRANCH_COLORS_CB).on('click', this.branchColorsCbClicked);
-
-    $('#' + AP.DYNAHIDE_CB).on('click', this.dynaHideCbClicked);
-
-    $('#' + AP.SHORTEN_NODE_NAME_CB).on('click', this.shortenCbClicked);
-
-    $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU).on('change', function () {
-      const v = this.value;
-      if (self.isAddVisualization2()) {
-        self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_2, AP.DEFAULT);
-      }
-      if (self.isAddVisualization3()) {
-        self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_3, AP.DEFAULT);
-      }
-
-      if (v && v != AP.DEFAULT) {
-        self.currentLabelColorVisualization = v;
-        if (
-          self.visualizations &&
-          self.visualizations.labelColor &&
-          self.visualizations.labelColor[self.currentLabelColorVisualization] != null
-        ) {
-          self.addLegend(AP.LEGEND_LABEL_COLOR, self.visualizations.labelColor[self.currentLabelColorVisualization]);
-        }
-      } else {
-        self.currentLabelColorVisualization = null;
-        self.removeLegend(AP.LEGEND_LABEL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU_2).on('change', function () {
-      const v = this.value;
-      self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU, AP.DEFAULT);
-      if (self.isAddVisualization3()) {
-        self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_3, AP.DEFAULT);
-      }
-      if (v && v != AP.DEFAULT) {
-        self.currentLabelColorVisualization = v;
-        options.showNodeName = true;
-        self.setCheckboxValue(AP.NODE_NAME_CB, true);
-        options.showExternalLabels = true;
-        self.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
-        options.showInternalLabels = true;
-        self.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
-      } else {
-        self.currentLabelColorVisualization = null;
-        self.removeLegend(AP.LEGEND_LABEL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $<HTMLSelectElement>('#' + AP.LABEL_COLOR_SELECT_MENU_3).on('change', function () {
-      const v = this.value;
-      self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU, AP.DEFAULT);
-      if (self.isAddVisualization2()) {
-        self.setSelectMenuValue(AP.LABEL_COLOR_SELECT_MENU_2, AP.DEFAULT);
-      }
-      if (v && v != AP.DEFAULT) {
-        self.currentLabelColorVisualization = v;
-        options.showNodeName = true;
-        self.setCheckboxValue(AP.NODE_NAME_CB, true);
-        options.showExternalLabels = true;
-        self.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
-        options.showInternalLabels = true;
-        self.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
-      } else {
-        self.currentLabelColorVisualization = null;
-        self.removeLegend(AP.LEGEND_LABEL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU).on('change', function () {
-      var v = this.value;
-      if (self.isAddVisualization2()) {
-        self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_2, AP.DEFAULT);
-      }
-      if (self.isAddVisualization3()) {
-        self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_3, AP.DEFAULT);
-      }
-      if (v && v != AP.DEFAULT) {
-        if (!options.showExternalNodes && !options.showInternalNodes && self.currentNodeShapeVisualization == null) {
-          options.showExternalNodes = true;
-          self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
-        }
-        options.showNodeVisualizations = true;
-        self.setCheckboxValue(AP.NODE_VIS_CB, true);
-        self.currentNodeFillColorVisualization = v;
-        if (
-          self.visualizations &&
-          self.visualizations.nodeFillColor &&
-          self.visualizations.nodeFillColor[self.currentNodeFillColorVisualization] != null
-        ) {
-          self.addLegend(
-            AP.LEGEND_NODE_FILL_COLOR,
-            self.visualizations.nodeFillColor[self.currentNodeFillColorVisualization],
-          );
-        }
-      } else {
-        self.currentNodeFillColorVisualization = null;
-        self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).on('change', function () {
-      const v = this.value;
-      self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU, AP.DEFAULT);
-      if (self.isAddVisualization3()) {
-        self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_3, AP.DEFAULT);
-      }
-      if (v && v != AP.DEFAULT) {
-        options.showExternalNodes = true;
-        self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
-        options.showInternalNodes = true;
-        self.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
-
-        options.showNodeVisualizations = true;
-        self.setCheckboxValue(AP.NODE_VIS_CB, true);
-        self.currentNodeFillColorVisualization = v;
-      } else {
-        self.currentNodeFillColorVisualization = null;
-        self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $<HTMLSelectElement>('#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).on('change', function () {
-      const v = this.value;
-      self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU, AP.DEFAULT);
-      if (self.isAddVisualization2()) {
-        self.setSelectMenuValue(AP.NODE_FILL_COLOR_SELECT_MENU_2, AP.DEFAULT);
-      }
-      if (v && v != AP.DEFAULT) {
-        options.showExternalNodes = true;
-        self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
-        options.showInternalNodes = true;
-        self.setCheckboxValue(AP.INTERNAL_NODES_CB, true);
-
-        options.showNodeVisualizations = true;
-        self.setCheckboxValue(AP.NODE_VIS_CB, true);
-        self.currentNodeFillColorVisualization = v;
-      } else {
-        self.currentNodeFillColorVisualization = null;
-        self.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    /*
-         $('#' + NODE_BORDER_COLOR_SELECT_MENU).on('change', function () {
-         const v = this.value;
-         if (isAddVisualization2()) {
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
-         }
-         if (isAddVisualization3()) {
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
-         }
-         if (v && v != DEFAULT) {
-         this.currentNodeBorderColorVisualization = v;
-         if ((v != SAME_AS_FILL ) && (v != NONE)) {
-         addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-         if (!this.options.showExternalNodes && !this.options.showInternalNodes
-         && ( this.currentNodeShapeVisualization == null )) {
-         this.options.showExternalNodes = true;
-         setCheckboxValue(EXTERNAL_NODES_CB, true);
-         }
-         this.options.showNodeVisualizations = true;
-         setCheckboxValue(NODE_VIS_CB, true);
-         }
-         }
-         else {
-         this.currentNodeBorderColorVisualization = null;
-         }
-         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-         removeLegend(LEGEND_NODE_BORDER_COLOR);
-         }
-         removeColorPicker();
-         update(null, 0);
-         });
-         */
-
-    /*
-         $('#' + NODE_BORDER_COLOR_SELECT_MENU_2).on('change', function () {
-         const v = this.value;
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
-         if (isAddVisualization3()) {
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_3, DEFAULT);
-         }
-         if (v && v != DEFAULT) {
-         this.currentNodeBorderColorVisualization = v;
-         if ((v != SAME_AS_FILL ) && (v != NONE)) {
-         //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-         //if (!this.options.showExternalNodes && !this.options.showInternalNodes
-         //&& ( this.currentNodeShapeVisualization == null )) {
-         this.options.showExternalNodes = true;
-         setCheckboxValue(EXTERNAL_NODES_CB, true);
-         this.options.showInternalNodes = true;
-         setCheckboxValue(INTERNAL_NODES_CB, true);
-         // }
-         this.options.showNodeVisualizations = true;
-         setCheckboxValue(NODE_VIS_CB, true);
-         }
-         }
-         else {
-         this.currentNodeBorderColorVisualization = null;
-         }
-         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-         removeLegend(LEGEND_NODE_BORDER_COLOR);
-         }
-         removeColorPicker();
-         update(null, 0);
-         });
-         */
-
-    /*
-         $('#' + NODE_BORDER_COLOR_SELECT_MENU_3).on('change', function () {
-         const v = this.value;
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU, DEFAULT);
-         if (isAddVisualization2()) {
-         setSelectMenuValue(NODE_BORDER_COLOR_SELECT_MENU_2, DEFAULT);
-         }
-         if (v && v != DEFAULT) {
-         this.currentNodeBorderColorVisualization = v;
-         if ((v != SAME_AS_FILL ) && (v != NONE)) {
-         //addLegend(LEGEND_NODE_BORDER_COLOR, this.visualizations.nodeBorderColor[this.currentNodeBorderColorVisualization]);
-         //if (!this.options.showExternalNodes && !this.options.showInternalNodes
-         //&& ( this.currentNodeShapeVisualization == null )) {
-         this.options.showExternalNodes = true;
-         setCheckboxValue(EXTERNAL_NODES_CB, true);
-         this.options.showInternalNodes = true;
-         setCheckboxValue(INTERNAL_NODES_CB, true);
-         // }
-         this.options.showNodeVisualizations = true;
-         setCheckboxValue(NODE_VIS_CB, true);
-         }
-         }
-         else {
-         this.currentNodeBorderColorVisualization = null;
-         }
-         if ((v == DEFAULT ) || (v == SAME_AS_FILL ) || (v == NONE)) {
-         removeLegend(LEGEND_NODE_BORDER_COLOR);
-         }
-         removeColorPicker();
-         update(null, 0);
-         });
-         */
-
-    $<HTMLSelectElement>('#' + AP.NODE_SHAPE_SELECT_MENU).on('change', function () {
-      var v = this.value;
-      if (v && v != AP.DEFAULT) {
-        self.currentNodeShapeVisualization = v;
-        options.showNodeVisualizations = true;
-        self.setCheckboxValue(AP.NODE_VIS_CB, true);
-        if (
-          self.visualizations &&
-          self.visualizations.nodeShape &&
-          self.visualizations.nodeShape[self.currentNodeShapeVisualization] != null
-        ) {
-          self.addLegend(AP.LEGEND_NODE_FILL_COLOR, self.visualizations.nodeShape[self.currentNodeShapeVisualization]);
-        }
-      } else {
-        self.currentNodeShapeVisualization = null;
-        self.removeLegendForShapes(AP.LEGEND_NODE_SHAPE);
-      }
-      self.removeColorPicker();
-      self.resetVis();
-      self.update(undefined, 0);
-      //self.update(null, 0); // BM 6?
-    });
-
-    $<HTMLSelectElement>('#' + AP.NODE_SIZE_SELECT_MENU).on('change', function () {
-      var v = this.value;
-      if (v && v != AP.DEFAULT) {
-        self.currentNodeSizeVisualization = v;
-        if (
-          self.visualizations &&
-          self.visualizations.nodeSize &&
-          self.visualizations.nodeSize[self.currentNodeSizeVisualization] != null
-        ) {
-          self.addLegend(AP.LEGEND_NODE_FILL_COLOR, self.visualizations.nodeSize[self.currentNodeSizeVisualization]);
-        }
-        if (!options.showExternalNodes && !options.showInternalNodes && self.currentNodeShapeVisualization == null) {
-          options.showExternalNodes = true;
-          self.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
-        }
-        options.showNodeVisualizations = true;
-        self.setCheckboxValue(AP.NODE_VIS_CB, true);
-      } else {
-        self.currentNodeSizeVisualization = null;
-        self.removeLegendForSizes(AP.LEGEND_NODE_SIZE);
-      }
-      self.removeColorPicker();
-      self.update(undefined, 0);
-    });
-
-    $('#' + AP.NODE_SIZE_SLIDER).slider({
-      min: AP.NODE_SIZE_MIN,
-      max: AP.NODE_SIZE_MAX,
-      step: AP.SLIDER_STEP,
-      value: this.options.nodeSizeDefault,
-      animate: 'fast',
-      slide: this.changeNodeSize,
-      change: this.changeNodeSize,
-    });
-
-    $('#' + AP.BRANCH_WIDTH_SLIDER).slider({
-      min: AP.BRANCH_WIDTH_MIN,
-      max: AP.BRANCH_WIDTH_MAX,
-      step: AP.SLIDER_STEP,
-      value: this.options.branchWidthDefault,
-      animate: 'fast',
-      slide: this.changeBranchWidth,
-      change: this.changeBranchWidth,
-    });
-
-    $('#' + AP.EXTERNAL_FONT_SIZE_SLIDER).slider({
-      min: AP.FONT_SIZE_MIN,
-      max: AP.FONT_SIZE_MAX,
-      step: AP.SLIDER_STEP,
-      value: +this.options.externalNodeFontSize,
-      animate: 'fast',
-      slide: this.changeExternalFontSize,
-      change: this.changeExternalFontSize,
-    });
-
-    $('#' + AP.INTERNAL_FONT_SIZE_SLIDER).slider({
-      min: AP.FONT_SIZE_MIN,
-      max: AP.FONT_SIZE_MAX,
-      step: AP.SLIDER_STEP,
-      value: +this.options.internalNodeFontSize,
-      animate: 'fast',
-      slide: this.changeInternalFontSize,
-      change: this.changeInternalFontSize,
-    });
-
-    $('#' + AP.BRANCH_DATA_FONT_SIZE_SLIDER).slider({
-      min: AP.FONT_SIZE_MIN,
-      max: AP.FONT_SIZE_MAX,
-      step: AP.SLIDER_STEP,
-      value: +this.options.branchDataFontSize,
-      animate: 'fast',
-      slide: this.changeBranchDataFontSize,
-      change: this.changeBranchDataFontSize,
-    });
-
-    $('#' + AP.SEARCH_FIELD_0 + ', #' + AP.SEARCH_FIELD_1)
-      .off('keydown')
-      .off('mouseenter')
-      .off('mousedown')
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-        'text-align': 'left',
-        outline: 'none',
-        cursor: 'text',
-        width: this.settings.searchFieldWidth,
-        height: this.settings.textFieldHeight,
-      });
-
-    $('#' + AP.DEPTH_COLLAPSE_LABEL + ', #' + AP.BL_COLLAPSE_LABEL)
-      .button()
-      .off('keydown')
-      .off('mouseenter')
-      .off('mousedown')
-      .attr('disabled', 'disabled')
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-        'text-align': 'center',
-        outline: 'none',
-        cursor: 'text',
-        width: this.settings.collapseLabelWidth,
-      });
-
-    $('#' + AP.ZOOM_IN_Y)
-      .mousedown(() => {
-        this.zoomInY();
-        this.intervalId = window.setInterval(this.zoomInY, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.ZOOM_OUT_Y)
-      .mousedown(() => {
-        this.zoomOutY();
-        this.intervalId = window.setInterval(this.zoomOutY, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.ZOOM_IN_X)
-      .mousedown(() => {
-        this.zoomInX();
-        this.intervalId = window.setInterval(this.zoomInX, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.ZOOM_OUT_X)
-      .mousedown(() => {
-        this.zoomOutX();
-        this.intervalId = window.setInterval(this.zoomOutX, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.DECR_DEPTH_COLLAPSE_LEVEL)
-      .mousedown(() => {
-        this.decrDepthCollapseLevel();
-        this.intervalId = window.setInterval(this.decrDepthCollapseLevel, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-    $('#' + AP.INCR_DEPTH_COLLAPSE_LEVEL)
-      .mousedown(() => {
-        this.incrDepthCollapseLevel();
-        this.intervalId = window.setInterval(this.incrDepthCollapseLevel, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-    $('#' + AP.DECR_BL_COLLAPSE_LEVEL)
-      .mousedown(() => {
-        this.decrBlCollapseLevel();
-        this.intervalId = window.setInterval(this.decrBlCollapseLevel, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-    $('#' + AP.INCR_BL_COLLAPSE_LEVEL)
-      .mousedown(() => {
-        this.incrBlCollapseLevel();
-        this.intervalId = window.setInterval(this.incrBlCollapseLevel, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.ZOOM_TO_FIT).mousedown(this.zoomToFit);
-
-    $('#' + AP.RETURN_TO_SUPERTREE_BUTTON).mousedown(this.returnToSupertreeButtonPressed);
-
-    $('#' + AP.ORDER_BUTTON).mousedown(this.orderButtonPressed);
-
-    $('#' + AP.UNCOLLAPSE_ALL_BUTTON).mousedown(this.uncollapseAllButtonPressed);
-
-    $('#' + AP.MIDPOINT_ROOT_BUTTON).mousedown(this.midpointRootButtonPressed);
-
-    // Search Controls
-    // ---------------
-
-    $('#' + AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB).click(this.searchOptionsCaseSenstiveCbClicked);
-    $('#' + AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB).click(this.searchOptionsCompleteTermsOnlyCbClicked);
-    $('#' + AP.SEARCH_OPTIONS_REGEX_CB).click(this.searchOptionsRegexCbClicked);
-    $('#' + AP.SEARCH_OPTIONS_NEGATE_RES_CB).click(this.searchOptionsNegateResultCbClicked);
-
-    $('#' + AP.RESET_SEARCH_A_BTN).mousedown(this.resetSearch0);
-    $('#' + AP.RESET_SEARCH_B_BTN).mousedown(this.resetSearch1);
-
-    // Visualization Legends
-    // ---------------------
-
-    $('#' + AP.LEGENDS_MOVE_UP_BTN)
-      .mousedown(() => {
-        this.legendMoveUp(2);
-        this.intervalId = window.setInterval(this.legendMoveUp, AP.MOVE_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.LEGENDS_MOVE_DOWN_BTN)
-      .mousedown(() => {
-        this.legendMoveDown(2);
-        this.intervalId = window.setInterval(this.legendMoveDown, AP.MOVE_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.LEGENDS_MOVE_LEFT_BTN)
-      .mousedown(() => {
-        this.legendMoveLeft(2);
-        this.intervalId = window.setInterval(this.legendMoveLeft, AP.MOVE_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.LEGENDS_MOVE_RIGHT_BTN)
-      .mousedown(() => {
-        this.legendMoveRight(2);
-        this.intervalId = window.setInterval(this.legendMoveRight, AP.MOVE_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.LEGENDS_HORIZ_VERT_BTN).click(this.legendHorizVertClicked);
-    $('#' + AP.LEGENDS_SHOW_BTN).click(this.legendShowClicked);
-    $('#' + AP.LEGENDS_RESET_BTN).click(this.legendResetClicked);
-
-    // ----------------
-
-    if (downloadButton) {
-      downloadButton.mousedown(this.downloadButtonPressed);
-    }
-
-    // Collapse
-    // ---------------
-
-    $('#' + AP.COLLAPSE_BY_FEATURE_SELECT)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.EXPORT_FORMAT_SELECT)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.COLLAPSE_BY_FEATURE_SELECT).on('change', () => {
-      var s = $('#' + AP.COLLAPSE_BY_FEATURE_SELECT);
-      if (s) {
-        var f = s.val();
-        if (f && typeof f === 'string') {
-          this.collapseByFeature(f);
-        }
-      }
-    });
-
-    // ---------------
-
-    // Visualizations
-    // ---------------
-
-    $('#' + AP.LABEL_COLOR_SELECT_MENU)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_FILL_COLOR_SELECT_MENU)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_SHAPE_SELECT_MENU)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_SIZE_SELECT_MENU)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.LABEL_COLOR_SELECT_MENU_2) //~~
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_FILL_COLOR_SELECT_MENU_2)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.LABEL_COLOR_SELECT_MENU_3) //~~~
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_FILL_COLOR_SELECT_MENU_3)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    $('#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3)
-      .select()
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-      });
-
-    // MSA residue visualization: Position control
-    // -------------------------------------------
-    $('#' + AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN + ', #' + AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN).css({
-      width: '18px',
-    });
-
-    $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL)
-      .off('keydown')
-      .off('mouseenter')
-      .off('mousedown')
-      .css({
-        font: 'inherit',
-        color: 'inherit',
-        'text-align': 'center',
-        outline: 'none',
-        cursor: 'text',
-        width: '28px',
-        height: this.settings.textFieldHeight,
-      });
-
-    $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).keyup(
-      (e: JQuery.KeyUpEvent<HTMLElement, null, HTMLElement, HTMLElement>) => {
-        var keycode = e.keyCode;
-        if (
-          (keycode >= AP.VK_0 && keycode <= AP.VK_9) ||
-          (keycode >= AP.VK_0_NUMPAD && keycode <= AP.VK_9_NUMPAD) ||
-          keycode === AP.VK_BACKSPACE ||
-          keycode === AP.VK_DELETE
-        ) {
-          var i = 0;
-          if (
-            ((keycode >= AP.VK_0 && keycode <= AP.VK_9) || (keycode >= AP.VK_0_NUMPAD && keycode <= AP.VK_9_NUMPAD)) &&
-            this.basicTreeProperties &&
-            this.basicTreeProperties.maxMolSeqLength &&
-            this.msa_residue_vis_curr_res_pos >= this.basicTreeProperties.maxMolSeqLength - 1
-          ) {
-            if (keycode >= AP.VK_0 && keycode <= AP.VK_9) {
-              i = keycode - 48;
-            } else {
-              i = keycode - 96;
-            }
-          } else {
-            var x = ($('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL).val() as string).trim();
-            if (x === '') {
-              return;
-            }
-            i = parseInt(x);
-            if (i === null || i === undefined || isNaN(i) || i < 0) {
-              i = 0;
-            }
-          }
-          this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
-          this.setMsaResidueVisCurrResPos(i - 1);
-          this.updateMsaResidueVisCurrResPosLabel();
-          this.updateMsaResidueVisCurrResPosSliderValue();
-          this.update(undefined, 0, true);
-        } else {
-          this.update(undefined, 0, true);
-        }
-      },
-    );
-
-    $('#' + AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN)
-      .mousedown(() => {
-        this.decrMsaResidueVisCurrResPos();
-        this.intervalId = window.setInterval(this.decrMsaResidueVisCurrResPos, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    $('#' + AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN)
-      .mousedown(() => {
-        this.incrMsaResidueVisCurrResPos();
-        this.intervalId = window.setInterval(this.incrMsaResidueVisCurrResPos, AP.ZOOM_INTERVAL);
-      })
-      .bind('mouseup mouseleave', () => {
-        window.clearTimeout(this.intervalId);
-      });
-
-    // -------------------------------------------
-
-    $(document).keyup((e) => {
-      if (e.altKey) {
-        switch (e.keyCode) {
-          case AP.VK_0:
-            this.orderButtonPressed();
-            break;
-          case AP.VK_R:
-            this.returnToSupertreeButtonPressed();
-            break;
-          case AP.VK_U:
-            this.uncollapseAllButtonPressed();
-            break;
-          case AP.VK_M:
-            this.midpointRootButtonPressed();
-            break;
-          case AP.VK_P:
-            this.cycleDisplay();
-            break;
-          //case AP.VK_L: this.toggleAlignPhylogram(); break; // BM what is this?
-          case AP.VK_OPEN_BRACKET:
-            if (this.isCanDoMsaResidueVisualizations()) {
-              this.decrMsaResidueVisCurrResPos();
-            }
-            break;
-          case AP.VK_CLOSE_BRACKET:
-            if (this.isCanDoMsaResidueVisualizations()) {
-              this.incrMsaResidueVisCurrResPos();
-            }
-            break;
-          case AP.VK_ESC:
-            this.escPressed();
-            break;
-          case AP.VK_C:
-          case AP.VK_DELETE:
-          case AP.VK_BACKSPACE:
-          case AP.VK_HOME:
-            this.zoomToFit();
-            break;
-          default:
-        }
-
-        /*
-                    if (e.keyCode === AP.VK_O) {
-                        this.orderButtonPressed();
-                    }
-                    else if (e.keyCode === AP.VK_R) {
-                        returnToSupertreeButtonPressed();
-                    }
-                    else if (e.keyCode === VK_U) {
-                        uncollapseAllButtonPressed();
-                    }
-                    else if (e.keyCode === VK_M) {
-                        midpointRootButtonPressed();
-                    }
-                    else if (e.keyCode === VK_C || e.keyCode === VK_DELETE
-                        || e.keyCode === VK_BACKSPACE || e.keyCode === VK_HOME) {
-                        zoomToFit();
-                    }
-                    else if (e.keyCode === VK_P) {
-                        cycleDisplay();
-                    }
-                    else if (e.keyCode === VK_L) {
-                        toggleAlignPhylogram();
-                    }
-                    else if (e.keyCode === VK_OPEN_BRACKET) {
-                        if (isCanDoMsaResidueVisualizations()) {
-                            decrMsaResidueVisCurrResPos();
-                        }
-                    }
-                    else if (e.keyCode === VK_CLOSE_BRACKET) {
-                        if (isCanDoMsaResidueVisualizations()) {
-                            incrMsaResidueVisCurrResPos();
-                        }
-                    }
-                */
-      } else if (e.keyCode === AP.VK_HOME) {
-        this.zoomToFit();
-      } else if (e.keyCode === AP.VK_ESC) {
-        this.escPressed();
-      }
-    });
-
-    $(document).keydown((e) => {
-      if (e.altKey) {
-        switch (e.keyCode) {
-          case AP.VK_UP:
-            this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-            break;
-          case AP.VK_DOWN:
-            this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            break;
-          case AP.VK_LEFT:
-            this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            break;
-          case AP.VK_RIGHT:
-            this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-            break;
-          case AP.VK_PLUS:
-          case AP.VK_PLUS_N:
-            if (e.shiftKey) {
-              this.increaseFontSizes();
-            } else {
-              this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-              this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-            }
-            break;
-          case AP.VK_MINUS:
-          case AP.VK_MINUS_N:
-            if (e.shiftKey) {
-              this.decreaseFontSizes();
-            } else {
-              this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-              this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            }
-            break;
-          case AP.VK_A:
-            this.decrDepthCollapseLevel();
-            break;
-          case AP.VK_S:
-            this.incrDepthCollapseLevel();
-            break;
-          default:
-        }
-        // if (e.keyCode === VK_UP) {
-        //     zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
-        // }
-        // else if (e.keyCode === VK_DOWN) {
-        //     zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-        // }
-        // else if (e.keyCode === VK_LEFT) {
-        //     zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-        // }
-        // else if (e.keyCode === VK_RIGHT) {
-        //     zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
-        // }
-        // else if (e.keyCode === VK_PLUS || e.keyCode === VK_PLUS_N) {
-        //     if (e.shiftKey) {
-        //         increaseFontSizes();
-        //     }
-        //     else {
-        //         zoomInY(BUTTON_ZOOM_IN_FACTOR_SLOW);
-        //         zoomInX(BUTTON_ZOOM_IN_FACTOR_SLOW);
-        //     }
-        // }
-        // else if (e.keyCode === VK_MINUS || e.keyCode === VK_MINUS_N) {
-        //     if (e.shiftKey) {
-        //         decreaseFontSizes();
-        //     }
-        //     else {
-        //         zoomOutY(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-        //         zoomOutX(BUTTON_ZOOM_OUT_FACTOR_SLOW);
-        //     }
-        // }
-        // else if (e.keyCode === VK_A) {
-        //     decrDepthCollapseLevel();
-        // }
-        // else if (e.keyCode === VK_S) {
-        //     incrDepthCollapseLevel();
-        // }
-      }
-      if (e.keyCode === AP.VK_PAGE_UP) {
-        this.increaseFontSizes();
-      } else if (e.keyCode === AP.VK_PAGE_DOWN) {
-        this.decreaseFontSizes();
-      }
-    });
-
-    $(document).on('mousewheel DOMMouseScroll', (e) => {
-      if (e.shiftKey) {
-        if (e.originalEvent) {
-          var oe = e.originalEvent as WheelEvent;
-          if (oe.detail > 0 || oe.deltaY < 0) {
-            if (e.ctrlKey) {
-              this.decreaseFontSizes();
-            } else if (e.altKey) {
-              this.zoomOutX(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            } else {
-              this.zoomOutY(AP.BUTTON_ZOOM_OUT_FACTOR_SLOW);
-            }
-          } else {
-            if (e.ctrlKey) {
-              this.increaseFontSizes();
-            } else if (e.altKey) {
-              this.zoomInX(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-            } else {
-              this.zoomInY(AP.BUTTON_ZOOM_IN_FACTOR_SLOW);
-            }
-          }
-        }
-        // To prevent page fom scrolling:
-        return false;
-      }
-    });
-
-    // --------------------------------------------------------------
-    // Functions to make GUI elements
-    // --------------------------------------------------------------
-
-    function makeProgramDesc(): HTMLstring {
-      var h = '';
-      h = h.concat('<div class=' + AP.PROG_NAME + '>');
-      h = h.concat(
-        '<a class="' +
-        AP.PROGNAMELINK +
-        '" href="' +
-        AP.WEBSITE +
-        '" target="this.blank">' +
-        AP.NAME +
-        ' ' +
-        AP.VERSION +
-        '</a>',
-      );
-      h = h.concat('</div>');
-      return h;
-    }
-
-    function makePhylogramControl(): HTMLstring {
-      var radioGroup = 'phylogram_control_radio';
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<div class="' + AP.PHYLOGRAM_CLADOGRAM_CONTROLGROUP + '">');
-      h = h.concat(
-        makeRadioButton(
-          'P',
-          AP.PHYLOGRAM_BUTTON,
-          radioGroup,
-          'phylogram display (uses branch length values)  (use Alt+P to cycle between display types)',
-        ),
-      );
-      h = h.concat(
-        makeRadioButton(
-          'A',
-          AP.PHYLOGRAM_ALIGNED_BUTTON,
-          radioGroup,
-          'phylogram display (uses branch length values) with aligned labels  (use Alt+P to cycle between display types)',
-        ),
-      );
-      h = h.concat(
-        makeRadioButton(
-          'C',
-          AP.CLADOGRAM_BUTTON,
-          radioGroup,
-          ' cladogram display (ignores branch length values)  (use Alt+P to cycle between display types)',
-        ),
-      );
-      h = h.concat('</div>');
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeDisplayControl(): HTMLstring {
-      var h = '';
-
-      h = h.concat('<fieldset><legend>Display Data</legend>');
-      h = h.concat('<div class="' + AP.DISPLAY_DATA_CONTROLGROUP + '">');
-      if (self.basicTreeProperties) {
-        if (self.basicTreeProperties.nodeNames) {
-          h = h.concat(
-            makeCheckboxButton(
-              'Node Name',
-              AP.NODE_NAME_CB,
-              'to show/hide node names (node names usually are the untyped labels found in New Hampshire/Newick formatted trees)',
-            ),
-          );
-        }
-        if (self.basicTreeProperties.taxonomies) {
-          h = h.concat(makeCheckboxButton('Taxonomy', AP.TAXONOMY_CB, 'to show/hide node taxonomic information'));
-        }
-        if (self.basicTreeProperties.sequences) {
-          h = h.concat(makeCheckboxButton('Sequence', AP.SEQUENCE_CB, 'to show/hide node sequence information'));
-        }
-        if (self.basicTreeProperties.confidences) {
-          h = h.concat(makeCheckboxButton('Confidence', AP.CONFIDENCE_VALUES_CB, 'to show/hide confidence values'));
-        }
-        if (self.basicTreeProperties.branchLengths) {
-          h = h.concat(
-            makeCheckboxButton('Branch Length', AP.BRANCH_LENGTH_VALUES_CB, 'to show/hide branch length values'),
-          );
-        }
-        if (self.basicTreeProperties.nodeEvents) {
-          h = h.concat(
-            makeCheckboxButton(
-              'Node Events',
-              AP.NODE_EVENTS_CB,
-              'to show speciations and duplications as colored nodes (e.g. speciations green, duplications red)',
-            ),
-          );
-        }
-        if (self.basicTreeProperties.branchEvents) {
-          h = h.concat(
-            makeCheckboxButton('Branch Events', AP.BRANCH_EVENTS_CB, 'to show/hide branch events (e.g. mutations)'),
-          );
-        }
-        h = h.concat(makeCheckboxButton('External Labels', AP.EXTERNAL_LABEL_CB, 'to show/hide external node labels'));
-        if (self.basicTreeProperties.internalNodeData) {
-          h = h.concat(
-            makeCheckboxButton('Internal Labels', AP.INTERNAL_LABEL_CB, 'to show/hide internal node labels'),
-          );
-        }
-      }
-      h = h.concat(
-        makeCheckboxButton(
-          'External Nodes',
-          AP.EXTERNAL_NODES_CB,
-          'to show external nodes as shapes (usually circles)',
-        ),
-      );
-      h = h.concat(
-        makeCheckboxButton(
-          'Internal Nodes',
-          AP.INTERNAL_NODES_CB,
-          'to show internal nodes as shapes (usually circles)',
-        ),
-      );
-      if (self.settings) {
-        if (self.settings.showBranchColorsButton) {
-          h = h.concat(
-            makeCheckboxButton(
-              'Branch Colors',
-              AP.BRANCH_COLORS_CB,
-              'to use/ignore branch colors (if present in tree file)',
-            ),
-          );
-        }
-        if (self.settings.enableNodeVisualizations) {
-          h = h.concat(
-            makeCheckboxButton(
-              'Node Vis',
-              AP.NODE_VIS_CB,
-              'to show/hide node visualizations (colors, shapes, sizes), set with the Visualizations sub-menu',
-            ),
-          );
-        }
-        if (self.settings.enableBranchVisualizations) {
-          h = h.concat(
-            makeCheckboxButton(
-              'Branch Vis',
-              AP.BRANCH_VIS_CB,
-              'to show/hide branch visualizations, set with the Visualizations sub-menu',
-            ),
-          );
-        }
-        if (self.settings.showDynahideButton) {
-          h = h.concat(
-            makeCheckboxButton('Dyna Hide', AP.DYNAHIDE_CB, 'to hide external labels depending on expected visibility'),
-          );
-        }
-        if (self.settings.showShortenNodeNamesButton) {
-          h = h.concat(makeCheckboxButton('Short Names', AP.SHORTEN_NODE_NAME_CB, 'to shorten long node names'));
-        }
-      }
-      h = h.concat('</div>');
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeZoomControl(): HTMLstring {
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Zoom</legend>');
-      h = h.concat(makeButton('Y+', AP.ZOOM_IN_Y, 'zoom in vertically (Alt+Up or Shift+mousewheel)'));
-      h = h.concat('<br>');
-      h = h.concat(makeButton('X-', AP.ZOOM_OUT_X, 'zoom out horizontally (Alt+Left or Shift+Alt+mousewheel)'));
-      h = h.concat(
-        makeButton(
-          'F',
-          AP.ZOOM_TO_FIT,
-          'fit and center tree display (Alt+C, Home, or Esc to re-position controls as well)',
-        ),
-      );
-      h = h.concat(makeButton('X+', AP.ZOOM_IN_X, 'zoom in horizontally (Alt+Right or Shift+Alt+mousewheel)'));
-      h = h.concat('<br>');
-      h = h.concat(makeButton('Y-', AP.ZOOM_OUT_Y, 'zoom out vertically (Alt+Down or Shift+mousewheel)'));
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeControlButtons(): HTMLstring {
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Tools</legend>');
-      h = h.concat('<div>');
-      h = h.concat(makeButton('O', AP.ORDER_BUTTON, 'order all (Alt+O)'));
-      h = h.concat(makeButton('R', AP.RETURN_TO_SUPERTREE_BUTTON, 'return to the supertree (if in subtree) (Alt+R)'));
-      h = h.concat('<br>');
-      h = h.concat(makeButton('U', AP.UNCOLLAPSE_ALL_BUTTON, 'uncollapse all (Alt+U)'));
-      h = h.concat(makeButton('M', AP.MIDPOINT_ROOT_BUTTON, 'midpoint re-root (Alt+M)'));
-      h = h.concat('</div>');
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeDownloadSection(): HTMLstring {
-      var h = '';
-      h = h.concat('<form action="#">');
-      h = h.concat('<fieldset>');
-      h = h.concat(
-        '<input type="button" value="Download" name="' +
-        AP.DOWNLOAD_BUTTON +
-        '" title="download/export tree in a selected format" id="' +
-        AP.DOWNLOAD_BUTTON +
-        '">',
-      ); // BM ??
-      h = h.concat('<br>');
-      h = h.concat('<select name="' + AP.EXPORT_FORMAT_SELECT + '" id="' + AP.EXPORT_FORMAT_SELECT + '">');
-      h = h.concat('<option value="' + AP.PNG_EXPORT_FORMAT + '">' + AP.PNG_EXPORT_FORMAT + '</option>');
-      h = h.concat('<option value="' + AP.SVG_EXPORT_FORMAT + '">' + AP.SVG_EXPORT_FORMAT + '</option>');
-      h = h.concat('<option value="' + AP.PHYLOXML_EXPORT_FORMAT + '">' + AP.PHYLOXML_EXPORT_FORMAT + '</option>');
-      h = h.concat('<option value="' + AP.NH_EXPORT_FORMAT + '">' + AP.NH_EXPORT_FORMAT + '</option>');
-      // h = h.concat('<option value="' + AP.PDF_EXPORT_FORMAT + '">' + AP.PDF_EXPORT_FORMAT + '</option>');
-      h = h.concat('</select>');
-      h = h.concat('</fieldset>');
-      h = h.concat('</form>');
-      return h;
-    }
-
-    function makeSliders(): HTMLstring {
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat(makeSlider('External label size:', AP.EXTERNAL_FONT_SIZE_SLIDER));
-      if (self.basicTreeProperties && self.basicTreeProperties.internalNodeData) {
-        h = h.concat(makeSlider('Internal label size:', AP.INTERNAL_FONT_SIZE_SLIDER));
-      }
-      if (
-        self.basicTreeProperties &&
-        (self.basicTreeProperties.branchLengths ||
-          self.basicTreeProperties.confidences ||
-          self.basicTreeProperties.branchEvents)
-      ) {
-        h = h.concat(makeSlider('Branch label size:', AP.BRANCH_DATA_FONT_SIZE_SLIDER));
-      }
-      h = h.concat(makeSlider('Node size:', AP.NODE_SIZE_SLIDER));
-      h = h.concat(makeSlider('Branch width:', AP.BRANCH_WIDTH_SLIDER));
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeAutoCollapse(): HTMLstring {
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Collapse Depth</legend>');
-      h = h.concat(
-        makeButton('-', AP.DECR_DEPTH_COLLAPSE_LEVEL, 'to decrease the depth threshold (wraps around) (Alt+A)'),
-      );
-      h = h.concat(makeTextInput(AP.DEPTH_COLLAPSE_LABEL, 'the current depth threshold'));
-      h = h.concat(
-        makeButton('+', AP.INCR_DEPTH_COLLAPSE_LEVEL, 'to increase the depth threshold (wraps around) (Alt+S)'),
-      );
-      h = h.concat('</fieldset>');
-      if (
-        self.settings &&
-        self.basicTreeProperties &&
-        self.settings.enableCollapseByBranchLenghts &&
-        self.basicTreeProperties.branchLengths
-      ) {
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Collapse Length</legend>');
-        h = h.concat(
-          makeButton(
-            '-',
-            AP.DECR_BL_COLLAPSE_LEVEL,
-            'to decrease the maximal subtree branch length threshold (wraps around)',
-          ),
-        );
-        h = h.concat(makeTextInput(AP.BL_COLLAPSE_LABEL, 'the current maximal subtree branch length threshold'));
-        h = h.concat(
-          makeButton(
-            '+',
-            AP.INCR_BL_COLLAPSE_LEVEL,
-            'to increase the maximal subtree branch length threshold (wraps around)',
-          ),
-        );
-        h = h.concat('</fieldset>');
-      }
-
-      if (self.settings && self.settings.enableCollapseByFeature) {
-        h = h.concat('<fieldset>');
-        h = h.concat('<legend>Collapse Feature</legend>');
-        h = h.concat(
-          '<select name="' + AP.COLLAPSE_BY_FEATURE_SELECT + '" id="' + AP.COLLAPSE_BY_FEATURE_SELECT + '">',
-        );
-        h = h.concat('<option value="' + AP.OFF_FEATURE + '">' + AP.OFF_FEATURE + '</option>');
-        if (self.basicTreeProperties && self.basicTreeProperties.taxonomies) {
-          h = h.concat('<option value="' + AP.SPECIES_FEATURE + '">' + AP.SPECIES_FEATURE + '</option>');
-        }
-        var refs = self.treeData && forester.collectPropertyRefs(self.treeData, 'node', false);
-        if (refs) {
-          refs.forEach(function (v) {
-            var label = v;
-            label = label.replace(/^.+:/, '');
-            if (
-              self.settings &&
-              (!self.settings.propertiesToIgnoreForNodeVisualization ||
-                self.settings.propertiesToIgnoreForNodeVisualization.indexOf(label) < 0)
-            ) {
-              if (label.length > AP.MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL + 2) {
-                label = label.substring(0, AP.MAX_LENGTH_FOR_COLLAPSE_BY_FEATURE_LABEL) + '..';
-              }
-              h = h.concat('<option value="' + v + '">' + label + '</option>');
-            }
-          });
-        }
-        h = h.concat('</select>');
-        h = h.concat('</fieldset>');
-      }
-      return h;
-    }
-
-    // --------------------------------------------------------------
-    // Functions to make search-related elements
-    // --------------------------------------------------------------
-    function makeSearchBoxes(): HTMLstring {
-      var tooltip =
-        "enter text to search for (use ',' for logical OR and '+' for logical AND," +
-        ' use expressions in form of XX:term for typed search -- e.g. NN:node name, TC:taxonomy code,' +
-        ' TS:taxonomy scientific name, SN:sequence name, GN:gene name, SS:sequence symbol, MS:molecular sequence, ...)';
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Search</legend>');
-      h = h.concat(makeTextInput(AP.SEARCH_FIELD_0, tooltip));
-      h = h.concat(makeButton('R', AP.RESET_SEARCH_A_BTN, AP.RESET_SEARCH_A_BTN_TOOLTIP));
-      h = h.concat('<br>');
-      h = h.concat(makeTextInput(AP.SEARCH_FIELD_1, tooltip));
-      h = h.concat(makeButton('R', AP.RESET_SEARCH_B_BTN, AP.RESET_SEARCH_B_BTN_TOOLTIP));
-      h = h.concat('<br>');
-      h = h.concat(makeSearchControls());
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeSearchControls(): HTMLstring {
-      var h = '';
-      h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
-      h = h.concat(
-        makeCheckboxButton('Cas', AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'),
-      );
-      h = h.concat(
-        makeCheckboxButton(
-          'Wrd',
-          AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB,
-          ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)',
-        ),
-      );
-      h = h.concat('</div>');
-      h = h.concat('<br>');
-      h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
-      h = h.concat(makeCheckboxButton('Neg', AP.SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
-      h = h.concat(makeCheckboxButton('Reg', AP.SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
-      h = h.concat('</div>');
-      return h;
-    }
-
-    function makeSearchControlsCompact(): HTMLstring {
-      var h = '';
-      h = h.concat('<div class="' + AP.SEARCH_OPTIONS_GROUP + '">');
-      h = h.concat(
-        makeCheckboxButton('C', AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, 'to search in a case-sensitive manner'),
-      );
-      h = h.concat(
-        makeCheckboxButton(
-          'W',
-          AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB,
-          ' to match complete terms (separated by spaces or underscores) only (does not apply to regular expression search)',
-        ),
-      );
-      h = h.concat(makeCheckboxButton('N', AP.SEARCH_OPTIONS_NEGATE_RES_CB, 'to invert (negate) the search results'));
-      h = h.concat(makeCheckboxButton('R', AP.SEARCH_OPTIONS_REGEX_CB, 'to search with regular expressions'));
-      h = h.concat('</div>');
-      return h;
-    }
-
-    // --------------------------------------------------------------
-    // Functions to make visualization controls
-    // --------------------------------------------------------------
-    function makeVisualControls(): HTMLstring {
-      var h = '';
-      h = h.concat('<form action="#">');
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Visualizations</legend>');
-      h = h.concat(
-        makeSelectMenu(
-          'Label Color:',
-          '<br>',
-          AP.LABEL_COLOR_SELECT_MENU,
-          'colorize the node label according to a property',
-        ),
-      );
-      h = h.concat('<br>');
-      h = h.concat(
-        makeSelectMenu(
-          'Node Fill Color:',
-          '<br>',
-          AP.NODE_FILL_COLOR_SELECT_MENU,
-          'colorize the node fill according to a property',
-        ),
-      );
-      h = h.concat('<br>');
-      //  h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU, 'colorize the node border according to a property'));
-      //  h = h.concat('<br>');
-      h = h.concat(
-        makeSelectMenu(
-          'Node Shape:',
-          '<br>',
-          AP.NODE_SHAPE_SELECT_MENU,
-          'change the node shape according to a property',
-        ),
-      );
-      h = h.concat('<br>');
-      h = h.concat(
-        makeSelectMenu('Node Size:', '<br>', AP.NODE_SIZE_SELECT_MENU, 'change the node size according to a property'),
-      );
-      h = h.concat('</fieldset>');
-      h = h.concat('</form>');
-      return h;
-    }
-
-    function makeVisualization2(title: string): HTMLstring {
-      //~~
-      var h = '';
-      h = h.concat('<form action="#">');
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>' + title + '</legend>');
-      h = h.concat(
-        makeSelectMenu(
-          'Label Color:',
-          '<br>',
-          AP.LABEL_COLOR_SELECT_MENU_2,
-          'colorize the node label according to a property',
-        ),
-      );
-      h = h.concat('<br>');
-      h = h.concat(
-        makeSelectMenu(
-          'Node Fill Color:',
-          '<br>',
-          AP.NODE_FILL_COLOR_SELECT_MENU_2,
-          'colorize the node fill according to a property',
-        ),
-      );
-      //  h = h.concat('<br>');
-      // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_2, 'colorize the node border according to a property'));
-      h = h.concat('</fieldset>');
-      h = h.concat('</form>');
-      return h;
-    }
-
-    function makeVisualization3(title: string): HTMLstring {
-      //~~~
-      var h = '';
-      h = h.concat('<form action="#">');
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>' + title + '</legend>');
-      h = h.concat(
-        makeSelectMenu(
-          'Label Color:',
-          '<br>',
-          AP.LABEL_COLOR_SELECT_MENU_3,
-          'colorize the node label according to a property',
-        ),
-      );
-      h = h.concat('<br>');
-      h = h.concat(
-        makeSelectMenu(
-          'Node Fill Color:',
-          '<br>',
-          AP.NODE_FILL_COLOR_SELECT_MENU_3,
-          'colorize the node fill according to a property',
-        ),
-      );
-      // h = h.concat('<br>');
-      // h = h.concat(makeSelectMenu('Node Border Color:', '<br>', NODE_BORDER_COLOR_SELECT_MENU_3, 'colorize the node border according to a property'));
-      h = h.concat('</fieldset>');
-      h = h.concat('</form>');
-      return h;
-    }
-
-    function makeMsaResidueVisCurrResPositionControl(): HTMLstring {
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>MSA Residue Pos.</legend>');
-      h = h.concat(makeSlider(null, AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1));
-      h = h.concat(
-        makeButton(
-          '-',
-          AP.MSA_RESIDUE_VIS_DECR_CURR_RES_POS_BTN,
-          'to decrease current MSA residue position by 1 (wraps around) (Alt+[)',
-        ),
-      );
-      h = h.concat(makeTextInput(AP.MSA_RESIDUE_VIS_CURR_RES_POS_LABEL, 'the current MSA residue position'));
-      h = h.concat(
-        makeButton(
-          '+',
-          AP.MSA_RESIDUE_VIS_INCR_CURR_RES_POS_BTN,
-          'to increase current MSA residue position by 1 (wraps around) (Alt+])',
-        ),
-      );
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    function makeLegendControl(): HTMLstring {
-      var mouseTip =
-        ' (alternatively, place legend with mouse using shift+left-mouse-button click, or alt+left-mouse-button click)';
-      var h = '';
-      h = h.concat('<fieldset>');
-      h = h.concat('<legend>Vis Legend</legend>');
-      h = h.concat(makeButton('Show', AP.LEGENDS_SHOW_BTN, 'to show/hide legend(s)'));
-      h = h.concat(
-        makeButton(
-          'Dir',
-          AP.LEGENDS_HORIZ_VERT_BTN,
-          'to toggle between vertical and horizontal alignment of (multiple) legends',
-        ),
-      );
-      h = h.concat('<br>');
-      h = h.concat(makeButton('^', AP.LEGENDS_MOVE_UP_BTN, 'move legend(s) up' + mouseTip));
-      h = h.concat('<br>');
-      h = h.concat(makeButton('<', AP.LEGENDS_MOVE_LEFT_BTN, 'move legend(s) left' + mouseTip));
-      h = h.concat(makeButton('R', AP.LEGENDS_RESET_BTN, 'return legend(s) to original position' + mouseTip));
-      h = h.concat(makeButton('>', AP.LEGENDS_MOVE_RIGHT_BTN, 'move legend(s) right' + mouseTip));
-      h = h.concat('<br>');
-      h = h.concat(makeButton('v', AP.LEGENDS_MOVE_DOWN_BTN, 'move legend(s) down' + mouseTip));
-      h = h.concat('</fieldset>');
-      return h;
-    }
-
-    // --------------------------------------------------------------
-    // Functions to make individual GUI components
-    // --------------------------------------------------------------
-    function makeButton(label: string, id: string, tooltip: string): HTMLstring {
-      return '<input type="button" value="' + label + '" name="' + id + '" id="' + id + '" title="' + tooltip + '">';
-    }
-
-    function makeCheckboxButton(label: string, id: string, tooltip: string): HTMLstring {
-      return (
-        '<label for="' +
-        id +
-        '" title="' +
-        tooltip +
-        '">' +
-        label +
-        '</label><input type="checkbox" name="' +
-        id +
-        '" id="' +
-        id +
-        '">'
-      );
-    }
-
-    function makeRadioButton(label: string, id: string, radioGroup: string, tooltip: string): HTMLstring {
-      return (
-        '<label for="' +
-        id +
-        '" title="' +
-        tooltip +
-        '">' +
-        label +
-        '</label><input type="radio" name="' +
-        radioGroup +
-        '" id="' +
-        id +
-        '">'
-      );
-    }
-
-    function makeSelectMenu(label: string, sep: string, id: string, tooltip: string): HTMLstring {
-      return (
-        '<label for="' +
-        id +
-        '" title="' +
-        tooltip +
-        '">' +
-        label +
-        '</label>' +
-        sep +
-        '<select name="' +
-        id +
-        '" id="' +
-        id +
-        '"></select>'
-      );
-    }
-
-    function makeSlider(label: string | null | undefined, id: string): HTMLstring {
-      if (label) {
-        return label + '<div id="' + id + '"></div>';
-      }
-      return '<div id="' + id + '"></div>';
-    }
-
-    function makeTextInput(id: string, tooltip: string): HTMLstring {
-      return '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
-    }
-
-    function makeTextInputWithLabel(label: string, sep: string, id: string, tooltip: string): HTMLstring {
-      return label + sep + '<input title="' + tooltip + '" type="text" name="' + id + '" id="' + id + '">';
-    }
   }; // function createGui()
 
-  initializeGui = () => {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-    this.setDisplayTypeButtons();
-
-    this.setCheckboxValue(AP.NODE_NAME_CB, this.options.showNodeName);
-    this.setCheckboxValue(AP.TAXONOMY_CB, this.options.showTaxonomy);
-    this.setCheckboxValue(AP.SEQUENCE_CB, this.options.showSequence);
-    this.setCheckboxValue(AP.CONFIDENCE_VALUES_CB, this.options.showConfidenceValues);
-    this.setCheckboxValue(AP.BRANCH_LENGTH_VALUES_CB, this.options.showBranchLengthValues);
-    this.setCheckboxValue(AP.NODE_EVENTS_CB, this.options.showNodeEvents);
-    this.setCheckboxValue(AP.BRANCH_EVENTS_CB, this.options.showBranchEvents);
-    this.setCheckboxValue(AP.INTERNAL_LABEL_CB, this.options.showInternalLabels);
-    this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, this.options.showExternalLabels);
-    this.setCheckboxValue(AP.INTERNAL_NODES_CB, this.options.showInternalNodes);
-    this.setCheckboxValue(AP.EXTERNAL_NODES_CB, this.options.showExternalNodes);
-    this.setCheckboxValue(AP.BRANCH_COLORS_CB, this.options.showBranchColors);
-    this.setCheckboxValue(AP.NODE_VIS_CB, this.options.showNodeVisualizations);
-    this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
-    this.setCheckboxValue(AP.DYNAHIDE_CB, this.options.dynahide);
-    this.setCheckboxValue(AP.SHORTEN_NODE_NAME_CB, this.options.shortenNodeNames);
-    this.initializeVisualizationMenu();
-    this.initializeSearchOptions();
-    this.makeBackgorund();
-  };
-
-  makeBackgorund = () => {
+  makeBackground = () => {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
     this.baseSvg
       .append('rect')
@@ -7836,140 +6083,6 @@ export default class alcmonavispoeschli {
       .attr('class', AP.BASE_BACKGROUND)
       .attr('fill', this.options.backgroundColorDefault);
   };
-
-  initializeVisualizationMenu = () => {
-    $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>').val(AP.NONE).html('none'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>').val(AP.SAME_AS_FILL).html('same as fill'));
-
-    $('select#' + AP.NODE_SHAPE_SELECT_MENU).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_SIZE_SELECT_MENU).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.LABEL_COLOR_SELECT_MENU).append($('<option>').val(AP.DEFAULT).html('default'));
-
-    //~~
-    $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>').val(AP.NONE).html('none'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>').val(AP.SAME_AS_FILL).html('same as fill'));
-
-    $('select#' + AP.LABEL_COLOR_SELECT_MENU_2).append($('<option>').val(AP.DEFAULT).html('default'));
-
-    //
-
-    //~~
-    $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>').val(AP.DEFAULT).html('default'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>').val(AP.NONE).html('none'));
-    $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>').val(AP.SAME_AS_FILL).html('same as fill'));
-
-    $('select#' + AP.LABEL_COLOR_SELECT_MENU_3).append($('<option>').val(AP.DEFAULT).html('default'));
-
-    //
-
-    if (this.visualizations) {
-      if (this.visualizations.labelColor) {
-        for (var key in this.visualizations.labelColor) {
-          if (this.visualizations.labelColor.hasOwnProperty(key)) {
-            $('select#' + AP.LABEL_COLOR_SELECT_MENU).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-      if (this.visualizations.nodeShape) {
-        for (var key in this.visualizations.nodeShape) {
-          if (this.visualizations.nodeShape.hasOwnProperty(key)) {
-            $('select#' + AP.NODE_SHAPE_SELECT_MENU).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-      if (this.visualizations.nodeFillColor) {
-        for (var key in this.visualizations.nodeFillColor) {
-          if (this.visualizations.nodeFillColor.hasOwnProperty(key)) {
-            $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-      if (this.visualizations.nodeBorderColor) {
-        for (var key in this.visualizations.nodeBorderColor) {
-          if (this.visualizations.nodeBorderColor.hasOwnProperty(key)) {
-            $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-      if (this.visualizations.nodeSize) {
-        for (var key in this.visualizations.nodeSize) {
-          if (this.visualizations.nodeSize.hasOwnProperty(key)) {
-            $('select#' + AP.NODE_SIZE_SELECT_MENU).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-    }
-
-    if (this.specialVisualizations != null) {
-      //~~
-      if ('Mutations' in this.specialVisualizations) {
-        const mutations = this.specialVisualizations['Mutations'];
-        if (mutations != null && mutations.property_values != null) {
-          const properties = mutations.property_values;
-          const arrayLength = properties.length;
-          for (var i = 0; i < arrayLength; i++) {
-            const key = properties[i];
-            $('select#' + AP.LABEL_COLOR_SELECT_MENU_2).append($('<option>').val(key).html(key));
-            $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_2).append($('<option>').val(key).html(key));
-            $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_2).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-
-      if ('Convergent_Mutations' in this.specialVisualizations) {
-        const conv_mutations = this.specialVisualizations['Convergent_Mutations'];
-
-        if (conv_mutations != null && conv_mutations.property_values != null) {
-          const properties = conv_mutations.property_values;
-          const arrayLength = properties.length;
-          for (var i = 0; i < arrayLength; i++) {
-            const key = properties[i];
-            $('select#' + AP.LABEL_COLOR_SELECT_MENU_3).append($('<option>').val(key).html(key));
-            $('select#' + AP.NODE_FILL_COLOR_SELECT_MENU_3).append($('<option>').val(key).html(key));
-            $('select#' + AP.NODE_BORDER_COLOR_SELECT_MENU_3).append($('<option>').val(key).html(key));
-          }
-        }
-      }
-    }
-
-    $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1).slider({
-      min: 1,
-      max: (this.basicTreeProperties && this.basicTreeProperties.maxMolSeqLength) || 1,
-      step: 1,
-      value: 1,
-      animate: 'fast',
-      slide: this.updateMsaResidueVisCurrResPosFromSlider,
-      change: this.updateMsaResidueVisCurrResPosFromSlider,
-    });
-  };
-
-  initializeSearchOptions() {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-
-    if (this.options.searchUsesRegex === true) {
-      this.options.searchIsPartial = true;
-    }
-    if (this.options.searchIsPartial === false) {
-      this.options.searchUsesRegex = false;
-    }
-    this.options.searchNegateResult = false;
-    this.setCheckboxValue(AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB, this.options.searchIsCaseSensitive);
-    this.setCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB, !this.options.searchIsPartial);
-    this.setCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB, this.options.searchUsesRegex);
-    this.setCheckboxValue(AP.SEARCH_OPTIONS_NEGATE_RES_CB, this.options.searchNegateResult);
-
-    if (this.options.searchAinitialValue) {
-      $('#' + AP.SEARCH_FIELD_0).val(this.options.searchAinitialValue);
-    }
-    if (this.options.searchBinitialValue) {
-      $('#' + AP.SEARCH_FIELD_1).val(this.options.searchBinitialValue);
-    }
-  }
 
   orderSubtree = (n: Alcmonavis.phylo, order: boolean) => {
     var changed = false;
@@ -8011,20 +6124,9 @@ export default class alcmonavispoeschli {
     } else if (!this.options.phylogram && !this.options.alignPhylogram) {
       this.options.phylogram = true;
     }
-    this.setDisplayTypeButtons();
+    //this.setDisplayTypeButtons();
+    this.TriggerHandler("displayType");
     this.update(undefined, 0);
-  };
-
-  setDisplayTypeButtons = () => {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-
-    this.setRadioButtonValue(AP.PHYLOGRAM_BUTTON, this.options.phylogram && !this.options.alignPhylogram);
-    this.setRadioButtonValue(AP.CLADOGRAM_BUTTON, !this.options.phylogram && !this.options.alignPhylogram);
-    this.setRadioButtonValue(AP.PHYLOGRAM_ALIGNED_BUTTON, this.options.alignPhylogram && this.options.phylogram);
-    if (!(this.basicTreeProperties && this.basicTreeProperties.branchLengths)) {
-      this.disableCheckbox('#' + AP.PHYLOGRAM_BUTTON);
-      this.disableCheckbox('#' + AP.PHYLOGRAM_ALIGNED_BUTTON);
-    }
   };
 
   unCollapseAll = (node: Alcmonavis.phylo) => {
@@ -8151,7 +6253,8 @@ export default class alcmonavispoeschli {
       }
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
-        this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+        //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
       }
     } else if (
       this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -8174,7 +6277,8 @@ export default class alcmonavispoeschli {
       }
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
-        this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
       }
     } else if (
       this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -8197,7 +6301,8 @@ export default class alcmonavispoeschli {
       }
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
-        this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
+        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
       }
     } else if (
       this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -8397,6 +6502,16 @@ export default class alcmonavispoeschli {
   };
 
   updateLegendButtonEnabledState = () => {
+    this.TriggerHandler("showLegend", this.showLegends);
+    this.TriggerHandler("legendenabled", Boolean(this.showLegends &&
+      (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+        (this.options &&
+          this.options.showNodeVisualizations &&
+          (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+            this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+            this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+            this.legendSizeScales[AP.LEGEND_NODE_SIZE])))));
+
     var b = $('#' + AP.LEGENDS_SHOW_BTN);
     if (b) {
       if (this.showLegends) {
@@ -8430,17 +6545,6 @@ export default class alcmonavispoeschli {
       this.disableButton($('#' + AP.LEGENDS_MOVE_LEFT_BTN));
       this.disableButton($('#' + AP.LEGENDS_MOVE_RIGHT_BTN));
       this.disableButton($('#' + AP.LEGENDS_RESET_BTN));
-    }
-  };
-
-  disableCheckbox = (cb: string) => {
-    if (cb) {
-      var b = $<HTMLInputElement>(cb);
-      if (b) {
-        b.checkboxradio({
-          disabled: true,
-        });
-      }
     }
   };
 
