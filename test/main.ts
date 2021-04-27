@@ -1,6 +1,7 @@
 import jQuery from "jquery"
 import { Alcmonavis } from "../alcomanavispoeschli";
-import AlcmonavisPoeschli, { parseTree } from "../lib/alcmonavispoeschli";
+import Controls from "../src/controls"
+import AlcmonavisPoeschli, { parseTree } from "../src/alcmonavispoeschli";
 
 const $ = jQuery;
 let alcmonavis: AlcmonavisPoeschli;
@@ -24,9 +25,11 @@ $($ => {
         if (tree) {
             try {
                 alcmonavis = new AlcmonavisPoeschli('#phylogram1', tree, options, settings);
+                new Controls(alcmonavis, "controls0");
             }
             catch (e) {
                 alert("error while launching alcmonavis: " + e);
+                throw e;
             }
         }
     }, "text")

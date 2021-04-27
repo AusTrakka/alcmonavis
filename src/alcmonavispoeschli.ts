@@ -81,6 +81,7 @@ export default class alcmonavispoeschli {
   visualizations3_property_applies_to!: string;
 
   eventhandlers: Dict<((val?: string | number | boolean) => void)[]> = {};
+  preemptiveHandlers: Dict<string | number | boolean | undefined> = {};
 
   constructor(
     id: string,
@@ -108,23 +109,35 @@ export default class alcmonavispoeschli {
   }
 
   AddHandler = (event: string, handler: (val?: string | number | boolean) => void) => {
-    if (!~this.eventhandlers[event].indexOf(handler)) {
+    if(!(event in this.eventhandlers)){
+      this.eventhandlers[event] = [handler];
+    }
+    else if (!~this.eventhandlers[event].indexOf(handler)) {
       this.eventhandlers[event].push(handler);
+    }
+    if (event in this.preemptiveHandlers) {
+      handler(this.preemptiveHandlers[event]);
     }
   }
 
   RemoveHandler = (event: string, handler?: (val?: string | number | boolean) => void) => {
-    if (handler && !!~this.eventhandlers[event].indexOf(handler)) {
-      const index = this.eventhandlers[event].indexOf(handler)
-      this.eventhandlers[event].splice(index, 1);
+    if (event in this.eventhandlers) {
+      if (handler && !!~this.eventhandlers[event].indexOf(handler)) {
+        const index = this.eventhandlers[event].indexOf(handler)
+        this.eventhandlers[event].splice(index, 1);
+      }
+      else {
+        (this.eventhandlers[event]).length = 0;
+      }
     }
-    else {
-      (this.eventhandlers[event]).length = 0;
-    }
+    delete this.preemptiveHandlers[event];
   }
 
   TriggerHandler = (event: string, value?: string | number | boolean) => {
-    this.eventhandlers[event].forEach(h => h(value));
+    if (event in this.eventhandlers) {
+      this.eventhandlers[event].forEach(h => h(value));
+    }
+    this.preemptiveHandlers[event] = value;
   }
 
   branchLengthScaling = (nodes: Alcmonavis.phylo[], width: number) => {
@@ -4109,7 +4122,7 @@ export default class alcmonavispoeschli {
       this.initializeNodeVisualizations(nodeProperties);
     }
 
-    //this.createGui();
+    this.createGui();
 
     if (settings.enableNodeVisualizations || settings.enableBranchVisualizations) {
       d3.select(window).on('mousedown', this.mouseDown);
@@ -6043,8 +6056,6 @@ export default class alcmonavispoeschli {
   getPropertyRefs = () => this.treeData && forester.collectPropertyRefs(this.treeData, 'node', false);
 
   createGui = () => {
-    const self: alcmonavispoeschli = this;
-
     var d3selectId = d3.select(this.id);
     if (d3selectId && d3selectId[0]) {
       var phyloDiv = d3selectId[0][0] as HTMLElement;
@@ -6726,6 +6737,7 @@ export default class alcmonavispoeschli {
         this.launch(label, tree, options, settings, nodeVisualizations);
       } catch (e) {
         alert(AP.ERROR + 'error while launching alcmonavis: ' + e);
+        throw e;
       }
     }
   };
