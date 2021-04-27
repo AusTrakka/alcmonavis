@@ -89,7 +89,7 @@ export default class alcmonavispoeschli {
     options: Alcmonavis.Options | undefined | null,
     settings: Alcmonavis.Settings,
     nodeVisualizations?: Dict<Alcmonavis.NodeVisualisation>,
-    specialVisualizations?: Dict<Alcmonavis.SpecialVisulaisation>
+    specialVisualizations?: Dict<Alcmonavis.SpecialVisulaisation>,
   ) {
     $('html').on('click', (d) => {
       var attrClass = d.target.getAttribute('class');
@@ -109,36 +109,34 @@ export default class alcmonavispoeschli {
   }
 
   AddHandler = (event: string, handler: (val?: string | number | boolean) => void) => {
-    if(!(event in this.eventhandlers)){
+    if (!(event in this.eventhandlers)) {
       this.eventhandlers[event] = [handler];
-    }
-    else if (!~this.eventhandlers[event].indexOf(handler)) {
+    } else if (!~this.eventhandlers[event].indexOf(handler)) {
       this.eventhandlers[event].push(handler);
     }
     if (event in this.preemptiveHandlers) {
       handler(this.preemptiveHandlers[event]);
     }
-  }
+  };
 
   RemoveHandler = (event: string, handler?: (val?: string | number | boolean) => void) => {
     if (event in this.eventhandlers) {
       if (handler && !!~this.eventhandlers[event].indexOf(handler)) {
-        const index = this.eventhandlers[event].indexOf(handler)
+        const index = this.eventhandlers[event].indexOf(handler);
         this.eventhandlers[event].splice(index, 1);
-      }
-      else {
-        (this.eventhandlers[event]).length = 0;
+      } else {
+        this.eventhandlers[event].length = 0;
       }
     }
     delete this.preemptiveHandlers[event];
-  }
+  };
 
   TriggerHandler = (event: string, value?: string | number | boolean) => {
     if (event in this.eventhandlers) {
-      this.eventhandlers[event].forEach(h => h(value));
+      this.eventhandlers[event].forEach((h) => h(value));
     }
     this.preemptiveHandlers[event] = value;
-  }
+  };
 
   branchLengthScaling = (nodes: Alcmonavis.phylo[], width: number) => {
     const bl = (node: Forester.phylo) => {
@@ -214,9 +212,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-      this.options.nodeLabelGap +
-      AP.LABEL_SIZE_CALC_ADDITION +
-      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+          this.options.nodeLabelGap +
+          AP.LABEL_SIZE_CALC_ADDITION +
+          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -315,14 +313,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-              ': Ordinal scale mapping for ' +
-              label +
-              ' (' +
-              s +
-              '): domain > range: ' +
-              mappingFn.domain().length +
-              ' > ' +
-              mappingFn.range().length,
+                ': Ordinal scale mapping for ' +
+                label +
+                ' (' +
+                s +
+                '): domain > range: ' +
+                mappingFn.domain().length +
+                ' > ' +
+                mappingFn.range().length,
             );
           }
         }
@@ -3995,10 +3993,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-          ' Grouping species from "' +
-          settings.groupSpecies.source +
-          '" to "' +
-          settings.groupSpecies.target,
+            ' Grouping species from "' +
+            settings.groupSpecies.source +
+            '" to "' +
+            settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -4019,14 +4017,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-          ' Grouping years from "' +
-          settings.groupYears.source +
-          '" to "' +
-          settings.groupYears.target +
-          '", ignoring ' +
-          settings.groupYears.ignore +
-          ', range ' +
-          settings.groupYears.groupsize,
+            ' Grouping years from "' +
+            settings.groupYears.source +
+            '" to "' +
+            settings.groupYears.target +
+            '", ignoring ' +
+            settings.groupYears.ignore +
+            ', range ' +
+            settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4226,11 +4224,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-          ' initial value for collapse depth [' +
-          this.depth_collapse_level +
-          '] is larger than or equal to maximum depth [' +
-          max_depth +
-          ']',
+            ' initial value for collapse depth [' +
+            this.depth_collapse_level +
+            '] is larger than or equal to maximum depth [' +
+            max_depth +
+            ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -5474,7 +5472,7 @@ export default class alcmonavispoeschli {
       }
     }
     this.update(undefined, 0, true);
-  }
+  };
 
   search0 = () => {
     this.foundNodes0.clear();
@@ -5535,7 +5533,7 @@ export default class alcmonavispoeschli {
     this.options!.phylogram = true;
     this.options!.alignPhylogram = false;
     //this.setDisplayTypeButtons();
-    this.TriggerHandler("displayType");
+    this.TriggerHandler('displayType');
     this.update(undefined, 0);
   };
 
@@ -5543,7 +5541,7 @@ export default class alcmonavispoeschli {
     this.options!.phylogram = true;
     this.options!.alignPhylogram = true;
     //this.setDisplayTypeButtons();
-    this.TriggerHandler("displayType");
+    this.TriggerHandler('displayType');
     this.update(undefined, 0);
   };
 
@@ -5551,7 +5549,7 @@ export default class alcmonavispoeschli {
     this.options!.phylogram = false;
     this.options!.alignPhylogram = false;
     //this.setDisplayTypeButtons();
-    this.TriggerHandler("displayType");
+    this.TriggerHandler('displayType');
     this.update(undefined, 0);
   };
 
@@ -5559,7 +5557,7 @@ export default class alcmonavispoeschli {
     this.options!.showNodeName = this.getCheckboxValue(AP.NODE_NAME_CB);
     if (this.options!.showNodeName) {
       this.options!.showExternalLabels = true;
-      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
+      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels);
     }
     this.update();
   };
@@ -5568,7 +5566,7 @@ export default class alcmonavispoeschli {
     this.options!.showTaxonomy = this.getCheckboxValue(AP.TAXONOMY_CB);
     if (this.options!.showTaxonomy) {
       this.options!.showExternalLabels = true;
-      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
+      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels);
     }
     this.update();
   };
@@ -5577,7 +5575,7 @@ export default class alcmonavispoeschli {
     this.options!.showSequence = this.getCheckboxValue(AP.SEQUENCE_CB);
     if (this.options!.showSequence) {
       this.options!.showExternalLabels = true;
-      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
+      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels);
     }
     this.update();
   };
@@ -5686,8 +5684,8 @@ export default class alcmonavispoeschli {
     ) {
       this.options!.showInternalNodes = true;
       this.options!.showExternalNodes = true;
-      this.TriggerHandler("showInternalNodes", this.options!.showInternalNodes)
-      this.TriggerHandler("showExternalLabels", this.options!.showExternalLabels)
+      this.TriggerHandler('showInternalNodes', this.options!.showInternalNodes);
+      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels);
     }
     this.update(undefined, 0, true);
   };
@@ -5724,8 +5722,7 @@ export default class alcmonavispoeschli {
     this.options!.searchIsPartial = !this.getCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB);
     if (this.options!.searchIsPartial === false) {
       this.options!.searchUsesRegex = false;
-      this.TriggerHandler("searchUsesRegex", this.options!.searchUsesRegex)
-
+      this.TriggerHandler('searchUsesRegex', this.options!.searchUsesRegex);
     }
     this.search0();
     this.search1();
@@ -5735,8 +5732,7 @@ export default class alcmonavispoeschli {
     this.options!.searchUsesRegex = this.getCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB);
     if (this.options!.searchUsesRegex === true) {
       this.options!.searchIsPartial = true;
-      this.TriggerHandler("searchIsComplete", !this.options!.searchIsPartial)
-
+      this.TriggerHandler('searchIsComplete', !this.options!.searchIsPartial);
     }
     this.search0();
     this.search1();
@@ -5943,10 +5939,10 @@ export default class alcmonavispoeschli {
     }
   };
 
-  setLabelColorMenu = (value: string, style: "legend" | "check") => {
+  setLabelColorMenu = (value: string, style: 'legend' | 'check') => {
     if (value && value != AP.DEFAULT) {
       this.currentLabelColorVisualization = value;
-      if (style = "legend") {
+      if ((style = 'legend')) {
         if (
           this.visualizations &&
           this.visualizations.labelColor &&
@@ -5954,15 +5950,14 @@ export default class alcmonavispoeschli {
         ) {
           this.addLegend(AP.LEGEND_LABEL_COLOR, this.visualizations.labelColor[this.currentLabelColorVisualization]);
         }
-      }
-      else {
+      } else {
         this.options = this.options || {};
         this.options.showNodeName = true;
         this.options.showExternalLabels = true;
         this.options.showInternalLabels = true;
-        this.TriggerHandler("showNodeName", this.options.showNodeName);
-        this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
-        this.TriggerHandler("showInternalLabels", this.options.showInternalLabels);
+        this.TriggerHandler('showNodeName', this.options.showNodeName);
+        this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
+        this.TriggerHandler('showInternalLabels', this.options.showInternalLabels);
         //this.setCheckboxValue(AP.NODE_NAME_CB, true);
         //this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
         //this.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
@@ -5973,19 +5968,23 @@ export default class alcmonavispoeschli {
     }
     this.removeColorPicker();
     this.update(undefined, 0);
-  }
+  };
 
-  setFillColorMenu = (value: string, style: "legend" | "check") => {
+  setFillColorMenu = (value: string, style: 'legend' | 'check') => {
     this.options = this.options || {};
     if (value && value != AP.DEFAULT) {
-      if (style = "legend") {
-        if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+      if ((style = 'legend')) {
+        if (
+          !this.options.showExternalNodes &&
+          !this.options.showInternalNodes &&
+          this.currentNodeShapeVisualization == null
+        ) {
           this.options.showExternalNodes = true;
-          this.TriggerHandler("showExternalNodes", this.options.showExternalNodes);
+          this.TriggerHandler('showExternalNodes', this.options.showExternalNodes);
           //alcmonavis.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
         }
         this.options.showNodeVisualizations = true;
-        this.TriggerHandler("showNodeVisualizations", this.options.showExternalNodes);
+        this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes);
         // alcmonavis.setCheckboxValue(AP.NODE_VIS_CB, true);
         this.currentNodeFillColorVisualization = value;
         if (
@@ -5998,30 +5997,28 @@ export default class alcmonavispoeschli {
             this.visualizations.nodeFillColor[this.currentNodeFillColorVisualization],
           );
         }
-      }
-      else {
+      } else {
         this.options.showExternalNodes = true;
         this.options.showInternalNodes = true;
         this.options.showNodeVisualizations = true;
-        this.TriggerHandler("showExternalNodes", this.options.showNodeName);
-        this.TriggerHandler("showInternalNodes", this.options.showExternalLabels);
-        this.TriggerHandler("showNodeVisualizations", this.options.showInternalLabels);
+        this.TriggerHandler('showExternalNodes', this.options.showNodeName);
+        this.TriggerHandler('showInternalNodes', this.options.showExternalLabels);
+        this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels);
       }
-    }
-    else {
+    } else {
       this.currentNodeFillColorVisualization = null;
       this.removeLegend(AP.LEGEND_NODE_FILL_COLOR);
     }
     this.removeColorPicker();
     this.update(undefined, 0);
-  }
+  };
 
   setShapeSelectMenu = (value: string) => {
     this.options = this.options || {};
     if (value && value != AP.DEFAULT) {
       this.currentNodeShapeVisualization = value;
       this.options.showNodeVisualizations = true;
-      this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
+      this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);
 
       if (
         this.visualizations &&
@@ -6037,7 +6034,7 @@ export default class alcmonavispoeschli {
     this.removeColorPicker();
     this.resetVis();
     this.update(undefined, 0);
-  }
+  };
 
   setSizeSelectMenu = (value: string) => {
     this.options = this.options || {};
@@ -6050,21 +6047,23 @@ export default class alcmonavispoeschli {
       ) {
         this.addLegend(AP.LEGEND_NODE_FILL_COLOR, this.visualizations.nodeSize[this.currentNodeSizeVisualization]);
       }
-      if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+      if (
+        !this.options.showExternalNodes &&
+        !this.options.showInternalNodes &&
+        this.currentNodeShapeVisualization == null
+      ) {
         this.options.showExternalNodes = true;
-        this.TriggerHandler("showExternalNodes", this.options.showNodeName);
+        this.TriggerHandler('showExternalNodes', this.options.showNodeName);
       }
       this.options.showNodeVisualizations = true;
-      this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
-
-    }
-    else {
+      this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);
+    } else {
       this.currentNodeSizeVisualization = null;
       this.removeLegendForSizes(AP.LEGEND_NODE_SIZE);
     }
     this.removeColorPicker();
     this.update(undefined, 0);
-  }
+  };
 
   getPropertyRefs = () => this.treeData && forester.collectPropertyRefs(this.treeData, 'node', false);
 
@@ -6093,8 +6092,6 @@ export default class alcmonavispoeschli {
       .append('div')
       .attr('class', 'node_mouseover_tooltip')
       .style('opacity', 1e-6);
-
-
   }; // function createGui()
 
   makeBackground = () => {
@@ -6149,7 +6146,7 @@ export default class alcmonavispoeschli {
       this.options.phylogram = true;
     }
     //this.setDisplayTypeButtons();
-    this.TriggerHandler("displayType");
+    this.TriggerHandler('displayType');
     this.update(undefined, 0);
   };
 
@@ -6277,7 +6274,7 @@ export default class alcmonavispoeschli {
       }
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
-        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+        this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
         //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
       }
     } else if (
@@ -6302,7 +6299,7 @@ export default class alcmonavispoeschli {
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
         //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
-        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+        this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
       }
     } else if (
       this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -6326,7 +6323,7 @@ export default class alcmonavispoeschli {
       if (this.settings.enableBranchVisualizations) {
         this.options.showBranchVisualizations = true;
         //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
-        this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+        this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
       }
     } else if (
       this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -6526,15 +6523,20 @@ export default class alcmonavispoeschli {
   };
 
   updateLegendButtonEnabledState = () => {
-    this.TriggerHandler("showLegend", this.showLegends);
-    this.TriggerHandler("legendenabled", Boolean(this.showLegends &&
-      (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
-        (this.options &&
-          this.options.showNodeVisualizations &&
-          (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-            this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-            this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-            this.legendSizeScales[AP.LEGEND_NODE_SIZE])))));
+    this.TriggerHandler('showLegend', this.showLegends);
+    this.TriggerHandler(
+      'legendenabled',
+      Boolean(
+        this.showLegends &&
+          (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+            (this.options &&
+              this.options.showNodeVisualizations &&
+              (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+                this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
+      ),
+    );
 
     var b = $('#' + AP.LEGENDS_SHOW_BTN);
     if (b) {
@@ -6696,7 +6698,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => { };
+  downloadAsPdf = () => {};
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";
@@ -6863,7 +6865,6 @@ export function OptionsDeclared(
     HasValue(options.visualizationsLegendYposOrig)
   );
 }
-
 
 export const parsePhyloXML = (data: string) => {
   var phy: Alcmonavis.phylo = phyloXml.parse(data, { trim: true, normalize: true })[0];
