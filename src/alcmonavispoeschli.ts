@@ -5463,6 +5463,19 @@ export default class alcmonavispoeschli {
     }
   };
 
+  search0Text = (query: string) => {
+    this.foundNodes0.clear();
+    this.searchBox0Empty = true;
+    if (query && query.length > 0) {
+      var my_query = query.trim();
+      if (my_query.length > 0) {
+        this.searchBox0Empty = false;
+        this.foundNodes0 = this.search(my_query);
+      }
+    }
+    this.update(undefined, 0, true);
+  }
+
   search0 = () => {
     this.foundNodes0.clear();
     this.searchBox0Empty = true;
