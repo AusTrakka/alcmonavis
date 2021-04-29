@@ -34,6 +34,7 @@ export default class alcmonavispoeschli {
   dynahide_counter = 0;
   dynahide_factor = 0;
   external_nodes = 0;
+  searchQueries: string[] = [];
   foundNodes0 = new Set<Forester.phylo>();
   foundNodes1 = new Set<Forester.phylo>();
   foundSum = 0;
@@ -58,10 +59,13 @@ export default class alcmonavispoeschli {
   showColorPicker = false;
   showLegends = true;
   superTreeRoots: Alcmonavis.phylo[] = [];
+  backTreeRoots: Alcmonavis.phylo[] = [];
+  forwardTreeRoots: Alcmonavis.phylo[] = [];
+  currentParentNode: Alcmonavis.phylo | undefined = undefined;
   svgGroup!: d3.Selection<any>;
   totalSearchedWithData = 0;
   translate: [number, number] | null | undefined = null;
-  treeData: Alcmonavis.phylo | null | undefined = null;
+  treeData!: Alcmonavis.phylo;
   treeFn!: Alcmonavis.CustomCluster<Alcmonavis.phylo>;
   usedColorCategories = new Set<string>();
   visualizations: Alcmonavis.Visualisations | null | undefined = null;
@@ -212,9 +216,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-          this.options.nodeLabelGap +
-          AP.LABEL_SIZE_CALC_ADDITION +
-          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+      this.options.nodeLabelGap +
+      AP.LABEL_SIZE_CALC_ADDITION +
+      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -313,14 +317,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-                ': Ordinal scale mapping for ' +
-                label +
-                ' (' +
-                s +
-                '): domain > range: ' +
-                mappingFn.domain().length +
-                ' > ' +
-                mappingFn.range().length,
+              ': Ordinal scale mapping for ' +
+              label +
+              ' (' +
+              s +
+              '): domain > range: ' +
+              mappingFn.domain().length +
+              ' > ' +
+              mappingFn.range().length,
             );
           }
         }
@@ -3993,10 +3997,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-            ' Grouping species from "' +
-            settings.groupSpecies.source +
-            '" to "' +
-            settings.groupSpecies.target,
+          ' Grouping species from "' +
+          settings.groupSpecies.source +
+          '" to "' +
+          settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -4017,14 +4021,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-            ' Grouping years from "' +
-            settings.groupYears.source +
-            '" to "' +
-            settings.groupYears.target +
-            '", ignoring ' +
-            settings.groupYears.ignore +
-            ', range ' +
-            settings.groupYears.groupsize,
+          ' Grouping years from "' +
+          settings.groupYears.source +
+          '" to "' +
+          settings.groupYears.target +
+          '", ignoring ' +
+          settings.groupYears.ignore +
+          ', range ' +
+          settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4224,11 +4228,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-            ' initial value for collapse depth [' +
-            this.depth_collapse_level +
-            '] is larger than or equal to maximum depth [' +
-            max_depth +
-            ']',
+          ' initial value for collapse depth [' +
+          this.depth_collapse_level +
+          '] is larger than or equal to maximum depth [' +
+          max_depth +
+          ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -4260,6 +4264,89 @@ export default class alcmonavispoeschli {
   };
 
   removeTooltips = () => this.svgGroup.selectAll('.tooltipElem').remove();
+
+  setBack = () => {
+    this.backTreeRoots.push(this.root);
+    this.forwardTreeRoots.length = 0;
+    this.TriggerHandler("forwardEnable", false);
+    this.TriggerHandler("backwardEnable", true);
+  }
+
+  goForward = () => {
+    if (this.forwardTreeRoots.length > 0) {
+      this.backTreeRoots.push(this.root);
+      this.goToSubTree(this.forwardTreeRoots.pop()!, false, false);
+      this.TriggerHandler("forwardEnable", this.forwardTreeRoots.length > 0);
+      this.TriggerHandler("backwardEnable", true);
+    }
+  }
+
+  goBackward = () => {
+    if (this.backTreeRoots.length > 0) {
+      this.forwardTreeRoots.push(this.root);
+      this.goToSubTree(this.backTreeRoots.pop()!, false, false);
+      this.TriggerHandler("forwardEnable", true);
+      this.TriggerHandler("backwardEnable", this.backTreeRoots.length > 0);
+    }
+  }
+
+  goToRootTree = (history: boolean = true) => {
+    if (history) { this.setBack(); }
+    this.root = this.treeData;
+    this.refresh();
+  }
+
+  goToParent = (history: boolean = true) => {
+    if (this.currentParentNode) {
+      this.goToSubTree(this.currentParentNode, history, false);
+    }
+  }
+
+  goToSuperTree = (history: boolean = true) => {
+    if (history) { this.setBack(); }
+    this.root = this.superTreeRoots.pop()!;
+    this.refresh();
+  }
+
+  goToSubTree = (node: Alcmonavis.phylo, history: boolean = true, pushCurrent: boolean = true) => {
+    if (node === this.treeData) {
+      this.goToRootTree(history);
+    }
+    else {
+      if (history) { this.setBack(); }
+      if (this.superTreeRoots.slice(-1, 1)[0] === this.root) { this.superTreeRoots.pop(); }
+      if (pushCurrent) { this.superTreeRoots.push(this.root); }
+      this.currentParentNode = node.parent;
+      const fakeNode = {
+        children: [node],
+        x: 0,
+        x0: 0,
+        y: 0,
+        y0: 0
+      } as Alcmonavis.phylo;
+      this.root = fakeNode;
+      if (node._children) {
+        // To make sure, new root is uncollapsed.
+        node.children = node._children;
+        node._children = null;
+      }
+      this.refresh();
+    }
+  }
+
+  refresh = () => {
+    this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
+    this.updateNodeVisualizationsAndLegends(this.root);
+    this.resetDepthCollapseDepthValue();
+    this.resetRankCollapseRankValue();
+    this.resetBranchLengthCollapseValue();
+    this.search0Text(this.searchQueries[0]);
+    //this.search0();
+    this.search1();
+    this.zoomToFit();
+    this.TriggerHandler("HasParent", Boolean(this.root.parent && this.root.parent.parent));
+    this.TriggerHandler("AtRoot", this.root === this.treeData);
+  }
 
   getClickEventListenerNode = (tree: Alcmonavis.phylo) => {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
@@ -4698,44 +4785,6 @@ export default class alcmonavispoeschli {
           self.update();
         }
 
-        function goToSubTree(node: Alcmonavis.phylo) {
-          if (node.parent && (node.children || node._children)) {
-            if (self.root.children && self.superTreeRoots.length > 0 && node === self.root.children[0]) {
-              self.root = self.superTreeRoots.pop()!;
-              self.basicTreeProperties = forester.collectBasicTreeProperties(self.root);
-              self.updateNodeVisualizationsAndLegends(self.root);
-              self.resetDepthCollapseDepthValue();
-              self.resetRankCollapseRankValue();
-              self.resetBranchLengthCollapseValue();
-              self.search0();
-              self.search1();
-              self.zoomToFit();
-            } else if (node.parent.parent) {
-              self.superTreeRoots.push(self.root);
-              var fakeNode = {} as Alcmonavis.phylo;
-              fakeNode.children = [node];
-              fakeNode.x = 0;
-              fakeNode.x0 = 0;
-              fakeNode.y = 0;
-              fakeNode.y0 = 0;
-              self.root = fakeNode;
-              if (node._children) {
-                // To make sure, new root is uncollapsed.
-                node.children = node._children;
-                node._children = null;
-              }
-              self.basicTreeProperties = forester.collectBasicTreeProperties(self.root);
-              self.updateNodeVisualizationsAndLegends(self.root);
-              self.resetDepthCollapseDepthValue();
-              self.resetRankCollapseRankValue();
-              self.resetBranchLengthCollapseValue();
-              self.search0();
-              self.search1();
-              self.zoomToFit();
-            }
-          }
-        }
-
         function swapChildren(d: Alcmonavis.phylo) {
           var c = d.children;
           var l = (c && c.length) || 0;
@@ -4893,20 +4942,67 @@ export default class alcmonavispoeschli {
           .style('font-weight', 'bold')
           .style('text-decoration', 'none')
           .text((d: Alcmonavis.phylo) => {
-            if (d.parent && (d.children || d._children)) {
-              if (self.superTreeRoots.length > 0 && self.root.children && d === self.root.children[0]) {
-                textSum += textInc;
-                return 'Return to Supertree';
-              } else if (d.parent.parent) {
-                textSum += textInc;
-                return 'Go to Subtree';
-              }
+            if (d.parent && (d.children || d._children) && d.parent.parent) {
+              textSum += textInc;
+              return 'Go to Subtree';
             }
             return '';
           })
-          .on('click', function (d) {
-            goToSubTree(d);
-          });
+          .on('click', (d: Alcmonavis.phylo) => self.goToSubTree(d));
+
+        d3.select(this)
+          .append('text')
+          .attr('class', 'tooltipElem tooltipElemText')
+          .attr('y', topPad + textSum)
+          .attr('x', +rightPad)
+          .style('text-align', 'left')
+          .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
+          .style('font-size', fs)
+          .style(
+            'font-family',
+            settings.controlsFont.map((v) => (/\s/.test(v) ? '"' + v + '"' : v)).reduce((p, v) => p + ', ' + v),
+          )
+          .style('font-style', 'normal')
+          .style('font-weight', 'bold')
+          .style('text-decoration', 'none')
+          .text((d: Alcmonavis.phylo) => {
+            if (d.parent && (d.children || d._children)
+              && self.superTreeRoots.length > 0
+              && self.root.children
+              && d === self.root.children[0]) {
+              textSum += textInc;
+              return 'Return to Supertree';
+            }
+            return '';
+          })
+          .on('click', self.goToSuperTree);
+
+        d3.select(this)
+          .append('text')
+          .attr('class', 'tooltipElem tooltipElemText')
+          .attr('y', topPad + textSum)
+          .attr('x', +rightPad)
+          .style('text-align', 'left')
+          .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
+          .style('font-size', fs)
+          .style(
+            'font-family',
+            settings.controlsFont.map((v) => (/\s/.test(v) ? '"' + v + '"' : v)).reduce((p, v) => p + ', ' + v),
+          )
+          .style('font-style', 'normal')
+          .style('font-weight', 'bold')
+          .style('text-decoration', 'none')
+          .text((d: Alcmonavis.phylo) => {
+            if (d.parent && (d.children || d._children)
+              && self.superTreeRoots.length > 0
+              && self.root.children
+              && d === self.root.children[0]) {
+              textSum += textInc;
+              return 'Go to Parent Subtree';
+            }
+            return '';
+          })
+          .on('click', self.goToParent);
 
         d3.select(this)
           .append('text')
@@ -5164,7 +5260,8 @@ export default class alcmonavispoeschli {
               self.resetRankCollapseRankValue();
               self.resetBranchLengthCollapseValue();
               self.resetCollapseByFeature();
-              self.search0();
+              self.search0Text(self.searchQueries[0]);
+              //self.search0();
               self.search1();
               self.zoomToFit();
             });
@@ -5366,7 +5463,8 @@ export default class alcmonavispoeschli {
       this.resetDepthCollapseDepthValue();
       this.resetRankCollapseRankValue();
       this.resetBranchLengthCollapseValue();
-      this.search0();
+      this.search0Text(this.searchQueries[0]);
+      //this.search0();
       this.search1();
       this.zoomToFit();
     }
@@ -5468,6 +5566,7 @@ export default class alcmonavispoeschli {
       var my_query = query.trim();
       if (my_query.length > 0) {
         this.searchBox0Empty = false;
+        this.searchQueries[0] = my_query;
         this.foundNodes0 = this.search(my_query);
       }
     }
@@ -5504,6 +5603,7 @@ export default class alcmonavispoeschli {
 
   resetSearch0 = () => {
     this.foundNodes0.clear();
+    delete this.searchQueries[0];
     this.searchBox0Empty = true;
     $('#' + AP.SEARCH_FIELD_0).val('');
     this.update(undefined, 0, true);
@@ -5714,7 +5814,8 @@ export default class alcmonavispoeschli {
 
   searchOptionsCaseSenstiveCbClicked = () => {
     this.options!.searchIsCaseSensitive = this.getCheckboxValue(AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB);
-    this.search0();
+    this.search0Text(this.searchQueries[0]);
+    //this.search0();
     this.search1();
   };
 
@@ -5724,7 +5825,8 @@ export default class alcmonavispoeschli {
       this.options!.searchUsesRegex = false;
       this.TriggerHandler('searchUsesRegex', this.options!.searchUsesRegex);
     }
-    this.search0();
+    this.search0Text(this.searchQueries[0]);
+    //this.search0();
     this.search1();
   };
 
@@ -5734,13 +5836,15 @@ export default class alcmonavispoeschli {
       this.options!.searchIsPartial = true;
       this.TriggerHandler('searchIsComplete', !this.options!.searchIsPartial);
     }
-    this.search0();
+    this.search0Text(this.searchQueries[0]);
+    //this.search0();
     this.search1();
   };
 
   searchOptionsNegateResultCbClicked = () => {
     this.options!.searchNegateResult = this.getCheckboxValue(AP.SEARCH_OPTIONS_NEGATE_RES_CB);
-    this.search0();
+    this.search0Text(this.searchQueries[0]);
+    //this.search0();
     this.search1();
   };
 
@@ -6528,13 +6632,13 @@ export default class alcmonavispoeschli {
       'legendenabled',
       Boolean(
         this.showLegends &&
-          (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
-            (this.options &&
-              this.options.showNodeVisualizations &&
-              (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-                this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
+        (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+          (this.options &&
+            this.options.showNodeVisualizations &&
+            (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+              this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+              this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+              this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
       ),
     );
 
@@ -6698,7 +6802,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => {};
+  downloadAsPdf = () => { };
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";

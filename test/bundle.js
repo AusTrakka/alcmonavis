@@ -27583,6 +27583,7 @@ class alcmonavispoeschli {
         this.dynahide_counter = 0;
         this.dynahide_factor = 0;
         this.external_nodes = 0;
+        this.searchQueries = [];
         this.foundNodes0 = new Set();
         this.foundNodes1 = new Set();
         this.foundSum = 0;
@@ -27603,9 +27604,11 @@ class alcmonavispoeschli {
         this.showColorPicker = false;
         this.showLegends = true;
         this.superTreeRoots = [];
+        this.backTreeRoots = [];
+        this.forwardTreeRoots = [];
+        this.currentParentNode = undefined;
         this.totalSearchedWithData = 0;
         this.translate = null;
-        this.treeData = null;
         this.usedColorCategories = new Set();
         this.visualizations = null;
         this.visualizations2 = null;
@@ -27630,14 +27633,14 @@ class alcmonavispoeschli {
                     this.eventhandlers[event].splice(index, 1);
                 }
                 else {
-                    (this.eventhandlers[event]).length = 0;
+                    this.eventhandlers[event].length = 0;
                 }
             }
             delete this.preemptiveHandlers[event];
         };
         this.TriggerHandler = (event, value) => {
             if (event in this.eventhandlers) {
-                this.eventhandlers[event].forEach(h => h(value));
+                this.eventhandlers[event].forEach((h) => h(value));
             }
             this.preemptiveHandlers[event] = value;
         };
@@ -31116,6 +31119,91 @@ class alcmonavispoeschli {
             });
         };
         this.removeTooltips = () => this.svgGroup.selectAll('.tooltipElem').remove();
+        this.setBack = () => {
+            this.backTreeRoots.push(this.root);
+            this.forwardTreeRoots.length = 0;
+            this.TriggerHandler("forwardEnable", false);
+            this.TriggerHandler("backwardEnable", true);
+        };
+        this.goForward = () => {
+            if (this.forwardTreeRoots.length > 0) {
+                this.backTreeRoots.push(this.root);
+                this.goToSubTree(this.forwardTreeRoots.pop(), false, false);
+                this.TriggerHandler("forwardEnable", this.forwardTreeRoots.length > 0);
+                this.TriggerHandler("backwardEnable", true);
+            }
+        };
+        this.goBackward = () => {
+            if (this.backTreeRoots.length > 0) {
+                this.forwardTreeRoots.push(this.root);
+                this.goToSubTree(this.backTreeRoots.pop(), false, false);
+                this.TriggerHandler("forwardEnable", true);
+                this.TriggerHandler("backwardEnable", this.backTreeRoots.length > 0);
+            }
+        };
+        this.goToRootTree = (history = true) => {
+            if (history) {
+                this.setBack();
+            }
+            this.root = this.treeData;
+            this.refresh();
+        };
+        this.goToParent = (history = true) => {
+            if (this.currentParentNode) {
+                this.goToSubTree(this.currentParentNode, history, false);
+            }
+        };
+        this.goToSuperTree = (history = true) => {
+            if (history) {
+                this.setBack();
+            }
+            this.root = this.superTreeRoots.pop();
+            this.refresh();
+        };
+        this.goToSubTree = (node, history = true, pushCurrent = true) => {
+            if (node === this.treeData) {
+                this.goToRootTree(history);
+            }
+            else {
+                if (history) {
+                    this.setBack();
+                }
+                if (this.superTreeRoots.slice(-1, 1)[0] === this.root) {
+                    this.superTreeRoots.pop();
+                }
+                if (pushCurrent) {
+                    this.superTreeRoots.push(this.root);
+                }
+                this.currentParentNode = node.parent;
+                const fakeNode = {
+                    children: [node],
+                    x: 0,
+                    x0: 0,
+                    y: 0,
+                    y0: 0
+                };
+                this.root = fakeNode;
+                if (node._children) {
+                    // To make sure, new root is uncollapsed.
+                    node.children = node._children;
+                    node._children = null;
+                }
+                this.refresh();
+            }
+        };
+        this.refresh = () => {
+            this.basicTreeProperties = forester_1.forester.collectBasicTreeProperties(this.root);
+            this.updateNodeVisualizationsAndLegends(this.root);
+            this.resetDepthCollapseDepthValue();
+            this.resetRankCollapseRankValue();
+            this.resetBranchLengthCollapseValue();
+            this.search0Text(this.searchQueries[0]);
+            //this.search0();
+            this.search1();
+            this.zoomToFit();
+            this.TriggerHandler("HasParent", Boolean(this.root.parent && this.root.parent.parent));
+            this.TriggerHandler("AtRoot", this.root === this.treeData);
+        };
         this.getClickEventListenerNode = (tree) => {
             if (!OptionsDeclared(this.options))
                 throw 'Options not set';
@@ -31534,44 +31622,6 @@ class alcmonavispoeschli {
                         dialog.dialog('option', 'title', title);
                         self.update();
                     }
-                    function goToSubTree(node) {
-                        if (node.parent && (node.children || node._children)) {
-                            if (self.root.children && self.superTreeRoots.length > 0 && node === self.root.children[0]) {
-                                self.root = self.superTreeRoots.pop();
-                                self.basicTreeProperties = forester_1.forester.collectBasicTreeProperties(self.root);
-                                self.updateNodeVisualizationsAndLegends(self.root);
-                                self.resetDepthCollapseDepthValue();
-                                self.resetRankCollapseRankValue();
-                                self.resetBranchLengthCollapseValue();
-                                self.search0();
-                                self.search1();
-                                self.zoomToFit();
-                            }
-                            else if (node.parent.parent) {
-                                self.superTreeRoots.push(self.root);
-                                var fakeNode = {};
-                                fakeNode.children = [node];
-                                fakeNode.x = 0;
-                                fakeNode.x0 = 0;
-                                fakeNode.y = 0;
-                                fakeNode.y0 = 0;
-                                self.root = fakeNode;
-                                if (node._children) {
-                                    // To make sure, new root is uncollapsed.
-                                    node.children = node._children;
-                                    node._children = null;
-                                }
-                                self.basicTreeProperties = forester_1.forester.collectBasicTreeProperties(self.root);
-                                self.updateNodeVisualizationsAndLegends(self.root);
-                                self.resetDepthCollapseDepthValue();
-                                self.resetRankCollapseRankValue();
-                                self.resetBranchLengthCollapseValue();
-                                self.search0();
-                                self.search1();
-                                self.zoomToFit();
-                            }
-                        }
-                    }
                     function swapChildren(d) {
                         var c = d.children;
                         var l = (c && c.length) || 0;
@@ -31712,21 +31762,59 @@ class alcmonavispoeschli {
                         .style('font-weight', 'bold')
                         .style('text-decoration', 'none')
                         .text((d) => {
-                        if (d.parent && (d.children || d._children)) {
-                            if (self.superTreeRoots.length > 0 && self.root.children && d === self.root.children[0]) {
-                                textSum += textInc;
-                                return 'Return to Supertree';
-                            }
-                            else if (d.parent.parent) {
-                                textSum += textInc;
-                                return 'Go to Subtree';
-                            }
+                        if (d.parent && (d.children || d._children) && d.parent.parent) {
+                            textSum += textInc;
+                            return 'Go to Subtree';
                         }
                         return '';
                     })
-                        .on('click', function (d) {
-                        goToSubTree(d);
-                    });
+                        .on('click', (d) => self.goToSubTree(d));
+                    d3_1.default.select(this)
+                        .append('text')
+                        .attr('class', 'tooltipElem tooltipElemText')
+                        .attr('y', topPad + textSum)
+                        .attr('x', +rightPad)
+                        .style('text-align', 'left')
+                        .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
+                        .style('font-size', fs)
+                        .style('font-family', settings.controlsFont.map((v) => (/\s/.test(v) ? '"' + v + '"' : v)).reduce((p, v) => p + ', ' + v))
+                        .style('font-style', 'normal')
+                        .style('font-weight', 'bold')
+                        .style('text-decoration', 'none')
+                        .text((d) => {
+                        if (d.parent && (d.children || d._children)
+                            && self.superTreeRoots.length > 0
+                            && self.root.children
+                            && d === self.root.children[0]) {
+                            textSum += textInc;
+                            return 'Return to Supertree';
+                        }
+                        return '';
+                    })
+                        .on('click', self.goToSuperTree);
+                    d3_1.default.select(this)
+                        .append('text')
+                        .attr('class', 'tooltipElem tooltipElemText')
+                        .attr('y', topPad + textSum)
+                        .attr('x', +rightPad)
+                        .style('text-align', 'left')
+                        .style('fill', AP.NODE_TOOLTIP_TEXT_COLOR)
+                        .style('font-size', fs)
+                        .style('font-family', settings.controlsFont.map((v) => (/\s/.test(v) ? '"' + v + '"' : v)).reduce((p, v) => p + ', ' + v))
+                        .style('font-style', 'normal')
+                        .style('font-weight', 'bold')
+                        .style('text-decoration', 'none')
+                        .text((d) => {
+                        if (d.parent && (d.children || d._children)
+                            && self.superTreeRoots.length > 0
+                            && self.root.children
+                            && d === self.root.children[0]) {
+                            textSum += textInc;
+                            return 'Go to Parent Subtree';
+                        }
+                        return '';
+                    })
+                        .on('click', self.goToParent);
                     d3_1.default.select(this)
                         .append('text')
                         .attr('class', 'tooltipElem tooltipElemText')
@@ -31962,7 +32050,8 @@ class alcmonavispoeschli {
                             self.resetRankCollapseRankValue();
                             self.resetBranchLengthCollapseValue();
                             self.resetCollapseByFeature();
-                            self.search0();
+                            self.search0Text(self.searchQueries[0]);
+                            //self.search0();
                             self.search1();
                             self.zoomToFit();
                         });
@@ -32125,7 +32214,8 @@ class alcmonavispoeschli {
                 this.resetDepthCollapseDepthValue();
                 this.resetRankCollapseRankValue();
                 this.resetBranchLengthCollapseValue();
-                this.search0();
+                this.search0Text(this.searchQueries[0]);
+                //this.search0();
                 this.search1();
                 this.zoomToFit();
             }
@@ -32221,6 +32311,7 @@ class alcmonavispoeschli {
                 var my_query = query.trim();
                 if (my_query.length > 0) {
                     this.searchBox0Empty = false;
+                    this.searchQueries[0] = my_query;
                     this.foundNodes0 = this.search(my_query);
                 }
             }
@@ -32254,6 +32345,7 @@ class alcmonavispoeschli {
         };
         this.resetSearch0 = () => {
             this.foundNodes0.clear();
+            delete this.searchQueries[0];
             this.searchBox0Empty = true;
             jquery_1.default('#' + AP.SEARCH_FIELD_0).val('');
             this.update(undefined, 0, true);
@@ -32273,28 +32365,28 @@ class alcmonavispoeschli {
             this.options.phylogram = true;
             this.options.alignPhylogram = false;
             //this.setDisplayTypeButtons();
-            this.TriggerHandler("displayType");
+            this.TriggerHandler('displayType');
             this.update(undefined, 0);
         };
         this.toAlignedPhylogram = () => {
             this.options.phylogram = true;
             this.options.alignPhylogram = true;
             //this.setDisplayTypeButtons();
-            this.TriggerHandler("displayType");
+            this.TriggerHandler('displayType');
             this.update(undefined, 0);
         };
         this.toCladegram = () => {
             this.options.phylogram = false;
             this.options.alignPhylogram = false;
             //this.setDisplayTypeButtons();
-            this.TriggerHandler("displayType");
+            this.TriggerHandler('displayType');
             this.update(undefined, 0);
         };
         this.nodeNameCbClicked = () => {
             this.options.showNodeName = this.getCheckboxValue(AP.NODE_NAME_CB);
             if (this.options.showNodeName) {
                 this.options.showExternalLabels = true;
-                this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
+                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
             }
             this.update();
         };
@@ -32302,7 +32394,7 @@ class alcmonavispoeschli {
             this.options.showTaxonomy = this.getCheckboxValue(AP.TAXONOMY_CB);
             if (this.options.showTaxonomy) {
                 this.options.showExternalLabels = true;
-                this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
+                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
             }
             this.update();
         };
@@ -32310,7 +32402,7 @@ class alcmonavispoeschli {
             this.options.showSequence = this.getCheckboxValue(AP.SEQUENCE_CB);
             if (this.options.showSequence) {
                 this.options.showExternalLabels = true;
-                this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
+                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
             }
             this.update();
         };
@@ -32400,8 +32492,8 @@ class alcmonavispoeschli {
                 !this.options.showNodeEvents) {
                 this.options.showInternalNodes = true;
                 this.options.showExternalNodes = true;
-                this.TriggerHandler("showInternalNodes", this.options.showInternalNodes);
-                this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
+                this.TriggerHandler('showInternalNodes', this.options.showInternalNodes);
+                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
             }
             this.update(undefined, 0, true);
         };
@@ -32425,30 +32517,34 @@ class alcmonavispoeschli {
         };
         this.searchOptionsCaseSenstiveCbClicked = () => {
             this.options.searchIsCaseSensitive = this.getCheckboxValue(AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB);
-            this.search0();
+            this.search0Text(this.searchQueries[0]);
+            //this.search0();
             this.search1();
         };
         this.searchOptionsCompleteTermsOnlyCbClicked = () => {
             this.options.searchIsPartial = !this.getCheckboxValue(AP.SEARCH_OPTIONS_COMPLETE_TERMS_ONLY_CB);
             if (this.options.searchIsPartial === false) {
                 this.options.searchUsesRegex = false;
-                this.TriggerHandler("searchUsesRegex", this.options.searchUsesRegex);
+                this.TriggerHandler('searchUsesRegex', this.options.searchUsesRegex);
             }
-            this.search0();
+            this.search0Text(this.searchQueries[0]);
+            //this.search0();
             this.search1();
         };
         this.searchOptionsRegexCbClicked = () => {
             this.options.searchUsesRegex = this.getCheckboxValue(AP.SEARCH_OPTIONS_REGEX_CB);
             if (this.options.searchUsesRegex === true) {
                 this.options.searchIsPartial = true;
-                this.TriggerHandler("searchIsComplete", !this.options.searchIsPartial);
+                this.TriggerHandler('searchIsComplete', !this.options.searchIsPartial);
             }
-            this.search0();
+            this.search0Text(this.searchQueries[0]);
+            //this.search0();
             this.search1();
         };
         this.searchOptionsNegateResultCbClicked = () => {
             this.options.searchNegateResult = this.getCheckboxValue(AP.SEARCH_OPTIONS_NEGATE_RES_CB);
-            this.search0();
+            this.search0Text(this.searchQueries[0]);
+            //this.search0();
             this.search1();
         };
         this.legendMoveUp = (x) => {
@@ -32617,7 +32713,7 @@ class alcmonavispoeschli {
         this.setLabelColorMenu = (value, style) => {
             if (value && value != AP.DEFAULT) {
                 this.currentLabelColorVisualization = value;
-                if (style = "legend") {
+                if ((style = 'legend')) {
                     if (this.visualizations &&
                         this.visualizations.labelColor &&
                         this.visualizations.labelColor[this.currentLabelColorVisualization] != null) {
@@ -32629,9 +32725,9 @@ class alcmonavispoeschli {
                     this.options.showNodeName = true;
                     this.options.showExternalLabels = true;
                     this.options.showInternalLabels = true;
-                    this.TriggerHandler("showNodeName", this.options.showNodeName);
-                    this.TriggerHandler("showExternalLabels", this.options.showExternalLabels);
-                    this.TriggerHandler("showInternalLabels", this.options.showInternalLabels);
+                    this.TriggerHandler('showNodeName', this.options.showNodeName);
+                    this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
+                    this.TriggerHandler('showInternalLabels', this.options.showInternalLabels);
                     //this.setCheckboxValue(AP.NODE_NAME_CB, true);
                     //this.setCheckboxValue(AP.EXTERNAL_LABEL_CB, true);
                     //this.setCheckboxValue(AP.INTERNAL_LABEL_CB, true);
@@ -32647,14 +32743,16 @@ class alcmonavispoeschli {
         this.setFillColorMenu = (value, style) => {
             this.options = this.options || {};
             if (value && value != AP.DEFAULT) {
-                if (style = "legend") {
-                    if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+                if ((style = 'legend')) {
+                    if (!this.options.showExternalNodes &&
+                        !this.options.showInternalNodes &&
+                        this.currentNodeShapeVisualization == null) {
                         this.options.showExternalNodes = true;
-                        this.TriggerHandler("showExternalNodes", this.options.showExternalNodes);
+                        this.TriggerHandler('showExternalNodes', this.options.showExternalNodes);
                         //alcmonavis.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
                     }
                     this.options.showNodeVisualizations = true;
-                    this.TriggerHandler("showNodeVisualizations", this.options.showExternalNodes);
+                    this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes);
                     // alcmonavis.setCheckboxValue(AP.NODE_VIS_CB, true);
                     this.currentNodeFillColorVisualization = value;
                     if (this.visualizations &&
@@ -32667,9 +32765,9 @@ class alcmonavispoeschli {
                     this.options.showExternalNodes = true;
                     this.options.showInternalNodes = true;
                     this.options.showNodeVisualizations = true;
-                    this.TriggerHandler("showExternalNodes", this.options.showNodeName);
-                    this.TriggerHandler("showInternalNodes", this.options.showExternalLabels);
-                    this.TriggerHandler("showNodeVisualizations", this.options.showInternalLabels);
+                    this.TriggerHandler('showExternalNodes', this.options.showNodeName);
+                    this.TriggerHandler('showInternalNodes', this.options.showExternalLabels);
+                    this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels);
                 }
             }
             else {
@@ -32684,7 +32782,7 @@ class alcmonavispoeschli {
             if (value && value != AP.DEFAULT) {
                 this.currentNodeShapeVisualization = value;
                 this.options.showNodeVisualizations = true;
-                this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
+                this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);
                 if (this.visualizations &&
                     this.visualizations.nodeShape &&
                     this.visualizations.nodeShape[this.currentNodeShapeVisualization] != null) {
@@ -32708,12 +32806,14 @@ class alcmonavispoeschli {
                     this.visualizations.nodeSize[this.currentNodeSizeVisualization] != null) {
                     this.addLegend(AP.LEGEND_NODE_FILL_COLOR, this.visualizations.nodeSize[this.currentNodeSizeVisualization]);
                 }
-                if (!this.options.showExternalNodes && !this.options.showInternalNodes && this.currentNodeShapeVisualization == null) {
+                if (!this.options.showExternalNodes &&
+                    !this.options.showInternalNodes &&
+                    this.currentNodeShapeVisualization == null) {
                     this.options.showExternalNodes = true;
-                    this.TriggerHandler("showExternalNodes", this.options.showNodeName);
+                    this.TriggerHandler('showExternalNodes', this.options.showNodeName);
                 }
                 this.options.showNodeVisualizations = true;
-                this.TriggerHandler("showNodeVisualizations", this.options.showNodeVisualizations);
+                this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);
             }
             else {
                 this.currentNodeSizeVisualization = null;
@@ -32799,7 +32899,7 @@ class alcmonavispoeschli {
                 this.options.phylogram = true;
             }
             //this.setDisplayTypeButtons();
-            this.TriggerHandler("displayType");
+            this.TriggerHandler('displayType');
             this.update(undefined, 0);
         };
         this.unCollapseAll = (node) => {
@@ -32919,7 +33019,7 @@ class alcmonavispoeschli {
                 }
                 if (this.settings.enableBranchVisualizations) {
                     this.options.showBranchVisualizations = true;
-                    this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+                    this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
                     //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
                 }
             }
@@ -32938,7 +33038,7 @@ class alcmonavispoeschli {
                 if (this.settings.enableBranchVisualizations) {
                     this.options.showBranchVisualizations = true;
                     //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
-                    this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+                    this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
                 }
             }
             else if (this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -32956,7 +33056,7 @@ class alcmonavispoeschli {
                 if (this.settings.enableBranchVisualizations) {
                     this.options.showBranchVisualizations = true;
                     //this.setCheckboxValue(AP.BRANCH_VIS_CB, this.options.showBranchVisualizations);
-                    this.TriggerHandler("showBranchVisualizations", this.options.showBranchVisualizations);
+                    this.TriggerHandler('showBranchVisualizations', this.options.showBranchVisualizations);
                 }
             }
             else if (this.currentLabelColorVisualization != AP.MSA_RESIDUE &&
@@ -33136,8 +33236,8 @@ class alcmonavispoeschli {
             }
         };
         this.updateLegendButtonEnabledState = () => {
-            this.TriggerHandler("showLegend", this.showLegends);
-            this.TriggerHandler("legendenabled", Boolean(this.showLegends &&
+            this.TriggerHandler('showLegend', this.showLegends);
+            this.TriggerHandler('legendenabled', Boolean(this.showLegends &&
                 (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
                     (this.options &&
                         this.options.showNodeVisualizations &&
@@ -38983,7 +39083,8 @@ const settings = {
     enableNodeVisualizations: true
 };
 const options = {
-    backgroundColorDefault: "#FFFFFF"
+    backgroundColorDefault: "#FFFFFF",
+    initialCollapseDepth: 1
 };
 const loc = "http://localhost:1337/api/newick/2021-02-10";
 $($ => {
@@ -39020,6 +39121,13 @@ const Search = {
     "label": "#searchLabel",
     "button": "#btn-do-search"
 };
+const GoToButtons = {
+    "back": "#btn-goback",
+    "forward": "#btn-goforward",
+    "parent": "#btn-gotoparent",
+    "root": "#btn-gotoroot",
+    "subtree": "#btn-gotosubtree"
+};
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
 let count = 0;
 const incrementCount = () => {
@@ -39052,7 +39160,40 @@ function controls(alcmonavis) {
         if (searchstring && typeof (searchstring) == "string") {
             alcmonavis.search0Text(searchstring);
             incrementCount();
+            $(GoToButtons.subtree).prop("disabled", false);
         }
+    });
+    //Go to
+    $("body").on("click", GoToButtons.subtree, () => {
+        $(GoToButtons.subtree).prop("disabled", true);
+    });
+    $("body").on("click", GoToButtons.parent, () => {
+        alcmonavis.goToParent();
+    });
+    $("body").on("click", GoToButtons.root, () => {
+        alcmonavis.goToRootTree();
+    });
+    $("body").on("click", GoToButtons.forward, () => {
+        alcmonavis.goForward();
+    });
+    $("body").on("click", GoToButtons.back, () => {
+        alcmonavis.goBackward();
+    });
+    alcmonavis.AddHandler("forwardEnable", (val) => {
+        const value = Boolean(val);
+        $(GoToButtons.forward).prop("disabled", !value);
+    });
+    alcmonavis.AddHandler("backwardEnable", (val) => {
+        const value = Boolean(val);
+        $(GoToButtons.back).prop("disabled", !value);
+    });
+    alcmonavis.AddHandler("HasParent", (val) => {
+        const value = Boolean(val);
+        $(GoToButtons.parent).prop("disabled", value);
+    });
+    alcmonavis.AddHandler("AtRoot", (val) => {
+        const value = Boolean(val);
+        $(GoToButtons.root).prop("disabled", !value);
     });
 }
 

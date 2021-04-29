@@ -9,7 +9,8 @@ const settings: Alcmonavis.Settings = {
     enableNodeVisualizations: true
 };
 const options:Alcmonavis.Options = {
-    backgroundColorDefault: "#FFFFFF"
+    backgroundColorDefault: "#FFFFFF",
+    initialCollapseDepth: 1
 };
 const loc = "http://localhost:1337/api/newick/2021-02-10";
 $($ => {
@@ -47,6 +48,14 @@ const Search = {
     "input": "#searchBox",
     "label": "#searchLabel",
     "button": "#btn-do-search"
+}
+
+const GoToButtons = {
+    "back": "#btn-goback",
+    "forward": "#btn-goforward",
+    "parent": "#btn-gotoparent",
+    "root": "#btn-gotoroot",
+    "subtree": "#btn-gotosubtree"
 }
 
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
@@ -88,6 +97,48 @@ function controls(alcmonavis: AlcmonavisPoeschli){
         if(searchstring && typeof(searchstring) == "string") {
             alcmonavis.search0Text(searchstring);
             incrementCount();
+            $(GoToButtons.subtree).prop("disabled", false);
         }
+    });
+
+    //Go to
+    $("body").on("click", GoToButtons.subtree, () => {
+        $(GoToButtons.subtree).prop("disabled", true);
+    });
+
+    $("body").on("click", GoToButtons.parent, () => {
+        alcmonavis.goToParent();
+    });
+
+    $("body").on("click", GoToButtons.root, () => {
+        alcmonavis.goToRootTree();
+    });
+
+    $("body").on("click", GoToButtons.forward, () => {
+        alcmonavis.goForward();
+    });
+
+    $("body").on("click", GoToButtons.back, () => {
+        alcmonavis.goBackward();
+    });
+
+    alcmonavis.AddHandler("forwardEnable", (val: string | number | boolean | undefined) => {
+        const value = Boolean(val);
+        $(GoToButtons.forward).prop("disabled", !value);
+    });
+
+    alcmonavis.AddHandler("backwardEnable", (val: string | number | boolean | undefined) => {
+        const value = Boolean(val);
+        $(GoToButtons.back).prop("disabled", !value);
+    });
+
+    alcmonavis.AddHandler("HasParent", (val: string | number | boolean | undefined) => {
+        const value = Boolean(val);
+        $(GoToButtons.parent).prop("disabled", value);
+    });
+
+    alcmonavis.AddHandler("AtRoot", (val: string | number | boolean | undefined) => {
+        const value = Boolean(val);
+        $(GoToButtons.root).prop("disabled", !value);
     });
 }
