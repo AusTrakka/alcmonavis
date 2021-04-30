@@ -103,6 +103,7 @@ function controls(alcmonavis: AlcmonavisPoeschli){
 
     //Go to
     $("body").on("click", GoToButtons.subtree, () => {
+        alcmonavis.goToSearch();
         $(GoToButtons.subtree).prop("disabled", true);
     });
 
@@ -139,6 +140,6 @@ function controls(alcmonavis: AlcmonavisPoeschli){
 
     alcmonavis.AddHandler("AtRoot", (val: string | number | boolean | undefined) => {
         const value = Boolean(val);
-        $(GoToButtons.root).prop("disabled", !value);
+        $(GoToButtons.root).prop("disabled", value);
     });
 }

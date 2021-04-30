@@ -56,6 +56,18 @@ export const forester = {
   },
 
   /**
+   * Add a foresterId key to every node, with a unique integer value
+   * preOrderTraversal so expect root, as defined by getTreeRoot(), to get id 0
+   * 
+   * @param phy - A phyloXML-based tree object or node.
+   */
+  addForesterIds: <T extends Forester.phylo>(phy: T) => {
+    const root = forester.getTreeRoot(phy);
+    let idVal = 0;
+    forester.preOrderTraversalAll(root, (node) => node.foresterId = idVal++);
+  },
+
+  /**
    * Returns the real root node of a
    * phyloXML-based tree object.
    * Precondition: needs to have parents set.
@@ -920,6 +932,52 @@ export const forester = {
     }
 
     return properties;
+  },
+
+  getSubtree: <T extends Forester.phylo>(nodeset: T[]): T | undefined => {
+    if (nodeset.length === 0) {
+      // no search result
+      return undefined;
+    }
+    const root = forester.getTreeRoot(nodeset[0]);
+
+    nodeset.forEach(n => n.depth = forester.calcDepth(n));
+    return _getSubtree(nodeset);
+
+    function _getSubtree<T extends Forester.phylo>(nodeset: T[]): T {
+      const penultimateMaxDepth = nodeset
+        .map(n => n.depth)
+        .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
+        .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
+
+      // if (penultimateMaxDepth === 0) {
+      //   if (nodeset.length === 1 && nodeset[0].parent) {
+      //     return nodeset[0].parent;
+      //   }
+      //   else {
+      //     return forester.getTreeRoot(nodeset[0]);
+      //   }
+      // }
+
+      const internalNodeset: T[] = nodeset.filter(n => n.depth <= penultimateMaxDepth);
+      nodeset.filter(n => n.depth > penultimateMaxDepth).forEach(n => {
+        const parent = n.parent;
+        if (n.depth > 0 && parent && !~internalNodeset.indexOf(parent)) {
+          parent.depth = n.depth - 1;
+          internalNodeset.push(parent);
+        }
+      })
+
+      if (internalNodeset.length === 1) {
+        return internalNodeset[0];
+      }
+      if (internalNodeset.length === 0) {
+        // shouldn't happen, would require multiple roots of depth 0. 
+        // Return the root identifiable from the first node.
+        return root as unknown as T;
+      }
+      return _getSubtree(internalNodeset);
+    }
   },
 
   searchData: <T extends Forester.phylo>(

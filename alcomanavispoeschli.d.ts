@@ -26,6 +26,8 @@ declare namespace Forester {
         max?: number;
         hide?: boolean;
         id?: string;
+        foresterId: number;
+        depth: number;
     }
 
     interface PhyloEvents {

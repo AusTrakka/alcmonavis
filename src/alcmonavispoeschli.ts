@@ -4334,6 +4334,23 @@ export default class alcmonavispoeschli {
     }
   }
 
+  goToSearch = (searchList: number[] = [0]) => {
+    const milli = performance.now()
+    const foundNodes: Set<Forester.phylo> = new Set();
+    searchList.forEach(list => {
+      switch(list){
+        case 0: this.foundNodes0.forEach(f => foundNodes.add(f));
+        case 1: this.foundNodes1.forEach(f => foundNodes.add(f));
+      }
+    });
+
+    if(foundNodes.size > 0){
+      const subRootNode = forester.getSubtree(Array.from(foundNodes));
+      console.log(`Get Subtree took ${performance.now() - milli}ms `)
+      this.goToSubTree(subRootNode as Alcmonavis.phylo);
+    }
+  }
+
   refresh = () => {
     this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
     this.updateNodeVisualizationsAndLegends(this.root);
