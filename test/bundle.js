@@ -31122,23 +31122,23 @@ class alcmonavispoeschli {
         this.setBack = () => {
             this.backTreeRoots.push(this.root);
             this.forwardTreeRoots.length = 0;
-            this.TriggerHandler("forwardEnable", false);
-            this.TriggerHandler("backwardEnable", true);
+            this.TriggerHandler('forwardEnable', false);
+            this.TriggerHandler('backwardEnable', true);
         };
         this.goForward = () => {
             if (this.forwardTreeRoots.length > 0) {
                 this.backTreeRoots.push(this.root);
                 this.goToSubTree(this.forwardTreeRoots.pop(), false, false);
-                this.TriggerHandler("forwardEnable", this.forwardTreeRoots.length > 0);
-                this.TriggerHandler("backwardEnable", true);
+                this.TriggerHandler('forwardEnable', this.forwardTreeRoots.length > 0);
+                this.TriggerHandler('backwardEnable', true);
             }
         };
         this.goBackward = () => {
             if (this.backTreeRoots.length > 0) {
                 this.forwardTreeRoots.push(this.root);
                 this.goToSubTree(this.backTreeRoots.pop(), false, false);
-                this.TriggerHandler("forwardEnable", true);
-                this.TriggerHandler("backwardEnable", this.backTreeRoots.length > 0);
+                this.TriggerHandler('forwardEnable', true);
+                this.TriggerHandler('backwardEnable', this.backTreeRoots.length > 0);
             }
         };
         this.goToRootTree = (history = true) => {
@@ -31146,6 +31146,7 @@ class alcmonavispoeschli {
                 this.setBack();
             }
             this.root = this.treeData;
+            forester_1.forester.addParents(this.root);
             this.refresh();
         };
         this.goToParent = (history = true) => {
@@ -31158,6 +31159,7 @@ class alcmonavispoeschli {
                 this.setBack();
             }
             this.root = this.superTreeRoots.pop();
+            forester_1.forester.addParents(this.root);
             this.refresh();
         };
         this.goToSubTree = (node, history = true, pushCurrent = true) => {
@@ -31180,7 +31182,7 @@ class alcmonavispoeschli {
                     x: 0,
                     x0: 0,
                     y: 0,
-                    y0: 0
+                    y0: 0,
                 };
                 this.root = fakeNode;
                 if (node._children) {
@@ -31194,10 +31196,12 @@ class alcmonavispoeschli {
         this.goToSearch = (searchList = [0]) => {
             const milli = performance.now();
             const foundNodes = new Set();
-            searchList.forEach(list => {
+            searchList.forEach((list) => {
                 switch (list) {
-                    case 0: this.foundNodes0.forEach(f => foundNodes.add(f));
-                    case 1: this.foundNodes1.forEach(f => foundNodes.add(f));
+                    case 0:
+                        this.foundNodes0.forEach((f) => foundNodes.add(f));
+                    case 1:
+                        this.foundNodes1.forEach((f) => foundNodes.add(f));
                 }
             });
             if (foundNodes.size > 0) {
@@ -31216,8 +31220,8 @@ class alcmonavispoeschli {
             //this.search0();
             this.search1();
             this.zoomToFit();
-            this.TriggerHandler("HasParent", Boolean(this.root.parent && this.root.parent.parent));
-            this.TriggerHandler("AtRoot", this.root === this.treeData);
+            this.TriggerHandler('HasParent', Boolean(this.root.parent && this.root.parent.parent));
+            this.TriggerHandler('AtRoot', this.root === this.treeData);
         };
         this.getClickEventListenerNode = (tree) => {
             if (!OptionsDeclared(this.options))
@@ -31797,10 +31801,11 @@ class alcmonavispoeschli {
                         .style('font-weight', 'bold')
                         .style('text-decoration', 'none')
                         .text((d) => {
-                        if (d.parent && (d.children || d._children)
-                            && self.superTreeRoots.length > 0
-                            && self.root.children
-                            && d === self.root.children[0]) {
+                        if (d.parent &&
+                            (d.children || d._children) &&
+                            self.superTreeRoots.length > 0 &&
+                            self.root.children &&
+                            d === self.root.children[0]) {
                             textSum += textInc;
                             return 'Return to Supertree';
                         }
@@ -31820,10 +31825,11 @@ class alcmonavispoeschli {
                         .style('font-weight', 'bold')
                         .style('text-decoration', 'none')
                         .text((d) => {
-                        if (d.parent && (d.children || d._children)
-                            && self.superTreeRoots.length > 0
-                            && self.root.children
-                            && d === self.root.children[0]) {
+                        if (d.parent &&
+                            (d.children || d._children) &&
+                            self.superTreeRoots.length > 0 &&
+                            self.root.children &&
+                            d === self.root.children[0]) {
                             textSum += textInc;
                             return 'Go to Parent Subtree';
                         }
@@ -34407,6 +34413,13 @@ exports.forester = {
                 exports.forester.addParents(c);
             }
         }
+        if (phy._children) {
+            for (var j = phy._children.length - 1; j >= 0; --j) {
+                var c = phy._children[j];
+                c.parent = phy;
+                exports.forester.addParents(c);
+            }
+        }
     },
     /**
      * Add a foresterId key to every node, with a unique integer value
@@ -34417,7 +34430,7 @@ exports.forester = {
     addForesterIds: (phy) => {
         const root = exports.forester.getTreeRoot(phy);
         let idVal = 0;
-        exports.forester.preOrderTraversalAll(root, (node) => node.foresterId = idVal++);
+        exports.forester.preOrderTraversalAll(root, (node) => (node.foresterId = idVal++));
     },
     /**
      * Returns the real root node of a
@@ -35246,11 +35259,11 @@ exports.forester = {
             return undefined;
         }
         const root = exports.forester.getTreeRoot(nodeset[0]);
-        nodeset.forEach(n => n.depth = exports.forester.calcDepth(n));
+        nodeset.forEach((n) => (n.depth = exports.forester.calcDepth(n)));
         return _getSubtree(nodeset);
         function _getSubtree(nodeset) {
             const penultimateMaxDepth = nodeset
-                .map(n => n.depth)
+                .map((n) => n.depth)
                 .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
                 .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
             // if (penultimateMaxDepth === 0) {
@@ -35261,8 +35274,10 @@ exports.forester = {
             //     return forester.getTreeRoot(nodeset[0]);
             //   }
             // }
-            const internalNodeset = nodeset.filter(n => n.depth <= penultimateMaxDepth);
-            nodeset.filter(n => n.depth > penultimateMaxDepth).forEach(n => {
+            const internalNodeset = nodeset.filter((n) => n.depth <= penultimateMaxDepth);
+            nodeset
+                .filter((n) => n.depth > penultimateMaxDepth)
+                .forEach((n) => {
                 const parent = n.parent;
                 if (n.depth > 0 && parent && !~internalNodeset.indexOf(parent)) {
                     parent.depth = n.depth - 1;
@@ -35273,7 +35288,7 @@ exports.forester = {
                 return internalNodeset[0];
             }
             if (internalNodeset.length === 0) {
-                // shouldn't happen, would require multiple roots of depth 0. 
+                // shouldn't happen, would require multiple roots of depth 0.
                 // Return the root identifiable from the first node.
                 return root;
             }

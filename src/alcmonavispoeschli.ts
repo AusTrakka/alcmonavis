@@ -4295,6 +4295,7 @@ export default class alcmonavispoeschli {
       this.setBack();
     }
     this.root = this.treeData;
+    forester.addParents(this.root);
     this.refresh();
   };
 
@@ -4309,6 +4310,7 @@ export default class alcmonavispoeschli {
       this.setBack();
     }
     this.root = this.superTreeRoots.pop()!;
+    forester.addParents(this.root);
     this.refresh();
   };
 

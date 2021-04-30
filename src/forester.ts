@@ -53,6 +53,13 @@ export const forester = {
         forester.addParents(c);
       }
     }
+    if (phy._children) {
+      for (var j = phy._children.length - 1; j >= 0; --j) {
+        var c = phy._children[j];
+        c.parent = phy;
+        forester.addParents(c);
+      }
+    }
   },
 
   /**
