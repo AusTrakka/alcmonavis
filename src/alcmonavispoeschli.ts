@@ -216,9 +216,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-      this.options.nodeLabelGap +
-      AP.LABEL_SIZE_CALC_ADDITION +
-      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+          this.options.nodeLabelGap +
+          AP.LABEL_SIZE_CALC_ADDITION +
+          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -317,14 +317,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-              ': Ordinal scale mapping for ' +
-              label +
-              ' (' +
-              s +
-              '): domain > range: ' +
-              mappingFn.domain().length +
-              ' > ' +
-              mappingFn.range().length,
+                ': Ordinal scale mapping for ' +
+                label +
+                ' (' +
+                s +
+                '): domain > range: ' +
+                mappingFn.domain().length +
+                ' > ' +
+                mappingFn.range().length,
             );
           }
         }
@@ -3997,10 +3997,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-          ' Grouping species from "' +
-          settings.groupSpecies.source +
-          '" to "' +
-          settings.groupSpecies.target,
+            ' Grouping species from "' +
+            settings.groupSpecies.source +
+            '" to "' +
+            settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -4021,14 +4021,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-          ' Grouping years from "' +
-          settings.groupYears.source +
-          '" to "' +
-          settings.groupYears.target +
-          '", ignoring ' +
-          settings.groupYears.ignore +
-          ', range ' +
-          settings.groupYears.groupsize,
+            ' Grouping years from "' +
+            settings.groupYears.source +
+            '" to "' +
+            settings.groupYears.target +
+            '", ignoring ' +
+            settings.groupYears.ignore +
+            ', range ' +
+            settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4228,11 +4228,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-          ' initial value for collapse depth [' +
-          this.depth_collapse_level +
-          '] is larger than or equal to maximum depth [' +
-          max_depth +
-          ']',
+            ' initial value for collapse depth [' +
+            this.depth_collapse_level +
+            '] is larger than or equal to maximum depth [' +
+            max_depth +
+            ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -4268,61 +4268,70 @@ export default class alcmonavispoeschli {
   setBack = () => {
     this.backTreeRoots.push(this.root);
     this.forwardTreeRoots.length = 0;
-    this.TriggerHandler("forwardEnable", false);
-    this.TriggerHandler("backwardEnable", true);
-  }
+    this.TriggerHandler('forwardEnable', false);
+    this.TriggerHandler('backwardEnable', true);
+  };
 
   goForward = () => {
     if (this.forwardTreeRoots.length > 0) {
       this.backTreeRoots.push(this.root);
       this.goToSubTree(this.forwardTreeRoots.pop()!, false, false);
-      this.TriggerHandler("forwardEnable", this.forwardTreeRoots.length > 0);
-      this.TriggerHandler("backwardEnable", true);
+      this.TriggerHandler('forwardEnable', this.forwardTreeRoots.length > 0);
+      this.TriggerHandler('backwardEnable', true);
     }
-  }
+  };
 
   goBackward = () => {
     if (this.backTreeRoots.length > 0) {
       this.forwardTreeRoots.push(this.root);
       this.goToSubTree(this.backTreeRoots.pop()!, false, false);
-      this.TriggerHandler("forwardEnable", true);
-      this.TriggerHandler("backwardEnable", this.backTreeRoots.length > 0);
+      this.TriggerHandler('forwardEnable', true);
+      this.TriggerHandler('backwardEnable', this.backTreeRoots.length > 0);
     }
-  }
+  };
 
   goToRootTree = (history: boolean = true) => {
-    if (history) { this.setBack(); }
+    if (history) {
+      this.setBack();
+    }
     this.root = this.treeData;
     this.refresh();
-  }
+  };
 
   goToParent = (history: boolean = true) => {
     if (this.currentParentNode) {
       this.goToSubTree(this.currentParentNode, history, false);
     }
-  }
+  };
 
   goToSuperTree = (history: boolean = true) => {
-    if (history) { this.setBack(); }
+    if (history) {
+      this.setBack();
+    }
     this.root = this.superTreeRoots.pop()!;
     this.refresh();
-  }
+  };
 
   goToSubTree = (node: Alcmonavis.phylo, history: boolean = true, pushCurrent: boolean = true) => {
     if (node === this.treeData) {
       this.goToRootTree(history);
-    }
-    else {
-      if (history) { this.setBack(); }
-      if (this.superTreeRoots.slice(-1, 1)[0] === this.root) { this.superTreeRoots.pop(); }
-      if (pushCurrent) { this.superTreeRoots.push(this.root); }
+    } else {
+      if (history) {
+        this.setBack();
+      }
+      if (this.superTreeRoots.slice(-1, 1)[0] === this.root) {
+        this.superTreeRoots.pop();
+      }
+      if (pushCurrent) {
+        this.superTreeRoots.push(this.root);
+      }
       this.currentParentNode = node.parent;
       const fakeNode = {
         children: [node],
         x: 0,
         x0: 0,
         y: 0,
-        y0: 0
+        y0: 0,
       } as Alcmonavis.phylo;
       this.root = fakeNode;
       if (node._children) {
@@ -4332,24 +4341,26 @@ export default class alcmonavispoeschli {
       }
       this.refresh();
     }
-  }
+  };
 
   goToSearch = (searchList: number[] = [0]) => {
-    const milli = performance.now()
+    const milli = performance.now();
     const foundNodes: Set<Forester.phylo> = new Set();
-    searchList.forEach(list => {
-      switch(list){
-        case 0: this.foundNodes0.forEach(f => foundNodes.add(f));
-        case 1: this.foundNodes1.forEach(f => foundNodes.add(f));
+    searchList.forEach((list) => {
+      switch (list) {
+        case 0:
+          this.foundNodes0.forEach((f) => foundNodes.add(f));
+        case 1:
+          this.foundNodes1.forEach((f) => foundNodes.add(f));
       }
     });
 
-    if(foundNodes.size > 0){
+    if (foundNodes.size > 0) {
       const subRootNode = forester.getSubtree(Array.from(foundNodes));
-      console.log(`Get Subtree took ${performance.now() - milli}ms `)
+      console.log(`Get Subtree took ${performance.now() - milli}ms `);
       this.goToSubTree(subRootNode as Alcmonavis.phylo);
     }
-  }
+  };
 
   refresh = () => {
     this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
@@ -4361,9 +4372,9 @@ export default class alcmonavispoeschli {
     //this.search0();
     this.search1();
     this.zoomToFit();
-    this.TriggerHandler("HasParent", Boolean(this.root.parent && this.root.parent.parent));
-    this.TriggerHandler("AtRoot", this.root === this.treeData);
-  }
+    this.TriggerHandler('HasParent', Boolean(this.root.parent && this.root.parent.parent));
+    this.TriggerHandler('AtRoot', this.root === this.treeData);
+  };
 
   getClickEventListenerNode = (tree: Alcmonavis.phylo) => {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
@@ -4983,10 +4994,13 @@ export default class alcmonavispoeschli {
           .style('font-weight', 'bold')
           .style('text-decoration', 'none')
           .text((d: Alcmonavis.phylo) => {
-            if (d.parent && (d.children || d._children)
-              && self.superTreeRoots.length > 0
-              && self.root.children
-              && d === self.root.children[0]) {
+            if (
+              d.parent &&
+              (d.children || d._children) &&
+              self.superTreeRoots.length > 0 &&
+              self.root.children &&
+              d === self.root.children[0]
+            ) {
               textSum += textInc;
               return 'Return to Supertree';
             }
@@ -5010,10 +5024,13 @@ export default class alcmonavispoeschli {
           .style('font-weight', 'bold')
           .style('text-decoration', 'none')
           .text((d: Alcmonavis.phylo) => {
-            if (d.parent && (d.children || d._children)
-              && self.superTreeRoots.length > 0
-              && self.root.children
-              && d === self.root.children[0]) {
+            if (
+              d.parent &&
+              (d.children || d._children) &&
+              self.superTreeRoots.length > 0 &&
+              self.root.children &&
+              d === self.root.children[0]
+            ) {
               textSum += textInc;
               return 'Go to Parent Subtree';
             }
@@ -6649,13 +6666,13 @@ export default class alcmonavispoeschli {
       'legendenabled',
       Boolean(
         this.showLegends &&
-        (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
-          (this.options &&
-            this.options.showNodeVisualizations &&
-            (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-              this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-              this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-              this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
+          (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+            (this.options &&
+              this.options.showNodeVisualizations &&
+              (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+                this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
       ),
     );
 
@@ -6819,7 +6836,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => { };
+  downloadAsPdf = () => {};
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";

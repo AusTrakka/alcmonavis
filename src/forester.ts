@@ -58,13 +58,13 @@ export const forester = {
   /**
    * Add a foresterId key to every node, with a unique integer value
    * preOrderTraversal so expect root, as defined by getTreeRoot(), to get id 0
-   * 
+   *
    * @param phy - A phyloXML-based tree object or node.
    */
   addForesterIds: <T extends Forester.phylo>(phy: T) => {
     const root = forester.getTreeRoot(phy);
     let idVal = 0;
-    forester.preOrderTraversalAll(root, (node) => node.foresterId = idVal++);
+    forester.preOrderTraversalAll(root, (node) => (node.foresterId = idVal++));
   },
 
   /**
@@ -941,14 +941,15 @@ export const forester = {
     }
     const root = forester.getTreeRoot(nodeset[0]);
 
-    nodeset.forEach(n => n.depth = forester.calcDepth(n));
+    nodeset.forEach((n) => (n.depth = forester.calcDepth(n)));
     return _getSubtree(nodeset);
 
     function _getSubtree<T extends Forester.phylo>(nodeset: T[]): T {
-      const penultimateMaxDepth = nodeset
-        .map(n => n.depth)
-        .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
-        .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
+      const penultimateMaxDepth =
+        nodeset
+          .map((n) => n.depth)
+          .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
+          .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
 
       // if (penultimateMaxDepth === 0) {
       //   if (nodeset.length === 1 && nodeset[0].parent) {
@@ -959,22 +960,24 @@ export const forester = {
       //   }
       // }
 
-      const internalNodeset: T[] = nodeset.filter(n => n.depth <= penultimateMaxDepth);
-      nodeset.filter(n => n.depth > penultimateMaxDepth).forEach(n => {
-        const parent = n.parent;
-        if (n.depth > 0 && parent && !~internalNodeset.indexOf(parent)) {
-          parent.depth = n.depth - 1;
-          internalNodeset.push(parent);
-        }
-      })
+      const internalNodeset: T[] = nodeset.filter((n) => n.depth <= penultimateMaxDepth);
+      nodeset
+        .filter((n) => n.depth > penultimateMaxDepth)
+        .forEach((n) => {
+          const parent = n.parent;
+          if (n.depth > 0 && parent && !~internalNodeset.indexOf(parent)) {
+            parent.depth = n.depth - 1;
+            internalNodeset.push(parent);
+          }
+        });
 
       if (internalNodeset.length === 1) {
         return internalNodeset[0];
       }
       if (internalNodeset.length === 0) {
-        // shouldn't happen, would require multiple roots of depth 0. 
+        // shouldn't happen, would require multiple roots of depth 0.
         // Return the root identifiable from the first node.
-        return root as unknown as T;
+        return (root as unknown) as T;
       }
       return _getSubtree(internalNodeset);
     }
