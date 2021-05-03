@@ -33096,11 +33096,13 @@ class alcmonavispoeschli {
         };
         this.updateDepthCollapseDepthDisplay = () => {
             var v = this.obtainDepthCollapseDepthValue();
-            jquery_1.default('#' + AP.DEPTH_COLLAPSE_LABEL).val(' ' + v);
+            //$('#' + AP.DEPTH_COLLAPSE_LABEL).val(' ' + v);
+            this.TriggerHandler("DepthCollapseDisplay", v);
         };
         this.updateBranchLengthCollapseBranchLengthDisplay = () => {
             var v = this.obtainBranchLengthCollapseBranchLengthValue();
-            jquery_1.default('#' + AP.BL_COLLAPSE_LABEL).val(v);
+            //$('#' + AP.BL_COLLAPSE_LABEL).val(v);
+            this.TriggerHandler("BranchLengthDisplay", v);
         };
         this.collapseByFeature = (feature) => {
             this.rank_collapse_level = -1;
@@ -39209,6 +39211,12 @@ const GoToButtons = {
     "root": "#btn-gotoroot",
     "subtree": "#btn-gotosubtree"
 };
+const Collapse = {
+    "down": "#btn-collapsedown",
+    "up": "#btn-collapseup",
+    "label": "#collapsevalue",
+    "uncollapseall": "#btn-uncollapseall",
+};
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
 let count = 0;
 const incrementCount = () => {
@@ -39261,6 +39269,16 @@ function controls(alcmonavis) {
     $("body").on("click", GoToButtons.back, () => {
         alcmonavis.goBackward();
     });
+    //Collapse
+    $("body").on("click", Collapse.down, () => {
+        alcmonavis.decrDepthCollapseLevel();
+    });
+    $("body").on("click", Collapse.up, () => {
+        alcmonavis.incrDepthCollapseLevel();
+    });
+    $("body").on("click", Collapse.uncollapseall, () => {
+        alcmonavis.unCollapseAll(alcmonavis.root);
+    });
     alcmonavis.AddHandler("forwardEnable", (val) => {
         const value = Boolean(val);
         $(GoToButtons.forward).prop("disabled", !value);
@@ -39276,6 +39294,11 @@ function controls(alcmonavis) {
     alcmonavis.AddHandler("AtRoot", (val) => {
         const value = Boolean(val);
         $(GoToButtons.root).prop("disabled", value);
+    });
+    alcmonavis.AddHandler("DepthCollapseDisplay", (val) => {
+        if (val !== undefined) {
+            $(Collapse.label).text(val);
+        }
     });
 }
 

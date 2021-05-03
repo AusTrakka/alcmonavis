@@ -6486,12 +6486,14 @@ export default class alcmonavispoeschli {
 
   updateDepthCollapseDepthDisplay = () => {
     var v = this.obtainDepthCollapseDepthValue();
-    $('#' + AP.DEPTH_COLLAPSE_LABEL).val(' ' + v);
+    //$('#' + AP.DEPTH_COLLAPSE_LABEL).val(' ' + v);
+    this.TriggerHandler("DepthCollapseDisplay", v);
   };
 
   updateBranchLengthCollapseBranchLengthDisplay = () => {
     var v = this.obtainBranchLengthCollapseBranchLengthValue();
-    $('#' + AP.BL_COLLAPSE_LABEL).val(v);
+    //$('#' + AP.BL_COLLAPSE_LABEL).val(v);
+    this.TriggerHandler("BranchLengthDisplay", v);
   };
 
   collapseByFeature = (feature: string) => {

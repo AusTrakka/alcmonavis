@@ -58,6 +58,13 @@ const GoToButtons = {
     "subtree": "#btn-gotosubtree"
 }
 
+const Collapse = {
+    "down": "#btn-collapsedown",
+    "up": "#btn-collapseup",
+    "label": "#collapsevalue",
+    "uncollapseall": "#btn-uncollapseall",
+}
+
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
 let count = 0;
 
@@ -123,6 +130,19 @@ function controls(alcmonavis: AlcmonavisPoeschli){
         alcmonavis.goBackward();
     });
 
+    //Collapse
+    $("body").on("click", Collapse.down, () => {
+        alcmonavis.decrDepthCollapseLevel();
+    });
+
+    $("body").on("click", Collapse.up, () => {
+        alcmonavis.incrDepthCollapseLevel();
+    });
+
+    $("body").on("click", Collapse.uncollapseall, () => {
+        alcmonavis.unCollapseAll(alcmonavis.root);
+    });
+
     alcmonavis.AddHandler("forwardEnable", (val: string | number | boolean | undefined) => {
         const value = Boolean(val);
         $(GoToButtons.forward).prop("disabled", !value);
@@ -141,5 +161,11 @@ function controls(alcmonavis: AlcmonavisPoeschli){
     alcmonavis.AddHandler("AtRoot", (val: string | number | boolean | undefined) => {
         const value = Boolean(val);
         $(GoToButtons.root).prop("disabled", value);
+    });
+
+    alcmonavis.AddHandler("DepthCollapseDisplay", (val: string | number | boolean | undefined) => {
+        if(val !== undefined){
+            $(Collapse.label).text(val);
+        }
     });
 }
