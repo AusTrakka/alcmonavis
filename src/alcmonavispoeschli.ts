@@ -216,9 +216,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-          this.options.nodeLabelGap +
-          AP.LABEL_SIZE_CALC_ADDITION +
-          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+      this.options.nodeLabelGap +
+      AP.LABEL_SIZE_CALC_ADDITION +
+      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -317,14 +317,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-                ': Ordinal scale mapping for ' +
-                label +
-                ' (' +
-                s +
-                '): domain > range: ' +
-                mappingFn.domain().length +
-                ' > ' +
-                mappingFn.range().length,
+              ': Ordinal scale mapping for ' +
+              label +
+              ' (' +
+              s +
+              '): domain > range: ' +
+              mappingFn.domain().length +
+              ' > ' +
+              mappingFn.range().length,
             );
           }
         }
@@ -3997,10 +3997,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-            ' Grouping species from "' +
-            settings.groupSpecies.source +
-            '" to "' +
-            settings.groupSpecies.target,
+          ' Grouping species from "' +
+          settings.groupSpecies.source +
+          '" to "' +
+          settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -4021,14 +4021,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-            ' Grouping years from "' +
-            settings.groupYears.source +
-            '" to "' +
-            settings.groupYears.target +
-            '", ignoring ' +
-            settings.groupYears.ignore +
-            ', range ' +
-            settings.groupYears.groupsize,
+          ' Grouping years from "' +
+          settings.groupYears.source +
+          '" to "' +
+          settings.groupYears.target +
+          '", ignoring ' +
+          settings.groupYears.ignore +
+          ', range ' +
+          settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4228,11 +4228,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-            ' initial value for collapse depth [' +
-            this.depth_collapse_level +
-            '] is larger than or equal to maximum depth [' +
-            max_depth +
-            ']',
+          ' initial value for collapse depth [' +
+          this.depth_collapse_level +
+          '] is larger than or equal to maximum depth [' +
+          max_depth +
+          ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -4296,7 +4296,10 @@ export default class alcmonavispoeschli {
     }
     this.root = this.treeData;
     forester.addParents(this.root);
-    this.refresh();
+    this.depth_collapse_level = this.options?.initialCollapseDepth || -1;
+    forester.collapseToDepth(this.root, this.depth_collapse_level);
+    this.updateDepthCollapseDepthDisplay();
+    this.refresh(false);
   };
 
   goToParent = (history: boolean = true) => {
@@ -4364,12 +4367,14 @@ export default class alcmonavispoeschli {
     }
   };
 
-  refresh = () => {
+  refresh = (resetDepth = true) => {
     this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
     this.updateNodeVisualizationsAndLegends(this.root);
-    this.resetDepthCollapseDepthValue();
-    this.resetRankCollapseRankValue();
-    this.resetBranchLengthCollapseValue();
+    if (resetDepth) {
+      this.resetDepthCollapseDepthValue();
+      this.resetRankCollapseRankValue();
+      this.resetBranchLengthCollapseValue();
+    }
     this.search0Text(this.searchQueries[0]);
     //this.search0();
     this.search1();
@@ -6307,9 +6312,10 @@ export default class alcmonavispoeschli {
     this.branch_length_collapse_level = -1;
     this.resetCollapseByFeature();
     if (this.root && this.treeData && this.external_nodes > 2) {
+      this.unCollapseAll(this.root);
       if (this.depth_collapse_level <= 1) {
         this.depth_collapse_level = forester.calcMaxDepth(this.root);
-        this.unCollapseAll(this.root);
+        // this.unCollapseAll(this.root);
       } else {
         --this.depth_collapse_level;
         forester.collapseToDepth(this.root, this.depth_collapse_level);
@@ -6324,10 +6330,11 @@ export default class alcmonavispoeschli {
     this.resetCollapseByFeature();
     if (this.root && this.treeData && this.external_nodes > 2) {
       var max = forester.calcMaxDepth(this.root);
+      this.unCollapseAll(this.root);
       if (this.depth_collapse_level >= max) {
         this.depth_collapse_level = 1;
       } else {
-        this.unCollapseAll(this.root);
+        // this.unCollapseAll(this.root);
         ++this.depth_collapse_level;
       }
       forester.collapseToDepth(this.root, this.depth_collapse_level);
@@ -6670,13 +6677,13 @@ export default class alcmonavispoeschli {
       'legendenabled',
       Boolean(
         this.showLegends &&
-          (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
-            (this.options &&
-              this.options.showNodeVisualizations &&
-              (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-                this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
+        (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+          (this.options &&
+            this.options.showNodeVisualizations &&
+            (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+              this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+              this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+              this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
       ),
     );
 
@@ -6840,7 +6847,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => {};
+  downloadAsPdf = () => { };
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";

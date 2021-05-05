@@ -951,21 +951,12 @@ export const forester = {
     nodeset.forEach((n) => (n.depth = forester.calcDepth(n)));
     return _getSubtree(nodeset);
 
-    function _getSubtree<T extends Forester.phylo>(nodeset: T[]): T {
+    function _getSubtree(nodeset: T[]): T {
       const penultimateMaxDepth =
         nodeset
           .map((n) => n.depth)
           .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
           .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
-
-      // if (penultimateMaxDepth === 0) {
-      //   if (nodeset.length === 1 && nodeset[0].parent) {
-      //     return nodeset[0].parent;
-      //   }
-      //   else {
-      //     return forester.getTreeRoot(nodeset[0]);
-      //   }
-      // }
 
       const internalNodeset: T[] = nodeset.filter((n) => n.depth <= penultimateMaxDepth);
       nodeset
@@ -984,7 +975,7 @@ export const forester = {
       if (internalNodeset.length === 0) {
         // shouldn't happen, would require multiple roots of depth 0.
         // Return the root identifiable from the first node.
-        return (root as unknown) as T;
+        return root;
       }
       return _getSubtree(internalNodeset);
     }
@@ -1396,8 +1387,29 @@ export const forester = {
     }
   },
 
-  // Unsure if this is an alias of collapseToBranchLength, or if it's supposed to have the opposite functionality
-  collapseToDepth: (root: Forester.phylo, branchLength: number) => forester.collapseToBranchLength(root, branchLength),
+  collapseToDepth: (root: Forester.phylo, depth: number) => {
+    const collapseToDepthHelper = (n: Forester.phylo, d: number, depth: number) => {
+      if (!n.children && !n._children) {
+        return;
+      }
+      if (d >= depth) {
+        forester.collapse(n);
+      }
+      else {
+        forester.unCollapse(n);
+        if (n.children) {
+          ++d;
+          for (var i = n.children.length - 1; i >= 0; i--) {
+            collapseToDepthHelper(n.children[i], d, depth);
+          }
+        }
+      }
+    }
+
+    if (root.children && root.children.length === 1) {
+      collapseToDepthHelper(root.children[0], 0, depth);
+    }
+  },
 
   collapse: (node: Forester.phylo) => {
     if (node.children) {

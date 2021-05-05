@@ -31142,12 +31142,16 @@ class alcmonavispoeschli {
             }
         };
         this.goToRootTree = (history = true) => {
+            var _a;
             if (history) {
                 this.setBack();
             }
             this.root = this.treeData;
             forester_1.forester.addParents(this.root);
-            this.refresh();
+            this.depth_collapse_level = ((_a = this.options) === null || _a === void 0 ? void 0 : _a.initialCollapseDepth) || -1;
+            forester_1.forester.collapseToDepth(this.root, this.depth_collapse_level);
+            this.updateDepthCollapseDepthDisplay();
+            this.refresh(false);
         };
         this.goToParent = (history = true) => {
             if (this.currentParentNode) {
@@ -31210,12 +31214,14 @@ class alcmonavispoeschli {
                 this.goToSubTree(subRootNode);
             }
         };
-        this.refresh = () => {
+        this.refresh = (resetDepth = true) => {
             this.basicTreeProperties = forester_1.forester.collectBasicTreeProperties(this.root);
             this.updateNodeVisualizationsAndLegends(this.root);
-            this.resetDepthCollapseDepthValue();
-            this.resetRankCollapseRankValue();
-            this.resetBranchLengthCollapseValue();
+            if (resetDepth) {
+                this.resetDepthCollapseDepthValue();
+                this.resetRankCollapseRankValue();
+                this.resetBranchLengthCollapseValue();
+            }
             this.search0Text(this.searchQueries[0]);
             //this.search0();
             this.search1();
@@ -32939,9 +32945,10 @@ class alcmonavispoeschli {
             this.branch_length_collapse_level = -1;
             this.resetCollapseByFeature();
             if (this.root && this.treeData && this.external_nodes > 2) {
+                this.unCollapseAll(this.root);
                 if (this.depth_collapse_level <= 1) {
                     this.depth_collapse_level = forester_1.forester.calcMaxDepth(this.root);
-                    this.unCollapseAll(this.root);
+                    // this.unCollapseAll(this.root);
                 }
                 else {
                     --this.depth_collapse_level;
@@ -32956,11 +32963,12 @@ class alcmonavispoeschli {
             this.resetCollapseByFeature();
             if (this.root && this.treeData && this.external_nodes > 2) {
                 var max = forester_1.forester.calcMaxDepth(this.root);
+                this.unCollapseAll(this.root);
                 if (this.depth_collapse_level >= max) {
                     this.depth_collapse_level = 1;
                 }
                 else {
-                    this.unCollapseAll(this.root);
+                    // this.unCollapseAll(this.root);
                     ++this.depth_collapse_level;
                 }
                 forester_1.forester.collapseToDepth(this.root, this.depth_collapse_level);
@@ -35268,14 +35276,6 @@ exports.forester = {
                 .map((n) => n.depth)
                 .filter((d, i, a) => a.slice(0, i).indexOf(d) === -1) // remove duplicates
                 .sort((a, b) => b - a)[1] || 0; // sort descending, grab second value, or 0 if undefined
-            // if (penultimateMaxDepth === 0) {
-            //   if (nodeset.length === 1 && nodeset[0].parent) {
-            //     return nodeset[0].parent;
-            //   }
-            //   else {
-            //     return forester.getTreeRoot(nodeset[0]);
-            //   }
-            // }
             const internalNodeset = nodeset.filter((n) => n.depth <= penultimateMaxDepth);
             nodeset
                 .filter((n) => n.depth > penultimateMaxDepth)
@@ -35664,8 +35664,28 @@ exports.forester = {
             collapseToBranchLengthHelper(root.children[0], branchLength);
         }
     },
-    // Unsure if this is an alias of collapseToBranchLength, or if it's supposed to have the opposite functionality
-    collapseToDepth: (root, branchLength) => exports.forester.collapseToBranchLength(root, branchLength),
+    collapseToDepth: (root, depth) => {
+        const collapseToDepthHelper = (n, d, depth) => {
+            if (!n.children && !n._children) {
+                return;
+            }
+            if (d >= depth) {
+                exports.forester.collapse(n);
+            }
+            else {
+                exports.forester.unCollapse(n);
+                if (n.children) {
+                    ++d;
+                    for (var i = n.children.length - 1; i >= 0; i--) {
+                        collapseToDepthHelper(n.children[i], d, depth);
+                    }
+                }
+            }
+        };
+        if (root.children && root.children.length === 1) {
+            collapseToDepthHelper(root.children[0], 0, depth);
+        }
+    },
     collapse: (node) => {
         if (node.children) {
             node._children = node.children;
