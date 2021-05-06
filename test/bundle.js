@@ -31222,9 +31222,9 @@ class alcmonavispoeschli {
                 this.resetRankCollapseRankValue();
                 this.resetBranchLengthCollapseValue();
             }
-            this.search0Text(this.searchQueries[0]);
+            //this.search0Text(this.searchQueries[0]);
             //this.search0();
-            this.search1();
+            //this.search1();
             this.zoomToFit();
             this.TriggerHandler('HasParent', Boolean(this.root.parent && this.root.parent.parent));
             this.TriggerHandler('AtRoot', this.root === this.treeData);
@@ -32336,6 +32336,7 @@ class alcmonavispoeschli {
         this.searchNodes = (nodes, family = 0, fromroot = false, IDfield = "ID", source = "database", provider = "unknown") => {
             if (nodes.every(n => IDfield in n)) {
                 const foundnodes = new Set();
+                let internal = 0;
                 const addnode = (phy) => {
                     const node = nodes.find(n => n[IDfield] === phy.name);
                     if (node) {
@@ -32350,13 +32351,18 @@ class alcmonavispoeschli {
                                 provider: provider,
                                 source: source
                             });
-                            phy.populated = true;
                         });
+                        phy.populated = true;
+                        if (forester_1.forester.isDescendant(phy, this.root)) {
+                            internal++;
+                        }
                         foundnodes.add(phy);
                     }
                 };
-                forester_1.forester.preOrderTraversal(fromroot ? this.treeData : this.root, addnode);
-                this.TriggerHandler("FoundNodes", { inside: foundnodes.size, outside: nodes.length - foundnodes.size });
+                //forester.preOrderTraversal(fromroot ? this.treeData : this.root, addnode);
+                forester_1.forester.preOrderTraversal(this.treeData, addnode);
+                //this.TriggerHandler("FoundNodes", {inside: foundnodes.size, outside: nodes.length - foundnodes.size});
+                this.TriggerHandler("FoundNodes", { inside: internal, outside: nodes.length - internal });
                 switch (family) {
                     default:
                     case 0:
