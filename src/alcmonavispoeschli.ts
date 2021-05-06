@@ -123,7 +123,7 @@ export default class alcmonavispoeschli {
     }
   };
 
-  RemoveHandler: Alcmonavis.AddHandler = (event: string, handler: (val: any) => void)=> {
+  RemoveHandler: Alcmonavis.AddHandler = (event: string, handler: (val: any) => void) => {
     if (event in this.eventhandlers) {
       if (handler && !!~this.eventhandlers[event].indexOf(handler)) {
         const index = this.eventhandlers[event].indexOf(handler);
@@ -141,7 +141,6 @@ export default class alcmonavispoeschli {
     }
     this.preemptiveHandlers[event] = value;
   };
-
 
   branchLengthScaling = (nodes: Alcmonavis.phylo[], width: number) => {
     const bl = (node: Forester.phylo) => {
@@ -217,9 +216,9 @@ export default class alcmonavispoeschli {
   calcMaxTreeLengthForDisplay = () => {
     return SettingsDeclared(this.settings) && OptionsDeclared(this.options)
       ? this.settings.rootOffset +
-      this.options.nodeLabelGap +
-      AP.LABEL_SIZE_CALC_ADDITION +
-      this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
+          this.options.nodeLabelGap +
+          AP.LABEL_SIZE_CALC_ADDITION +
+          this.maxLabelLength * (this.options.externalNodeFontSize as number) * AP.LABEL_SIZE_CALC_FACTOR
       : 0;
   };
 
@@ -318,14 +317,14 @@ export default class alcmonavispoeschli {
             var s = cladePropertyRef ? cladePropertyRef : field;
             console.log(
               AP.WARNING +
-              ': Ordinal scale mapping for ' +
-              label +
-              ' (' +
-              s +
-              '): domain > range: ' +
-              mappingFn.domain().length +
-              ' > ' +
-              mappingFn.range().length,
+                ': Ordinal scale mapping for ' +
+                label +
+                ' (' +
+                s +
+                '): domain > range: ' +
+                mappingFn.domain().length +
+                ' > ' +
+                mappingFn.range().length,
             );
           }
         }
@@ -3998,10 +3997,10 @@ export default class alcmonavispoeschli {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
           AP.MESSAGE +
-          ' Grouping species from "' +
-          settings.groupSpecies.source +
-          '" to "' +
-          settings.groupSpecies.target,
+            ' Grouping species from "' +
+            settings.groupSpecies.source +
+            '" to "' +
+            settings.groupSpecies.target,
         );
         forester.shortenProperties(
           this.treeData,
@@ -4022,14 +4021,14 @@ export default class alcmonavispoeschli {
       ) {
         console.log(
           AP.MESSAGE +
-          ' Grouping years from "' +
-          settings.groupYears.source +
-          '" to "' +
-          settings.groupYears.target +
-          '", ignoring ' +
-          settings.groupYears.ignore +
-          ', range ' +
-          settings.groupYears.groupsize,
+            ' Grouping years from "' +
+            settings.groupYears.source +
+            '" to "' +
+            settings.groupYears.target +
+            '", ignoring ' +
+            settings.groupYears.ignore +
+            ', range ' +
+            settings.groupYears.groupsize,
         );
         this.groupYears(
           this.treeData,
@@ -4229,11 +4228,11 @@ export default class alcmonavispoeschli {
       if (this.depth_collapse_level >= max_depth) {
         console.log(
           AP.WARNING +
-          ' initial value for collapse depth [' +
-          this.depth_collapse_level +
-          '] is larger than or equal to maximum depth [' +
-          max_depth +
-          ']',
+            ' initial value for collapse depth [' +
+            this.depth_collapse_level +
+            '] is larger than or equal to maximum depth [' +
+            max_depth +
+            ']',
         );
         this.depth_collapse_level = max_depth - 1;
       }
@@ -4559,7 +4558,7 @@ export default class alcmonavispoeschli {
           //dialog.dialog('option', 'modal', true);
           //dialog.dialog('option', 'title', title);
 
-          self.TriggerHandler("DisplayDataModal", {title: title, body: text});
+          self.TriggerHandler('DisplayDataModal', { title: title, body: text });
 
           self.update();
         }
@@ -4685,8 +4684,7 @@ export default class alcmonavispoeschli {
           //dialog.dialog('option', 'modal', true);
           //dialog.dialog('option', 'title', title);
 
-          self.TriggerHandler("DisplayDataModal", {title: title, body: text_all});
-
+          self.TriggerHandler('DisplayDataModal', { title: title, body: text_all });
 
           self.update();
         }
@@ -5603,36 +5601,44 @@ export default class alcmonavispoeschli {
     }
   };
 
-  searchNodes = (nodes: Dict<string>[], family: 0 | 1 = 0, IDfield: string = "ID", source: string = "database", provider: string = "unknown") => {
-    if (nodes.every(n => IDfield in n)) {
+  searchNodes = (
+    nodes: Dict<string>[],
+    family: 0 | 1 = 0,
+    IDfield: string = 'ID',
+    source: string = 'database',
+    provider: string = 'unknown',
+  ) => {
+    if (nodes.every((n) => IDfield in n)) {
       const foundnodes = new Set<Forester.phylo>();
       let internal = 0;
       const addnode = (phy: Forester.phylo) => {
-        const node = nodes.find(n => n[IDfield] === phy.name)
+        const node = nodes.find((n) => n[IDfield] === phy.name);
         if (node) {
           phy.properties = phy.properties || [];
-          const existingProps = phy.properties.map(p => p.ref);
-          Object.keys(node).filter(k => k !== IDfield && !existingProps.includes(k)).forEach(k => {
-            phy.properties!.push({
-              ref: k,
-              value: node[k],
-              datatype: AP.BRANCH_EVENT_DATATYPE,
-              applies_to: "node",
-              provider: provider,
-              source: source
+          const existingProps = phy.properties.map((p) => p.ref);
+          Object.keys(node)
+            .filter((k) => k !== IDfield && !existingProps.includes(k))
+            .forEach((k) => {
+              phy.properties!.push({
+                ref: k,
+                value: node[k],
+                datatype: AP.BRANCH_EVENT_DATATYPE,
+                applies_to: 'node',
+                provider: provider,
+                source: source,
+              });
             });
-          });
           phy.populated = true;
-          if(forester.isDescendant(phy, this.root)){
+          if (forester.isDescendant(phy, this.root)) {
             internal++;
           }
           foundnodes.add(phy);
         }
-      }
+      };
 
       forester.preOrderTraversal(this.treeData, addnode);
 
-      this.TriggerHandler("FoundNodes", {inside: internal, outside: nodes.length - internal});
+      this.TriggerHandler('FoundNodes', { inside: internal, outside: nodes.length - internal });
       switch (family) {
         default:
         case 0:
@@ -5644,21 +5650,21 @@ export default class alcmonavispoeschli {
       }
       this.update(undefined, 0, true);
     }
-  }
+  };
 
   // TODO: rethink this: if going to supertree/root, perhaps these *do* need to be re-searched
   recalcFoundNodes = () => {
-    this.foundNodes0.forEach(v => {
-      if(!forester.isDescendant(v, this.root)) {
+    this.foundNodes0.forEach((v) => {
+      if (!forester.isDescendant(v, this.root)) {
         this.foundNodes0.delete(v);
       }
     });
-    this.foundNodes1.forEach(v => {
-      if(!forester.isDescendant(v, this.root)) {
+    this.foundNodes1.forEach((v) => {
+      if (!forester.isDescendant(v, this.root)) {
         this.foundNodes1.delete(v);
       }
     });
-  }
+  };
 
   search0Text = (query: string) => {
     this.foundNodes0.clear();
@@ -6554,13 +6560,13 @@ export default class alcmonavispoeschli {
   updateDepthCollapseDepthDisplay = () => {
     var v = this.obtainDepthCollapseDepthValue();
     //$('#' + AP.DEPTH_COLLAPSE_LABEL).val(' ' + v);
-    this.TriggerHandler("DepthCollapseDisplay", v);
+    this.TriggerHandler('DepthCollapseDisplay', v);
   };
 
   updateBranchLengthCollapseBranchLengthDisplay = () => {
     var v = this.obtainBranchLengthCollapseBranchLengthValue();
     //$('#' + AP.BL_COLLAPSE_LABEL).val(v);
-    this.TriggerHandler("BranchLengthDisplay", v);
+    this.TriggerHandler('BranchLengthDisplay', v);
   };
 
   collapseByFeature = (feature: string) => {
@@ -6737,13 +6743,13 @@ export default class alcmonavispoeschli {
       'legendenabled',
       Boolean(
         this.showLegends &&
-        (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
-          (this.options &&
-            this.options.showNodeVisualizations &&
-            (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
-              this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
-              this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
-              this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
+          (this.legendColorScales[AP.LEGEND_LABEL_COLOR] ||
+            (this.options &&
+              this.options.showNodeVisualizations &&
+              (this.legendColorScales[AP.LEGEND_NODE_FILL_COLOR] ||
+                this.legendColorScales[AP.LEGEND_NODE_BORDER_COLOR] ||
+                this.legendShapeScales[AP.LEGEND_NODE_SHAPE] ||
+                this.legendSizeScales[AP.LEGEND_NODE_SIZE]))),
       ),
     );
 
@@ -6907,7 +6913,7 @@ export default class alcmonavispoeschli {
     // saveAs(new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: "application/svg+xml" }), this.options.nameForSvgDownload);
   };
 
-  downloadAsPdf = () => { };
+  downloadAsPdf = () => {};
 
   downloadAsPng = () => {
     // if (!OptionsDeclared(this.options)) throw "Options not set";

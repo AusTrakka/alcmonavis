@@ -1411,8 +1411,7 @@ export const forester = {
       }
       if (d >= depth) {
         forester.collapse(n);
-      }
-      else {
+      } else {
         forester.unCollapse(n);
         if (n.children) {
           ++d;
@@ -1421,7 +1420,7 @@ export const forester = {
           }
         }
       }
-    }
+    };
 
     if (root.children && root.children.length === 1) {
       collapseToDepthHelper(root.children[0], 0, depth);
