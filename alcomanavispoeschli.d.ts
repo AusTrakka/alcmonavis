@@ -28,6 +28,7 @@ declare namespace Forester {
         id?: string;
         foresterId: number;
         depth: number;
+        populated: boolean;
     }
 
     interface PhyloEvents {
@@ -334,6 +335,61 @@ declare namespace Alcmonavis {
     }
 
     type Shape = 'square' | 'diamond' | 'triangle-up' | 'triangle-down' | 'circle' | 'cross';
+
+    type TriggerHandler = {
+        // Booleans
+        (event: 'forwardEnable', value: boolean): void;
+        (event: 'backwardEnable', value: boolean): void;
+        (event: 'HasParent', value: boolean): void;
+        (event: 'AtRoot', value: boolean): void;
+        
+        (event: 'showExternalLabels', value: boolean): void;
+        (event: 'showInternalLabels', value: boolean): void;
+        (event: 'showExternalNodes', value: boolean): void;
+        (event: 'showInternalNodes', value: boolean): void;
+        (event: 'searchUsesRegex', value: boolean): void;
+        (event: 'searchIsComplete', value: boolean): void;
+        (event: 'showNodeName', value: boolean): void;
+        (event: 'showNodeVisualizations', value: boolean): void;
+        (event: 'showBranchVisualizations', value: boolean): void;
+        (event: 'showLegend', value: boolean): void;
+        (event: 'legendenabled', value: boolean): void;
+
+        // strings | number
+        (event: 'DepthCollapseDisplay', value: string | number): void;
+        (event: 'BranchLengthDisplay', value: string | number): void;
+
+        // voids
+        (event: 'displayType'): void;
+
+        // object
+        (event: 'DisplayDataModal', value: {title: string, body: string}): void;
+        (event: 'FoundNodes', value: {inside:number, outside: number}): void;
+    }
+
+    type AddHandler = {
+        (event: 'forwardEnable', handler: (val: boolean) => void): void;
+        (event: 'backwardEnable', handler: (val: boolean) => void): void;
+        (event: 'HasParent', handler: (val: boolean) => void): void;
+        (event: 'AtRoot', handler: (val: boolean) => void): void;
+        
+        (event: 'showExternalLabels', handler: (val: boolean) => void): void;
+        (event: 'showInternalLabels', handler: (val: boolean) => void): void;
+        (event: 'showExternalNodes', handler: (val: boolean) => void): void;
+        (event: 'showInternalNodes', handler: (val: boolean) => void): void;
+        (event: 'searchUsesRegex', handler: (val: boolean) => void): void;
+        (event: 'searchIsComplete', handler: (val: boolean) => void): void;
+        (event: 'showNodeName', handler: (val: boolean) => void): void;
+        (event: 'showNodeVisualizations', handler: (val: boolean) => void): void;
+        (event: 'showBranchVisualizations', handler: (val: boolean) => void): void;
+        (event: 'showLegend', handler: (val: boolean) => void): void;
+        (event: 'legendenabled', handler: (val: boolean) => void): void; 
+        (event: 'displayType', handler: () => void): void; 
+
+        (event: 'FoundNodes', handler: (val: {inside:number, outside: number}) => void): void;
+        (event: 'DepthCollapseDisplay', handler: (val: string) => void): void;
+        (event: 'DisplayDataModal', handler: (val: {title: string, body: string}) => void): void;
+    }
 }
 
 type voidFn<T> = (_: T) => void;

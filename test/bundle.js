@@ -31373,8 +31373,8 @@ class alcmonavispoeschli {
                         if (n.children || n._children) {
                             text += 'Number of External Nodes: ' + forester_1.forester.calcSumOfAllExternalDescendants(n) + '<br>';
                         }
-                        jquery_1.default('#' + AP.NODE_DATA).dialog('destroy');
-                        jquery_1.default("<div id='" + AP.NODE_DATA + "'>" + text + '</div>').dialog();
+                        //$('#' + AP.NODE_DATA).dialog('destroy');
+                        //$("<div id='" + AP.NODE_DATA + "'>" + text + '</div>').dialog();
                         var dialog = jquery_1.default('#' + AP.NODE_DATA);
                         var fs = ((self.settings && self.settings.controlsFontSize) || 0 + 4).toString() + 'px';
                         jquery_1.default('.ui-dialog').css({
@@ -31402,8 +31402,9 @@ class alcmonavispoeschli {
                             'font-weight': 'bold',
                             'text-decoration': 'none',
                         });
-                        dialog.dialog('option', 'modal', true);
-                        dialog.dialog('option', 'title', title);
+                        //dialog.dialog('option', 'modal', true);
+                        //dialog.dialog('option', 'title', title);
+                        self.TriggerHandler("DisplayDataModal", { title: title, body: text });
                         self.update();
                     }
                     function listExternalNodeData(node) {
@@ -31488,8 +31489,8 @@ class alcmonavispoeschli {
                                 text_all += text + '<br>';
                             }
                         }
-                        jquery_1.default('#' + AP.NODE_DATA).dialog('destroy');
-                        jquery_1.default("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
+                        //$('#' + AP.NODE_DATA).dialog('destroy');
+                        //$("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
                         var dialog = jquery_1.default('#' + AP.NODE_DATA);
                         var fs = (+settings.controlsFontSize + 2).toString() + 'px';
                         jquery_1.default('.ui-dialog').css({
@@ -31515,8 +31516,9 @@ class alcmonavispoeschli {
                             'font-weight': 'bold',
                             'text-decoration': 'none',
                         });
-                        dialog.dialog('option', 'modal', true);
-                        dialog.dialog('option', 'title', title);
+                        //dialog.dialog('option', 'modal', true);
+                        //dialog.dialog('option', 'title', title);
+                        self.TriggerHandler("DisplayDataModal", { title: title, body: text_all });
                         self.update();
                     }
                     // BM ??
@@ -32331,6 +32333,55 @@ class alcmonavispoeschli {
                 this.search1();
             }
         };
+        this.searchNodes = (nodes, family = 0, fromroot = false, IDfield = "ID", source = "database", provider = "unknown") => {
+            if (nodes.every(n => IDfield in n)) {
+                const foundnodes = new Set();
+                const addnode = (phy) => {
+                    const node = nodes.find(n => n[IDfield] === phy.name);
+                    if (node) {
+                        phy.properties = phy.properties || [];
+                        const existingProps = phy.properties.map(p => p.ref);
+                        Object.keys(node).filter(k => k !== IDfield && !existingProps.includes(k)).forEach(k => {
+                            phy.properties.push({
+                                ref: k,
+                                value: node[k],
+                                datatype: AP.BRANCH_EVENT_DATATYPE,
+                                applies_to: "node",
+                                provider: provider,
+                                source: source
+                            });
+                            phy.populated = true;
+                        });
+                        foundnodes.add(phy);
+                    }
+                };
+                forester_1.forester.preOrderTraversal(fromroot ? this.treeData : this.root, addnode);
+                this.TriggerHandler("FoundNodes", { inside: foundnodes.size, outside: nodes.length - foundnodes.size });
+                switch (family) {
+                    default:
+                    case 0:
+                        this.foundNodes0 = foundnodes;
+                        break;
+                    case 1:
+                        this.foundNodes1 = foundnodes;
+                        break;
+                }
+                this.update(undefined, 0, true);
+            }
+        };
+        // TODO: rethink this: if going to supertree/root, perhaps these *do* need to be re-searched
+        this.recalcFoundNodes = () => {
+            this.foundNodes0.forEach(v => {
+                if (!forester_1.forester.isDescendant(v, this.root)) {
+                    this.foundNodes0.delete(v);
+                }
+            });
+            this.foundNodes1.forEach(v => {
+                if (!forester_1.forester.isDescendant(v, this.root)) {
+                    this.foundNodes1.delete(v);
+                }
+            });
+        };
         this.search0Text = (query) => {
             this.foundNodes0.clear();
             this.searchBox0Empty = true;
@@ -32520,7 +32571,7 @@ class alcmonavispoeschli {
                 this.options.showInternalNodes = true;
                 this.options.showExternalNodes = true;
                 this.TriggerHandler('showInternalNodes', this.options.showInternalNodes);
-                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels);
+                this.TriggerHandler('showExternalLabels', this.options.showExternalLabels || false);
             }
             this.update(undefined, 0, true);
         };
@@ -32779,7 +32830,7 @@ class alcmonavispoeschli {
                         //alcmonavis.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
                     }
                     this.options.showNodeVisualizations = true;
-                    this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes);
+                    this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes || false);
                     // alcmonavis.setCheckboxValue(AP.NODE_VIS_CB, true);
                     this.currentNodeFillColorVisualization = value;
                     if (this.visualizations &&
@@ -32792,9 +32843,9 @@ class alcmonavispoeschli {
                     this.options.showExternalNodes = true;
                     this.options.showInternalNodes = true;
                     this.options.showNodeVisualizations = true;
-                    this.TriggerHandler('showExternalNodes', this.options.showNodeName);
-                    this.TriggerHandler('showInternalNodes', this.options.showExternalLabels);
-                    this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels);
+                    this.TriggerHandler('showExternalNodes', this.options.showNodeName || false);
+                    this.TriggerHandler('showInternalNodes', this.options.showExternalLabels || false);
+                    this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels || false);
                 }
             }
             else {
@@ -32837,7 +32888,7 @@ class alcmonavispoeschli {
                     !this.options.showInternalNodes &&
                     this.currentNodeShapeVisualization == null) {
                     this.options.showExternalNodes = true;
-                    this.TriggerHandler('showExternalNodes', this.options.showNodeName);
+                    this.TriggerHandler('showExternalNodes', this.options.showNodeName || false);
                 }
                 this.options.showNodeVisualizations = true;
                 this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);
@@ -34858,6 +34909,22 @@ exports.forester = {
             n1 = n1.parent;
         }
         return d;
+    },
+    /**
+     * Calculates whether n1 is a descendant of n2
+     *
+     * @param n1 a descendant of n2
+     * @param n2
+     * @returns {boolean}
+     */
+    isDescendant: (n1, n2) => {
+        while (n1 !== n2) {
+            if (!n1.parent) {
+                return false;
+            }
+            n1 = n1.parent;
+        }
+        return true;
     },
     removeChildNode: (parentNode, i) => {
         if (!parentNode.children) {
@@ -39174,12 +39241,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jquery_1 = __importDefault(require("jquery"));
 const alcmonavispoeschli_1 = __importStar(require("../src/alcmonavispoeschli"));
+;
 const $ = jquery_1.default;
 let alcmonavis;
 const settings = {
@@ -39189,8 +39266,17 @@ const options = {
     backgroundColorDefault: "#FFFFFF",
     initialCollapseDepth: 1
 };
-const loc = "http://localhost:1337/api/newick/2021-02-10";
+const host = "http://localhost:1337/";
+const newick = "api/newick/";
+const metadata = "api/metadata/";
+// const tree = "2021-02-10";
+const tree = "test1";
+const version = undefined;
 $($ => {
+    let loc = host + newick + tree;
+    if (version) {
+        loc += `?version=${version}`;
+    }
     $.get(loc, (data) => {
         var tree = null;
         try {
@@ -39211,6 +39297,19 @@ $($ => {
         }
     }, "text")
         .fail(() => alert("error: failed to read tree(s) from \"" + loc + "\""));
+});
+const RunMetadataSearch = (searchstring, family = 0) => __awaiter(void 0, void 0, void 0, function* () {
+    let loc = host + metadata + tree;
+    if (version) {
+        loc += `?version=${version}&keyword=${searchstring}`;
+    }
+    else {
+        loc += `?keyword=${searchstring}`;
+    }
+    const nodes = yield Promise.resolve($.ajax({ url: loc, method: "get" }));
+    console.log(nodes);
+    alcmonavis.searchNodes(nodes, family);
+    $(GoToButtons.subtree).prop("disabled", false);
 });
 const ZoomButtons = {
     "up": "#btn-zoom-up",
@@ -39237,21 +39336,38 @@ const Collapse = {
     "label": "#collapsevalue",
     "uncollapseall": "#btn-uncollapseall",
 };
+const MetadataSearch = {
+    "input": "#metadataSearchBox",
+    "button": "#btn-do-metadatasearch",
+    "switch": "#search-family",
+    "label": "#search-family + label",
+    "found": "#metadata-search-foundnodes"
+};
+const DisplayData = {
+    "modal": "#display-data-modal",
+    "title": "#display-data-label",
+    "body": "#display-data-body"
+};
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
 let count = 0;
+let family = 0;
 const incrementCount = () => {
     count++;
     $(Search.label).text(Alphabet[count]);
+};
+const switchfamily = () => {
+    family != family;
+    $(MetadataSearch.label).text(Alphabet[family]);
 };
 function controls(alcmonavis) {
     // Zoom
     let intervalId;
     $("body").on("mousedown", ZoomButtons.up, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomInY();
         intervalId = setInterval(alcmonavis.zoomInY, 200);
     }).on("mouseup mouseleave", ZoomButtons.up, () => window.clearInterval(intervalId));
     $("body").on("mousedown", ZoomButtons.down, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomOutY();
         intervalId = setInterval(alcmonavis.zoomOutY, 200);
     }).on("mouseup mouseleave", ZoomButtons.down, () => window.clearInterval(intervalId));
     $("body").on("mousedown", ZoomButtons.left, () => {
@@ -39259,7 +39375,7 @@ function controls(alcmonavis) {
         intervalId = setInterval(alcmonavis.zoomInX, 200);
     }).on("mouseup mouseleave", ZoomButtons.left, () => window.clearInterval(intervalId));
     $("body").on("mousedown", ZoomButtons.right, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomOutX();
         intervalId = setInterval(alcmonavis.zoomOutX, 200);
     }).on("mouseup mouseleave", ZoomButtons.right, () => window.clearInterval(intervalId));
     $("body").on("click", ZoomButtons.recentre, alcmonavis.zoomToFit);
@@ -39299,26 +39415,47 @@ function controls(alcmonavis) {
     $("body").on("click", Collapse.uncollapseall, () => {
         alcmonavis.unCollapseAll(alcmonavis.root);
     });
-    alcmonavis.AddHandler("forwardEnable", (val) => {
-        const value = Boolean(val);
-        $(GoToButtons.forward).prop("disabled", !value);
+    //MetadataSearch
+    $("body").on("click", MetadataSearch.button, () => __awaiter(this, void 0, void 0, function* () {
+        const searchstring = $(MetadataSearch.input).val();
+        if (searchstring && typeof (searchstring) == "string") {
+            console.log(`Searching keyword '${searchstring}'`);
+            const searchTimer = performance.now();
+            yield RunMetadataSearch(searchstring, family);
+            console.log(`Finished search in ${performance.now() - searchTimer}ms`);
+            switchfamily();
+        }
+    }));
+    $("body").on("change", MetadataSearch.switch, () => {
+        family = $(MetadataSearch.switch).is(":checked") ? 1 : 0;
+        $(MetadataSearch.label).text(Alphabet[family]);
     });
-    alcmonavis.AddHandler("backwardEnable", (val) => {
-        const value = Boolean(val);
-        $(GoToButtons.back).prop("disabled", !value);
+    alcmonavis.AddHandler("forwardEnable", val => {
+        $(GoToButtons.forward).prop("disabled", !val);
     });
-    alcmonavis.AddHandler("HasParent", (val) => {
-        const value = Boolean(val);
-        $(GoToButtons.parent).prop("disabled", value);
+    alcmonavis.AddHandler("backwardEnable", val => {
+        $(GoToButtons.back).prop("disabled", !val);
     });
-    alcmonavis.AddHandler("AtRoot", (val) => {
-        const value = Boolean(val);
-        $(GoToButtons.root).prop("disabled", value);
+    alcmonavis.AddHandler("HasParent", val => {
+        $(GoToButtons.parent).prop("disabled", val);
     });
-    alcmonavis.AddHandler("DepthCollapseDisplay", (val) => {
+    alcmonavis.AddHandler("AtRoot", val => {
+        $(GoToButtons.root).prop("disabled", val);
+    });
+    alcmonavis.AddHandler("DepthCollapseDisplay", val => {
         if (val !== undefined) {
             $(Collapse.label).text(val);
         }
+    });
+    alcmonavis.AddHandler("DisplayDataModal", val => {
+        $(DisplayData.title).text(val.title);
+        $(DisplayData.body).html(val.body);
+        window.$(DisplayData.modal).modal("show");
+    });
+    alcmonavis.AddHandler("FoundNodes", val => {
+        const text = `Showing ${val.inside} nodes, ${val.outside} nodes outside current view`;
+        console.log(text);
+        $(MetadataSearch.found).text(text);
     });
 }
 

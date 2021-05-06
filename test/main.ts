@@ -1,6 +1,9 @@
-import jQuery, { type } from "jquery"
+import jQuery, { valHooks } from "jquery"
 import { Alcmonavis } from "../alcomanavispoeschli";
 import AlcmonavisPoeschli, { parseTree } from "../src/alcmonavispoeschli";
+interface Dict<T> {
+    [k: string]: T
+};
 
 const $ = jQuery;
 let alcmonavis: AlcmonavisPoeschli;
@@ -8,12 +11,23 @@ let alcmonavis: AlcmonavisPoeschli;
 const settings: Alcmonavis.Settings = {
     enableNodeVisualizations: true
 };
-const options:Alcmonavis.Options = {
+const options: Alcmonavis.Options = {
     backgroundColorDefault: "#FFFFFF",
     initialCollapseDepth: 1
 };
-const loc = "http://localhost:1337/api/newick/2021-02-10";
+const host = "http://localhost:1337/";
+const newick = "api/newick/";
+const metadata = "api/metadata/";
+
+// const tree = "2021-02-10";
+const tree = "test1";
+const version = undefined;
+
 $($ => {
+    let loc = host + newick + tree;
+    if (version) {
+        loc += `?version=${version}`;
+    }
     $.get(loc, (data: string) => {
         var tree = null;
         try {
@@ -33,8 +47,24 @@ $($ => {
             }
         }
     }, "text")
-    .fail(() => alert("error: failed to read tree(s) from \"" + loc + "\""));
+        .fail(() => alert("error: failed to read tree(s) from \"" + loc + "\""));
 });
+
+const RunMetadataSearch = async (searchstring: string, family: 0 | 1 = 0) => {
+    let loc = host + metadata + tree;
+    if (version) {
+        loc += `?version=${version}&keyword=${searchstring}`;
+    }
+    else {
+        loc += `?keyword=${searchstring}`;
+    }
+
+    const nodes = await Promise.resolve<Dict<string>[]>($.ajax({ url: loc, method: "get" }));
+
+    console.log(nodes);
+    alcmonavis.searchNodes(nodes, family);
+    $(GoToButtons.subtree).prop("disabled", false);
+}
 
 const ZoomButtons = {
     "up": "#btn-zoom-up",
@@ -65,24 +95,45 @@ const Collapse = {
     "uncollapseall": "#btn-uncollapseall",
 }
 
+const MetadataSearch = {
+    "input": "#metadataSearchBox",
+    "button": "#btn-do-metadatasearch",
+    "switch": "#search-family",
+    "label": "#search-family + label",
+    "found": "#metadata-search-foundnodes"
+}
+
+const DisplayData = {
+    "modal": "#display-data-modal",
+    "title": "#display-data-label",
+    "body": "#display-data-body"
+}
+
 const Alphabet = "ABCDEFGHIJKLMONPQRSTUVWXYZ".split("");
 let count = 0;
+
+let family: 0 | 1 = 0;
 
 const incrementCount = () => {
     count++;
     $(Search.label).text(Alphabet[count])
 }
 
-function controls(alcmonavis: AlcmonavisPoeschli){
+const switchfamily = () => {
+    family != family;
+    $(MetadataSearch.label).text(Alphabet[family]);
+}
+
+function controls(alcmonavis: AlcmonavisPoeschli) {
     // Zoom
     let intervalId: number;
     $("body").on("mousedown", ZoomButtons.up, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomInY();
         intervalId = setInterval(alcmonavis.zoomInY, 200)
     }).on("mouseup mouseleave", ZoomButtons.up, () => window.clearInterval(intervalId));
 
     $("body").on("mousedown", ZoomButtons.down, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomOutY();
         intervalId = setInterval(alcmonavis.zoomOutY, 200)
     }).on("mouseup mouseleave", ZoomButtons.down, () => window.clearInterval(intervalId));
 
@@ -92,7 +143,7 @@ function controls(alcmonavis: AlcmonavisPoeschli){
     }).on("mouseup mouseleave", ZoomButtons.left, () => window.clearInterval(intervalId));
 
     $("body").on("mousedown", ZoomButtons.right, () => {
-        alcmonavis.zoomInX();
+        alcmonavis.zoomOutX();
         intervalId = setInterval(alcmonavis.zoomOutX, 200)
     }).on("mouseup mouseleave", ZoomButtons.right, () => window.clearInterval(intervalId));
 
@@ -101,7 +152,7 @@ function controls(alcmonavis: AlcmonavisPoeschli){
     //Search
     $("body").on("click", Search.button, () => {
         const searchstring = $(Search.input).val();
-        if(searchstring && typeof(searchstring) == "string") {
+        if (searchstring && typeof (searchstring) == "string") {
             alcmonavis.search0Text(searchstring);
             incrementCount();
             $(GoToButtons.subtree).prop("disabled", false);
@@ -143,29 +194,54 @@ function controls(alcmonavis: AlcmonavisPoeschli){
         alcmonavis.unCollapseAll(alcmonavis.root);
     });
 
-    alcmonavis.AddHandler("forwardEnable", (val: string | number | boolean | undefined) => {
-        const value = Boolean(val);
-        $(GoToButtons.forward).prop("disabled", !value);
+    //MetadataSearch
+    $("body").on("click", MetadataSearch.button, async () => {
+        const searchstring = $(MetadataSearch.input).val();
+        if (searchstring && typeof (searchstring) == "string") {
+            console.log(`Searching keyword '${searchstring}'`);
+            const searchTimer = performance.now();
+            await RunMetadataSearch(searchstring, family);
+            console.log(`Finished search in ${performance.now() - searchTimer}ms`);
+            switchfamily();
+        }
     });
 
-    alcmonavis.AddHandler("backwardEnable", (val: string | number | boolean | undefined) => {
-        const value = Boolean(val);
-        $(GoToButtons.back).prop("disabled", !value);
+    $("body").on("change", MetadataSearch.switch, () => {
+        family = $(MetadataSearch.switch).is(":checked") ? 1 : 0;
+        $(MetadataSearch.label).text(Alphabet[family]);
     });
 
-    alcmonavis.AddHandler("HasParent", (val: string | number | boolean | undefined) => {
-        const value = Boolean(val);
-        $(GoToButtons.parent).prop("disabled", value);
+    alcmonavis.AddHandler("forwardEnable", val => {
+        $(GoToButtons.forward).prop("disabled", !val);
     });
 
-    alcmonavis.AddHandler("AtRoot", (val: string | number | boolean | undefined) => {
-        const value = Boolean(val);
-        $(GoToButtons.root).prop("disabled", value);
+    alcmonavis.AddHandler("backwardEnable", val => {
+        $(GoToButtons.back).prop("disabled", !val);
     });
 
-    alcmonavis.AddHandler("DepthCollapseDisplay", (val: string | number | boolean | undefined) => {
-        if(val !== undefined){
+    alcmonavis.AddHandler("HasParent", val => {
+        $(GoToButtons.parent).prop("disabled", val);
+    });
+
+    alcmonavis.AddHandler("AtRoot", val => {
+        $(GoToButtons.root).prop("disabled", val);
+    });
+
+    alcmonavis.AddHandler("DepthCollapseDisplay", val => {
+        if (val !== undefined) {
             $(Collapse.label).text(val);
         }
+    });
+
+    alcmonavis.AddHandler("DisplayDataModal", val => {
+        $(DisplayData.title).text(val.title);
+        $(DisplayData.body).html(val.body);
+        (window as any).$(DisplayData.modal).modal("show");
+    });
+
+    alcmonavis.AddHandler("FoundNodes", val => {
+        const text = `Showing ${val.inside} nodes, ${val.outside} nodes outside current view`;
+        console.log(text);
+        $(MetadataSearch.found).text(text);
     });
 }

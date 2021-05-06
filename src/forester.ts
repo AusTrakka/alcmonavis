@@ -503,6 +503,23 @@ export const forester = {
     return d;
   },
 
+  /**
+   * Calculates whether n1 is a descendant of n2
+   *
+   * @param n1 a descendant of n2
+   * @param n2
+   * @returns {boolean}
+   */
+  isDescendant: (n1: Forester.phylo, n2: Forester.phylo): boolean => {
+    while (n1 !== n2) {
+      if (!n1.parent) {
+        return false;
+      }
+      n1 = n1.parent;
+    }
+    return true;
+  },
+
   removeChildNode: (parentNode: Forester.phylo, i: number) => {
     if (!parentNode.children) {
       throw 'cannot remove the child node for a external node';

@@ -84,7 +84,7 @@ export default class alcmonavispoeschli {
   visualizations2_property_applies_to!: string;
   visualizations3_property_applies_to!: string;
 
-  eventhandlers: Dict<((val?: string | number | boolean) => void)[]> = {};
+  eventhandlers: Dict<((val: any) => void)[]> = {};
   preemptiveHandlers: Dict<string | number | boolean | undefined> = {};
 
   constructor(
@@ -112,7 +112,7 @@ export default class alcmonavispoeschli {
     this.launch(id, phylo, options, settings, nodeVisualizations, specialVisualizations);
   }
 
-  AddHandler = (event: string, handler: (val?: string | number | boolean) => void) => {
+  AddHandler: Alcmonavis.AddHandler = (event: string, handler: (val: any) => void) => {
     if (!(event in this.eventhandlers)) {
       this.eventhandlers[event] = [handler];
     } else if (!~this.eventhandlers[event].indexOf(handler)) {
@@ -135,12 +135,13 @@ export default class alcmonavispoeschli {
     delete this.preemptiveHandlers[event];
   };
 
-  TriggerHandler = (event: string, value?: string | number | boolean) => {
+  TriggerHandler: Alcmonavis.TriggerHandler = (event: any, value?: any) => {
     if (event in this.eventhandlers) {
       this.eventhandlers[event].forEach((h) => h(value));
     }
     this.preemptiveHandlers[event] = value;
   };
+
 
   branchLengthScaling = (nodes: Alcmonavis.phylo[], width: number) => {
     const bl = (node: Forester.phylo) => {
@@ -4524,9 +4525,9 @@ export default class alcmonavispoeschli {
             text += 'Number of External Nodes: ' + forester.calcSumOfAllExternalDescendants(n) + '<br>';
           }
 
-          $('#' + AP.NODE_DATA).dialog('destroy');
+          //$('#' + AP.NODE_DATA).dialog('destroy');
 
-          $("<div id='" + AP.NODE_DATA + "'>" + text + '</div>').dialog();
+          //$("<div id='" + AP.NODE_DATA + "'>" + text + '</div>').dialog();
           var dialog = $('#' + AP.NODE_DATA);
 
           var fs = ((self.settings && self.settings.controlsFontSize) || 0 + 4).toString() + 'px';
@@ -4558,8 +4559,10 @@ export default class alcmonavispoeschli {
             'text-decoration': 'none',
           });
 
-          dialog.dialog('option', 'modal', true);
-          dialog.dialog('option', 'title', title);
+          //dialog.dialog('option', 'modal', true);
+          //dialog.dialog('option', 'title', title);
+
+          self.TriggerHandler("DisplayDataModal", {title: title, body: text});
 
           self.update();
         }
@@ -4648,9 +4651,9 @@ export default class alcmonavispoeschli {
             }
           }
 
-          $('#' + AP.NODE_DATA).dialog('destroy');
+          //$('#' + AP.NODE_DATA).dialog('destroy');
 
-          $("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
+          //$("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
           var dialog = $('#' + AP.NODE_DATA);
 
           var fs = (+settings.controlsFontSize + 2).toString() + 'px';
@@ -4682,8 +4685,11 @@ export default class alcmonavispoeschli {
             'text-decoration': 'none',
           });
 
-          dialog.dialog('option', 'modal', true);
-          dialog.dialog('option', 'title', title);
+          //dialog.dialog('option', 'modal', true);
+          //dialog.dialog('option', 'title', title);
+
+          self.TriggerHandler("DisplayDataModal", {title: title, body: text_all});
+
 
           self.update();
         }
@@ -5600,6 +5606,59 @@ export default class alcmonavispoeschli {
     }
   };
 
+  searchNodes = (nodes: Dict<string>[], family: 0 | 1 = 0, fromroot: boolean = false, IDfield: string = "ID", source: string = "database", provider: string = "unknown") => {
+    if (nodes.every(n => IDfield in n)) {
+      const foundnodes = new Set<Forester.phylo>();
+      const addnode = (phy: Forester.phylo) => {
+        const node = nodes.find(n => n[IDfield] === phy.name)
+        if (node) {
+          phy.properties = phy.properties || [];
+          const existingProps = phy.properties.map(p => p.ref);
+          Object.keys(node).filter(k => k !== IDfield && !existingProps.includes(k)).forEach(k => {
+            phy.properties!.push({
+              ref: k,
+              value: node[k],
+              datatype: AP.BRANCH_EVENT_DATATYPE,
+              applies_to: "node",
+              provider: provider,
+              source: source
+            });
+            phy.populated = true;
+          })
+          foundnodes.add(phy);
+        }
+      }
+
+      forester.preOrderTraversal(fromroot ? this.treeData : this.root, addnode);
+
+      this.TriggerHandler("FoundNodes", {inside: foundnodes.size, outside: nodes.length - foundnodes.size});
+      switch (family) {
+        default:
+        case 0:
+          this.foundNodes0 = foundnodes;
+          break;
+        case 1:
+          this.foundNodes1 = foundnodes;
+          break;
+      }
+      this.update(undefined, 0, true);
+    }
+  }
+
+  // TODO: rethink this: if going to supertree/root, perhaps these *do* need to be re-searched
+  recalcFoundNodes = () => {
+    this.foundNodes0.forEach(v => {
+      if(!forester.isDescendant(v, this.root)) {
+        this.foundNodes0.delete(v);
+      }
+    });
+    this.foundNodes1.forEach(v => {
+      if(!forester.isDescendant(v, this.root)) {
+        this.foundNodes1.delete(v);
+      }
+    });
+  }
+
   search0Text = (query: string) => {
     this.foundNodes0.clear();
     this.searchBox0Empty = true;
@@ -5826,7 +5885,7 @@ export default class alcmonavispoeschli {
       this.options!.showInternalNodes = true;
       this.options!.showExternalNodes = true;
       this.TriggerHandler('showInternalNodes', this.options!.showInternalNodes);
-      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels);
+      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels || false);
     }
     this.update(undefined, 0, true);
   };
@@ -6129,7 +6188,7 @@ export default class alcmonavispoeschli {
           //alcmonavis.setCheckboxValue(AP.EXTERNAL_NODES_CB, true);
         }
         this.options.showNodeVisualizations = true;
-        this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes);
+        this.TriggerHandler('showNodeVisualizations', this.options.showExternalNodes || false);
         // alcmonavis.setCheckboxValue(AP.NODE_VIS_CB, true);
         this.currentNodeFillColorVisualization = value;
         if (
@@ -6146,9 +6205,9 @@ export default class alcmonavispoeschli {
         this.options.showExternalNodes = true;
         this.options.showInternalNodes = true;
         this.options.showNodeVisualizations = true;
-        this.TriggerHandler('showExternalNodes', this.options.showNodeName);
-        this.TriggerHandler('showInternalNodes', this.options.showExternalLabels);
-        this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels);
+        this.TriggerHandler('showExternalNodes', this.options.showNodeName || false);
+        this.TriggerHandler('showInternalNodes', this.options.showExternalLabels || false);
+        this.TriggerHandler('showNodeVisualizations', this.options.showInternalLabels || false);
       }
     } else {
       this.currentNodeFillColorVisualization = null;
@@ -6198,7 +6257,7 @@ export default class alcmonavispoeschli {
         this.currentNodeShapeVisualization == null
       ) {
         this.options.showExternalNodes = true;
-        this.TriggerHandler('showExternalNodes', this.options.showNodeName);
+        this.TriggerHandler('showExternalNodes', this.options.showNodeName || false);
       }
       this.options.showNodeVisualizations = true;
       this.TriggerHandler('showNodeVisualizations', this.options.showNodeVisualizations);

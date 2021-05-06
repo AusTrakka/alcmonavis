@@ -42,6 +42,7 @@
     "jquery-ui": "^1.12.1"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.0.13",
     "@types/d3": "^3.5.34",
     "@types/jest": "^26.0.22",
     "@types/jquery": "^3.5.5",
