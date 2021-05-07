@@ -5636,7 +5636,7 @@ export default class alcmonavispoeschli {
         }
       };
 
-      forester.preOrderTraversal(this.treeData, addnode);
+      forester.preOrderTraversalAll(this.treeData, addnode);
 
       this.TriggerHandler('FoundNodes', { inside: internal, outside: nodes.length - internal });
       switch (family) {
