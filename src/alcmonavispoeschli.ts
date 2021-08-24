@@ -4781,9 +4781,9 @@ export default class alcmonavispoeschli {
             }
           }
 
-          $('#' + AP.NODE_DATA).dialog('destroy');
+          //$('#' + AP.NODE_DATA).dialog('destroy');
 
-          $("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
+          //$("<div id='" + AP.NODE_DATA + "'>" + text_all + '</div>').dialog();
           var dialog = $('#' + AP.NODE_DATA);
 
           var fs = (+settings.controlsFontSize + 2).toString() + 'px';
@@ -4815,8 +4815,8 @@ export default class alcmonavispoeschli {
             'text-decoration': 'none',
           });
 
-          dialog.dialog('option', 'modal', true);
-          dialog.dialog('option', 'title', title);
+          //dialog.dialog('option', 'modal', true);
+          //dialog.dialog('option', 'title', title);
 
           self.update();
         }
@@ -5876,48 +5876,48 @@ export default class alcmonavispoeschli {
     }
   };
 
-  changeBranchWidth = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.options!.branchWidthDefault = this.getSliderValue(slider);
-    this.update(undefined, 0, true);
-  };
+  //changeBranchWidth = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.options!.branchWidthDefault = this.getSliderValue(slider);
+  //  this.update(undefined, 0, true);
+  //};
 
-  changeNodeSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.options!.nodeSizeDefault = this.getSliderValue(slider);
-    if (
-      !this.options!.showInternalNodes &&
-      !this.options!.showExternalNodes &&
-      !this.options!.showNodeVisualizations &&
-      !this.options!.showNodeEvents
-    ) {
-      this.options!.showInternalNodes = true;
-      this.options!.showExternalNodes = true;
-      this.TriggerHandler('showInternalNodes', this.options!.showInternalNodes);
-      this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels || false);
-    }
-    this.update(undefined, 0, true);
-  };
+  //changeNodeSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.options!.nodeSizeDefault = this.getSliderValue(slider);
+  //  if (
+  //    !this.options!.showInternalNodes &&
+  //    !this.options!.showExternalNodes &&
+  //    !this.options!.showNodeVisualizations &&
+  //    !this.options!.showNodeEvents
+  //  ) {
+  //    this.options!.showInternalNodes = true;
+  //    this.options!.showExternalNodes = true;
+  //    this.TriggerHandler('showInternalNodes', this.options!.showInternalNodes);
+  //    this.TriggerHandler('showExternalLabels', this.options!.showExternalLabels || false);
+  //  }
+  //  this.update(undefined, 0, true);
+  //};
 
-  changeInternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.options!.internalNodeFontSize = this.getSliderValue(slider);
-    this.update(undefined, 0, true);
-  };
+  //changeInternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.options!.internalNodeFontSize = this.getSliderValue(slider);
+  //  this.update(undefined, 0, true);
+  //};
 
-  changeExternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.options!.externalNodeFontSize = this.getSliderValue(slider);
-    this.update(undefined, 0, true);
-  };
+  //changeExternalFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.options!.externalNodeFontSize = this.getSliderValue(slider);
+  //  this.update(undefined, 0, true);
+  //};
 
-  changeBranchDataFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.options!.branchDataFontSize = this.getSliderValue(slider);
-    this.update(undefined, 0, true);
-  };
+  //changeBranchDataFontSize = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.options!.branchDataFontSize = this.getSliderValue(slider);
+  //  this.update(undefined, 0, true);
+  //};
 
-  updateMsaResidueVisCurrResPosFromSlider = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
-    this.removeColorPicker();
-    this.msa_residue_vis_curr_res_pos = (this.getSliderValue(slider) || 0) - 1;
-    this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
-    this.update(undefined, 0, true);
-  };
+  //updateMsaResidueVisCurrResPosFromSlider = (_e: JQueryEventObject, slider: JQueryUI.SliderUIParams) => {
+  //  this.removeColorPicker();
+  //  this.msa_residue_vis_curr_res_pos = (this.getSliderValue(slider) || 0) - 1;
+  //  this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
+  //  this.update(undefined, 0, true);
+  //};
 
   searchOptionsCaseSenstiveCbClicked = () => {
     this.options!.searchIsCaseSensitive = this.getCheckboxValue(AP.SEARCH_OPTIONS_CASE_SENSITIVE_CB);
@@ -6073,23 +6073,23 @@ export default class alcmonavispoeschli {
     return $('#' + id).is(':checked');
   };
 
-  getSliderValue = (slider: JQueryUI.SliderUIParams) => {
-    return slider.value;
-  };
+  //getSliderValue = (slider: JQueryUI.SliderUIParams) => {
+  //  return slider.value;
+  //};
 
-  setSliderValue(id: string, value: number) {
-    var sli = $('#' + id);
-    if (sli) {
-      sli.slider('value', value);
-    }
-  }
+  //setSliderValue(id: string, value: number) {
+  //  var sli = $('#' + id);
+  //  if (sli) {
+  //    sli.slider('value', value);
+  //  }
+  //}
 
-  updateMsaResidueVisCurrResPosSliderValue = () => {
-    var sli = $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1);
-    if (sli) {
-      sli.slider('value', this.msa_residue_vis_curr_res_pos + 1);
-    }
-  };
+  //updateMsaResidueVisCurrResPosSliderValue = () => {
+  //  var sli = $('#' + AP.MSA_RESIDUE_VIS_CURR_RES_POS_SLIDER_1);
+  //  if (sli) {
+  //    sli.slider('value', this.msa_residue_vis_curr_res_pos + 1);
+  //  }
+  //};
 
   increaseFontSizes = () => {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
@@ -6114,9 +6114,9 @@ export default class alcmonavispoeschli {
       up = true;
     }
     if (up) {
-      this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
-      this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
-      this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
+      //this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
+      //this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
+      //this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
       this.update(undefined, 0, true);
     }
   };
@@ -6143,9 +6143,9 @@ export default class alcmonavispoeschli {
       up = true;
     }
     if (up) {
-      this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
-      this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
-      this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
+      //this.setSliderValue(AP.EXTERNAL_FONT_SIZE_SLIDER, this.options.externalNodeFontSize);
+      //this.setSliderValue(AP.INTERNAL_FONT_SIZE_SLIDER, this.options.internalNodeFontSize);
+      //this.setSliderValue(AP.BRANCH_DATA_FONT_SIZE_SLIDER, this.options.branchDataFontSize);
       this.update(undefined, 0, true);
     }
   };
@@ -6449,7 +6449,7 @@ export default class alcmonavispoeschli {
     } else {
       this.msa_residue_vis_curr_res_pos -= 1;
     }
-    this.updateMsaResidueVisCurrResPosSliderValue();
+    /*    this.updateMsaResidueVisCurrResPosSliderValue();*/
     this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
     this.update(undefined, 0, true);
   };
@@ -6460,7 +6460,7 @@ export default class alcmonavispoeschli {
     } else {
       this.msa_residue_vis_curr_res_pos += 1;
     }
-    this.updateMsaResidueVisCurrResPosSliderValue();
+    /*    this.updateMsaResidueVisCurrResPosSliderValue();*/
     this.showMsaResidueVisualizationAsLabelColorIfNotAlreadyShown();
     this.update(undefined, 0, true);
   };
