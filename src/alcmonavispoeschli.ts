@@ -4353,12 +4353,12 @@ export default class alcmonavispoeschli {
     const foundNodes: Set<Forester.phylo> = new Set();
     searchList.forEach((list) => {
       switch (list) {
-          case 0:
-              this.foundNodes0.forEach((f) => foundNodes.add(f));
-              break;
-          case 1:
-              this.foundNodes1.forEach((f) => foundNodes.add(f));
-              break;
+        case 0:
+          this.foundNodes0.forEach((f) => foundNodes.add(f));
+          break;
+        case 1:
+          this.foundNodes1.forEach((f) => foundNodes.add(f));
+          break;
       }
     });
 
