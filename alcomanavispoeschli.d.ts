@@ -56,7 +56,7 @@ declare namespace Forester {
 
     interface property {
         ref: string;
-        value: string;
+        value: any;
         datatype: string;
         provider: string;
         applies_to: properties;
@@ -397,6 +397,7 @@ type Fn<T, K> = (_: T) => K;
 type Dict<T> = { [k: string]: T }
 type HTMLstring = string;
 type MappingFunction = d3.scale.Ordinal<string, string> | d3.scale.Linear<number, number>;
+type JSType = "unknown" | "null" | "string" | "number" | "boolean" | "object" | "array" | "function" | "date" | "regexp" | "math" | "json" | "error" | "arguments"
 
 interface CustomD3Prototype<T> extends d3.Selection<any> {
     moveToFront: (this: d3.Selection<T>) => void;
