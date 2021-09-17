@@ -252,7 +252,7 @@ declare namespace Alcmonavis {
         minConfidenceValueToShow?: number | null; //?
         initialCollapseFeature?: string | null; //?
         treeName?: string | null;
-
+        labelCategories?: Dict<boolean>;
     }
 
     interface Options extends RequiredOptions, OptionalOptions {}
@@ -302,7 +302,7 @@ declare namespace Alcmonavis {
         border?: string;
         specialProcessing?: string;
         readSimpleCharacteristics?: boolean;
-        searchCallback?: (search: string) => Promise<Dict<any>[]>
+        searchCallback?: (search: string) => Promise<Dict<any>[]>;
     }
 
     interface Settings extends RequiredSettings, OptionalSettings { }
