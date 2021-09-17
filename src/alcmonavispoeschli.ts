@@ -4937,8 +4937,15 @@ export default class alcmonavispoeschli {
                         }
                         return '';
                     })
-                    .on('click', function (d) {
-                        displayNodeData(d);
+                    .on('click', function (d: Alcmonavis.phylo) {
+                        if (settings.searchCallback && !d.populated && d.name) {
+                            settings.searchCallback(d.name).then(nodes => {
+                                self.populateNode(nodes[0], d);
+                                displayNodeData(d);
+                            })
+                        } else {
+                            displayNodeData(d);
+                        }
                     });
 
                 d3.select(this)
@@ -5653,12 +5660,32 @@ export default class alcmonavispoeschli {
         }
     };
 
+    populateNode = (node: Dict<string> | undefined, phy: Forester.phylo, IDfield = 'ID', source = 'database', provider = 'unknown') => {
+        if (node) {
+            phy.properties = phy.properties || [];
+            const existingProps = phy.properties.map((p) => p.ref);
+            Object.keys(node)
+                .filter((k) => k !== IDfield && !existingProps.includes(k))
+                .forEach((k) => {
+                    phy.properties!.push({
+                        ref: k,
+                        value: node[k],
+                        datatype: AP.BRANCH_EVENT_DATATYPE,
+                        applies_to: 'node',
+                        provider: provider,
+                        source: source,
+                    });
+                });
+            phy.populated = true;
+        }
+    }
+
     searchNodes = (
         nodes: Dict<string>[],
         family: 0 | 1 = 0,
-        IDfield: string = 'ID',
-        source: string = 'database',
-        provider: string = 'unknown',
+        IDfield = 'ID',
+        source = 'database',
+        provider = 'unknown',
     ) => {
         if (nodes.every((n) => IDfield in n)) {
             const foundnodes = new Set<Forester.phylo>();
@@ -5666,21 +5693,7 @@ export default class alcmonavispoeschli {
             const addnode = (phy: Forester.phylo) => {
                 const node = nodes.find((n) => n[IDfield] === phy.name);
                 if (node) {
-                    phy.properties = phy.properties || [];
-                    const existingProps = phy.properties.map((p) => p.ref);
-                    Object.keys(node)
-                        .filter((k) => k !== IDfield && !existingProps.includes(k))
-                        .forEach((k) => {
-                            phy.properties!.push({
-                                ref: k,
-                                value: node[k],
-                                datatype: AP.BRANCH_EVENT_DATATYPE,
-                                applies_to: 'node',
-                                provider: provider,
-                                source: source,
-                            });
-                        });
-                    phy.populated = true;
+                    this.populateNode(node, phy, IDfield, source, provider);
                     if (forester.isDescendant(phy, this.root)) {
                         internal++;
                     }

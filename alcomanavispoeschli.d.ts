@@ -302,6 +302,7 @@ declare namespace Alcmonavis {
         border?: string;
         specialProcessing?: string;
         readSimpleCharacteristics?: boolean;
+        searchCallback?: (search: string) => Promise<Dict<any>[]>
     }
 
     interface Settings extends RequiredSettings, OptionalSettings { }
