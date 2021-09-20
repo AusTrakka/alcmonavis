@@ -139,6 +139,12 @@ export const WIDTH_OFFSET = 14; // Needed in Firefox Quantum (2018-02-22)
 export const ZOOM_INTERVAL = 200;
 
 // ---------------------------
+// Database Search constants
+// ---------------------------
+export const IDFIELD = 'ID';
+export const CALLSIZE = 1000;
+
+// ---------------------------
 // Names for GUI elements
 // ---------------------------
 export const BASE_BACKGROUND = 'basebackground';

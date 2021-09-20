@@ -289,6 +289,8 @@ declare namespace Alcmonavis {
         enableAccessToDatabases?: boolean;
         zoomToFitUponWindowResize?: boolean;
         dynamicallyAddNodeVisualizations?: boolean;
+        IDfield?: string;
+        callsize?: number;
     }
     // Actually Optional    
     interface OptionalSettings {
@@ -302,7 +304,7 @@ declare namespace Alcmonavis {
         border?: string;
         specialProcessing?: string;
         readSimpleCharacteristics?: boolean;
-        searchCallback?: (search: string) => Promise<Dict<any>[]>;
+        searchCallback?: (...search: string[]) => Promise<Dict<any>[]>;
     }
 
     interface Settings extends RequiredSettings, OptionalSettings { }
