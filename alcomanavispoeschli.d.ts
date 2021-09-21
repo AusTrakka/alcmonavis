@@ -20,6 +20,7 @@ declare namespace Forester {
         properties?: property[];
         sequences?: sequence[];
         parent?: this;
+        _parent?: this;
         children?: this[];
         _children?: this[] | null;
         events: PhyloEvents;

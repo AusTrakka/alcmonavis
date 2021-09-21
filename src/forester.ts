@@ -49,14 +49,16 @@ export const forester = {
     if (phy.children) {
       for (var i = phy.children.length - 1; i >= 0; --i) {
         var c = phy.children[i];
-        c.parent = phy;
+          c.parent = phy;
+          c._parent = phy;
         forester.addParents(c);
       }
     }
     if (phy._children) {
       for (var j = phy._children.length - 1; j >= 0; --j) {
         var c = phy._children[j];
-        c.parent = phy;
+          c.parent = phy;
+          c._parent = phy;
         forester.addParents(c);
       }
     }
@@ -602,7 +604,8 @@ export const forester = {
     return node._children ? node._children : node.children ? node.children : [];
   },
 
-  calcAverageTreeHeight: (node: Forester.phylo, externalDescendants?: Forester.phylo[]): number => {
+    calcAverageTreeHeight: (node: Forester.phylo, externalDescendants?: Forester.phylo[]): number => {
+        forester.addParents(node);
     var c = externalDescendants ? externalDescendants : forester.getAllExternalNodes(node);
     var l = c.length;
     var s = 0;
