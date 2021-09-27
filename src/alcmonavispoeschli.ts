@@ -216,7 +216,7 @@ export default class alcmonavispoeschli {
     if (!y) {
       y = 0;
     }
-    d3.select('g').attr('transform', 'translate(' + x + ',' + y + ')scale(' + scale + ')');
+    this.svgGroup.attr('transform', 'translate(' + x + ',' + y + ')scale(' + scale + ')');
     this.zoomListener.scale(scale);
     this.zoomListener.translate([x, y]);
   };
