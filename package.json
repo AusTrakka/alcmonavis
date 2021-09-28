@@ -37,12 +37,15 @@
   },
   "homepage": "https://github.com/AusTrakka/alcmonavis#readme",
   "dependencies": {
+    "canvg": "^3.0.8",
     "d3": "^3.5.17",
+    "file-saver": "^2.0.5",
     "jquery": "^3.6.0"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.0.13",
     "@types/d3": "^3.5.34",
+    "@types/file-saver": "^2.0.3",
     "@types/jest": "^26.0.22",
     "@types/jquery": "^3.5.5",
     "@types/node": "^14.14.36",
