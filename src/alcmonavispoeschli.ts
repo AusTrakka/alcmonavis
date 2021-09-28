@@ -1,7 +1,7 @@
 require('./Blob.js');
 require('./canvas-toBlob.js');
-import { saveAs } from 'file-saver';
-import Canvg from 'canvg';
+//import { saveAs } from 'file-saver';
+//import Canvg from 'canvg';
 import $ from 'jquery';
 import { phyloXml } from './phyloXml';
 import { forester, isString } from './forester';
@@ -7086,32 +7086,32 @@ export default class alcmonavispoeschli {
   };
 
   downloadAsSVG = () => {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-    const svg = this.getTreeAsSvg();
-    saveAs(
-      new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: 'application/svg+xml' }),
-      this.options.nameForSvgDownload,
-    );
+    //if (!OptionsDeclared(this.options)) throw 'Options not set';
+    //const svg = this.getTreeAsSvg();
+    //saveAs(
+    //  new Blob([decodeURIComponent(encodeURIComponent(svg))], { type: 'application/svg+xml' }),
+    //  this.options.nameForSvgDownload,
+    //);
   };
 
   downloadAsPdf = () => {};
 
   downloadAsPng = () => {
-    if (!OptionsDeclared(this.options)) throw 'Options not set';
-    const svg = this.getTreeAsSvg();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      Canvg.from(ctx, svg)
-        .then((canvg) => canvg.render)
-        .then(() => {
-          canvas.toBlob((blob) => {
-            if (blob) {
-              saveAs(blob, this.options!.nameForPngDownload);
-            }
-          });
-        });
-    }
+    //if (!OptionsDeclared(this.options)) throw 'Options not set';
+    //const svg = this.getTreeAsSvg();
+    //const canvas = document.createElement('canvas');
+    //const ctx = canvas.getContext('2d');
+    //if (ctx) {
+    //  Canvg.from(ctx, svg)
+    //    .then((canvg) => canvg.render)
+    //    .then(() => {
+    //      canvas.toBlob((blob) => {
+    //        if (blob) {
+    //          saveAs(blob, this.options!.nameForPngDownload);
+    //        }
+    //      });
+    //    });
+    //}
   };
 
   // --------------------------------------------------------------
