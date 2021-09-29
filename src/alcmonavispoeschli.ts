@@ -2934,13 +2934,13 @@ export default class alcmonavispoeschli {
         }
       }
     } else if (vis.cladePropertyRef && node.properties && node.properties.length > 0) {
-        const propVal = dearray(node, vis.cladePropertyRef);
-        if (propVal) {
-            // TODO figure out valuesToIgnore
-            return produceVis(vis, propVal);
-        } else {
-            return (undefined as unknown) as string;
-        }
+      const propVal = dearray(node, vis.cladePropertyRef);
+      if (propVal) {
+        // TODO figure out valuesToIgnore
+        return produceVis(vis, propVal);
+      } else {
+        return (undefined as unknown) as string;
+      }
       //var ref_name = vis.cladePropertyRef;
       //var propertiesLength = node.properties.length;
       //for (var i = 0; i < propertiesLength; ++i) {
