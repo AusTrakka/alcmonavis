@@ -4211,7 +4211,7 @@ export default class alcmonavispoeschli {
         });
       }
 
-      var nodeProperties = forester.collectProperties(this.treeData, 'node', false);
+      const nodeProperties = settings.forceNodeProperties || forester.collectProperties(this.treeData, 'node', false);
       if (settings.valuesToIgnoreForNodeVisualization) {
         this.deleteValuesFromNodeProperties(settings.valuesToIgnoreForNodeVisualization, nodeProperties);
       }
