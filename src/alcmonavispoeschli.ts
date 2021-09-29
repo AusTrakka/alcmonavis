@@ -25,6 +25,22 @@ const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<s
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dedot = (x: Dict<any>, y: string): any => y.split('.').reduce((acc, cur) => acc[cur], x);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dearray = (x: any, y: string): any => {
+    const r = /(\w+)\[(\w+)=(\w+)\]/;
+    return y.split('.').reduce(
+        (acc, cur) => {
+            if (acc === undefined) {
+                return undefined;
+            } else if (r.test(cur)) {
+                const e = r.exec(cur);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-non-null-assertion
+                return acc[e![1]].find((_: any) => _[e![2]] === e![3]);
+            } else {
+                return acc[cur];
+            }
+        }, x);
+}
 
 export default class alcmonavispoeschli {
   // ---------------------------
@@ -2802,25 +2818,32 @@ export default class alcmonavispoeschli {
             }
           }
         } else if (vis.cladePropertyRef && node.properties && node.properties.length > 0) {
-          var ref_name = vis.cladePropertyRef;
-          var propertiesLength = node.properties.length;
-          for (var i = 0; i < propertiesLength; ++i) {
-            var p = node.properties[i];
-            if (p.value && p.ref === ref_name) {
-              if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
-                if (p.ref in this.settings.valuesToIgnoreForNodeVisualization) {
-                  var ignoreValues = this.settings.valuesToIgnoreForNodeVisualization[p.ref];
-                  var arrayLength = ignoreValues.length;
-                  for (var i = 0; i < arrayLength; i++) {
-                    if (p.value === ignoreValues[i]) {
-                      return (undefined as unknown) as string;
-                    }
-                  }
-                }
-              }
-              return produceVis(vis, p.value);
+            const propVal = dearray(node, vis.cladePropertyRef);
+            if (propVal) { // TODO figure out valuesToIgnore
+                return produceVis(vis, propVal);
             }
-          }
+            else {
+                return (undefined as unknown) as string;
+            }
+          //var ref_name = vis.cladePropertyRef;
+          //var propertiesLength = node.properties.length;
+          //for (var i = 0; i < propertiesLength; ++i) {
+          //  var p = node.properties[i];
+          //  if (p.value && p.ref === ref_name) {
+          //    if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
+          //      if (p.ref in this.settings.valuesToIgnoreForNodeVisualization) {
+          //        var ignoreValues = this.settings.valuesToIgnoreForNodeVisualization[p.ref];
+          //        var arrayLength = ignoreValues.length;
+          //        for (var i = 0; i < arrayLength; i++) {
+          //          if (p.value === ignoreValues[i]) {
+          //            return (undefined as unknown) as string;
+          //          }
+          //        }
+          //      }
+          //    }
+          //    return produceVis(vis, p.value);
+          //  }
+          //}
         }
       }
     }
