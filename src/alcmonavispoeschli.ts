@@ -9,11 +9,12 @@ import d3 from 'd3';
 import * as AP from './constants';
 import { Alcmonavis, CustomD3Prototype, Dict, Forester, MappingFunction, JSType } from '../alcomanavispoeschli';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GetType = (x: any): JSType =>
   Object.prototype.toString
     .call(x)
     .replace(/\[object (.*?)\]/, '$1')
-    .toLowerCase() as JSType; // eslint-disable-line @typescript-eslint/no-explicit-any
+    .toLowerCase() as JSType;
 
 const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<string, string>) => (
   d: number | string,
@@ -21,6 +22,25 @@ const scaleSwitch = (scale: d3.scale.Linear<number, number> | d3.scale.Ordinal<s
   typeof d === 'number'
     ? (scale as d3.scale.Linear<number, number>)(d)
     : (scale as d3.scale.Ordinal<string, string>)(d);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dedot = (x: Dict<any>, y: string): any => y.split('.').reduce((acc, cur) => acc[cur], x);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dearray = (x: any, y: string): any => {
+  const r = /(\w+)\[(\w+)=(\w+)\]/;
+  return y.split('.').reduce((acc, cur) => {
+    if (acc === undefined) {
+      return undefined;
+    } else if (r.test(cur)) {
+      const e = r.exec(cur);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-non-null-assertion
+      return acc[e![1]].find((_: any) => _[e![2]] === e![3]);
+    } else {
+      return acc[cur];
+    }
+  }, x);
+};
+
 export default class alcmonavispoeschli {
   // ---------------------------
   // "Instance variables"
@@ -382,13 +402,14 @@ export default class alcmonavispoeschli {
                 scaleType = AP.ORDINAL_SCALE;
               } else if (
                 nodeVisualization.field &&
-                nodeProperties[nodeVisualization.field] &&
-                forester.setToArray(nodeProperties[nodeVisualization.field]).length > 0
+                //nodeProperties[nodeVisualization.field] &&
+                //forester.setToArray(nodeProperties[nodeVisualization.field]).length > 0
+                forester.setToArray(nodeProperties[key]).length > 0
               ) {
                 shapeScale = d3.scale
                   .ordinal<Alcmonavis.Shape>()
                   .range(nodeVisualization.shapes)
-                  .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.field]));
+                  .domain(forester.setToSortedArray(nodeProperties[key]));
                 scaleType = AP.ORDINAL_SCALE;
               }
 
@@ -408,14 +429,16 @@ export default class alcmonavispoeschli {
 
             if (nodeVisualization.colors) {
               // TODO: Not dealing with nodeVisualization.field, yet.
+              // Removed reference to cladeRef vs Field, and let makeNodeColor handle the visualisation directly
+              const valueSet = nodeProperties[key];
               if (
-                (nodeVisualization.cladeRef &&
-                  nodeProperties[nodeVisualization.cladeRef] &&
-                  forester.setToArray(nodeProperties[nodeVisualization.cladeRef]).length > 0) ||
+                ((nodeVisualization.cladeRef || nodeVisualization.field) &&
+                  valueSet &&
+                  forester.setToArray(valueSet).length > 0) ||
                 nodeVisualization.label === AP.MSA_RESIDUE
               ) {
-                var colorScale: MappingFunction | null = null;
-                var altColorScale: d3.scale.Linear<number, number> | null = null;
+                let colorScale: MappingFunction | null = null;
+                let altColorScale: d3.scale.Linear<number, number> | null = null;
 
                 if (Array.isArray(nodeVisualization.colors)) {
                   scaleType = AP.LINEAR_SCALE;
@@ -423,12 +446,12 @@ export default class alcmonavispoeschli {
                     colorScale = d3.scale
                       .linear()
                       .range(nodeVisualization.colors)
-                      .domain(forester.calcMinMeanMaxInSet(nodeProperties[nodeVisualization.cladeRef]));
+                      .domain(forester.calcMinMeanMaxInSet(valueSet));
                   } else if (nodeVisualization.colors.length === 2) {
                     colorScale = d3.scale
                       .linear()
                       .range(nodeVisualization.colors)
-                      .domain(forester.calcMinMaxInSet(nodeProperties[nodeVisualization.cladeRef]));
+                      .domain(forester.calcMinMaxInSet(valueSet));
                   } else {
                     throw 'Number of colors has to be either 2 or 3';
                   }
@@ -439,12 +462,12 @@ export default class alcmonavispoeschli {
                     altColorScale = d3.scale
                       .linear()
                       .range(nodeVisualization.colorsAlt)
-                      .domain(forester.calcMinMeanMaxInSet(nodeProperties[nodeVisualization.cladeRef]));
+                      .domain(forester.calcMinMeanMaxInSet(valueSet));
                   } else if (nodeVisualization.colorsAlt.length === 2) {
                     altColorScale = d3.scale
                       .linear()
                       .range(nodeVisualization.colorsAlt)
-                      .domain(forester.calcMinMaxInSet(nodeProperties[nodeVisualization.cladeRef]));
+                      .domain(forester.calcMinMaxInSet(valueSet));
                   } else {
                     throw 'Number of colors has to be either 2 or 3';
                   }
@@ -457,39 +480,25 @@ export default class alcmonavispoeschli {
                     this.usedColorCategories.add('category20');
                   } else {
                     if (nodeVisualization.colors === 'category20') {
-                      colorScale = d3.scale
-                        .category20()
-                        .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
+                      colorScale = d3.scale.category20().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category20');
                     } else if (nodeVisualization.colors === 'category20b') {
-                      colorScale = d3.scale
-                        .category20b()
-                        .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
+                      colorScale = d3.scale.category20b().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category20b');
                     } else if (nodeVisualization.colors === 'category20c') {
-                      colorScale = d3.scale
-                        .category20c()
-                        .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
+                      colorScale = d3.scale.category20c().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category20c');
                     } else if (nodeVisualization.colors === 'category10') {
-                      colorScale = d3.scale
-                        .category10()
-                        .domain(forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]));
+                      colorScale = d3.scale.category10().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category10');
                     } else if (nodeVisualization.colors === 'category50') {
-                      colorScale = AP.category50<string>().domain(
-                        forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]),
-                      );
+                      colorScale = AP.category50<string>().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category50');
                     } else if (nodeVisualization.colors === 'category50b') {
-                      colorScale = AP.category50b<string>().domain(
-                        forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]),
-                      );
+                      colorScale = AP.category50b<string>().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category50b');
                     } else if (nodeVisualization.colors === 'category50c') {
-                      colorScale = AP.category50c<string>().domain(
-                        forester.setToSortedArray(nodeProperties[nodeVisualization.cladeRef]),
-                      );
+                      colorScale = AP.category50c<string>().domain(forester.setToSortedArray(valueSet));
                       this.usedColorCategories.add('category50c');
                     } else {
                       throw 'do not know how to process ' + nodeVisualization.colors;
@@ -501,7 +510,7 @@ export default class alcmonavispoeschli {
                   this.addLabelColorVisualization(
                     nodeVisualization.label,
                     nodeVisualization.description,
-                    null,
+                    nodeVisualization.field,
                     nodeVisualization.cladeRef,
                     nodeVisualization.regex,
                     null,
@@ -513,7 +522,7 @@ export default class alcmonavispoeschli {
                   this.addNodeFillColorVisualization(
                     nodeVisualization.label,
                     nodeVisualization.description,
-                    null,
+                    nodeVisualization.field,
                     nodeVisualization.cladeRef,
                     nodeVisualization.regex,
                     null,
@@ -525,7 +534,7 @@ export default class alcmonavispoeschli {
                   this.addNodeBorderColorVisualization(
                     nodeVisualization.label,
                     nodeVisualization.description,
-                    null,
+                    nodeVisualization.field,
                     nodeVisualization.cladeRef,
                     nodeVisualization.regex,
                     null,
@@ -2808,25 +2817,32 @@ export default class alcmonavispoeschli {
             }
           }
         } else if (vis.cladePropertyRef && node.properties && node.properties.length > 0) {
-          var ref_name = vis.cladePropertyRef;
-          var propertiesLength = node.properties.length;
-          for (var i = 0; i < propertiesLength; ++i) {
-            var p = node.properties[i];
-            if (p.value && p.ref === ref_name) {
-              if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
-                if (p.ref in this.settings.valuesToIgnoreForNodeVisualization) {
-                  var ignoreValues = this.settings.valuesToIgnoreForNodeVisualization[p.ref];
-                  var arrayLength = ignoreValues.length;
-                  for (var i = 0; i < arrayLength; i++) {
-                    if (p.value === ignoreValues[i]) {
-                      return (undefined as unknown) as string;
-                    }
-                  }
-                }
-              }
-              return produceVis(vis, p.value);
-            }
+          const propVal = dearray(node, vis.cladePropertyRef);
+          if (propVal) {
+            // TODO figure out valuesToIgnore
+            return produceVis(vis, propVal);
+          } else {
+            return (undefined as unknown) as string;
           }
+          //var ref_name = vis.cladePropertyRef;
+          //var propertiesLength = node.properties.length;
+          //for (var i = 0; i < propertiesLength; ++i) {
+          //  var p = node.properties[i];
+          //  if (p.value && p.ref === ref_name) {
+          //    if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
+          //      if (p.ref in this.settings.valuesToIgnoreForNodeVisualization) {
+          //        var ignoreValues = this.settings.valuesToIgnoreForNodeVisualization[p.ref];
+          //        var arrayLength = ignoreValues.length;
+          //        for (var i = 0; i < arrayLength; i++) {
+          //          if (p.value === ignoreValues[i]) {
+          //            return (undefined as unknown) as string;
+          //          }
+          //        }
+          //      }
+          //    }
+          //    return produceVis(vis, p.value);
+          //  }
+          //}
         }
       }
     }
@@ -2902,7 +2918,7 @@ export default class alcmonavispoeschli {
 
   makeVisColor = (node: Forester.phylo, vis: Alcmonavis.Visualisation) => {
     if (vis.field) {
-      var fieldValue = node[vis.field];
+      const fieldValue = dedot(node, vis.field); //node[vis.field];
       if (fieldValue && typeof fieldValue === 'string') {
         if (vis.isRegex) {
           for (var key in vis.mapping) {
@@ -2918,27 +2934,34 @@ export default class alcmonavispoeschli {
         }
       }
     } else if (vis.cladePropertyRef && node.properties && node.properties.length > 0) {
-      var ref_name = vis.cladePropertyRef;
-      var propertiesLength = node.properties.length;
-      for (var i = 0; i < propertiesLength; ++i) {
-        var p = node.properties[i];
-        if (p.value && p.ref === ref_name) {
-          if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
-            var ignore = this.settings.valuesToIgnoreForNodeVisualization;
-            // for (var key in nodeProperties) {
-            if (p.ref in ignore) {
-              var toIgnores = ignore[p.ref];
-              var arrayLength = toIgnores.length;
-              for (var i = 0; i < arrayLength; i++) {
-                if (p.value === toIgnores[i]) {
-                  return null;
-                }
-              }
-            }
-          }
-          return produceVis(vis, p.value);
-        }
+      const propVal = dearray(node, vis.cladePropertyRef);
+      if (propVal) {
+        // TODO figure out valuesToIgnore
+        return produceVis(vis, propVal);
+      } else {
+        return (undefined as unknown) as string;
       }
+      //var ref_name = vis.cladePropertyRef;
+      //var propertiesLength = node.properties.length;
+      //for (var i = 0; i < propertiesLength; ++i) {
+      //  var p = node.properties[i];
+      //  if (p.value && p.ref === ref_name) {
+      //    if (this.settings && this.settings.valuesToIgnoreForNodeVisualization) {
+      //      var ignore = this.settings.valuesToIgnoreForNodeVisualization;
+      //      // for (var key in nodeProperties) {
+      //      if (p.ref in ignore) {
+      //        var toIgnores = ignore[p.ref];
+      //        var arrayLength = toIgnores.length;
+      //        for (var i = 0; i < arrayLength; i++) {
+      //          if (p.value === toIgnores[i]) {
+      //            return null;
+      //          }
+      //        }
+      //      }
+      //    }
+      //    return produceVis(vis, p.value);
+      //  }
+      //}
     }
 
     return null;
@@ -4211,7 +4234,7 @@ export default class alcmonavispoeschli {
         });
       }
 
-      var nodeProperties = forester.collectProperties(this.treeData, 'node', false);
+      const nodeProperties = settings.forceNodeProperties || forester.collectProperties(this.treeData, 'node', false);
       if (settings.valuesToIgnoreForNodeVisualization) {
         this.deleteValuesFromNodeProperties(settings.valuesToIgnoreForNodeVisualization, nodeProperties);
       }
@@ -5792,6 +5815,8 @@ export default class alcmonavispoeschli {
     }
     phy.populated = true;
   };
+
+  populateNodes = (nodes: Dict<any>[]) => nodes.forEach((n) => this.populateNode(n, this.root));
 
   searchNodes = (
     nodes: Dict<string>[],

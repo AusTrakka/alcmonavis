@@ -301,6 +301,7 @@ declare namespace Alcmonavis {
         enableMsaResidueVisualizations?: boolean;
         propertiesToIgnoreForNodeVisualization?: string[] | null //?
         valuesToIgnoreForNodeVisualization?: Dict<string> | null //?
+        forceNodeProperties?: Dict<Set<string>> | null;
         groupSpecies?: RefMapping | null;
         groupYears?: GroupMapping | null;
         border?: string;
