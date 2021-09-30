@@ -3,7 +3,7 @@ require('./canvas-toBlob.js');
 //import { saveAs } from 'file-saver';
 //import Canvg from 'canvg';
 import $ from 'jquery';
-import { phyloXml } from './phyloXml';
+import { phyloXml } from './phyloxml';
 import { forester, isString } from './forester';
 import d3 from 'd3';
 import * as AP from './constants';
