@@ -3,7 +3,7 @@ require('./canvas-toBlob.js');
 //import { saveAs } from 'file-saver';
 //import Canvg from 'canvg';
 import $ from 'jquery';
-import { phyloXml } from './phyloXml';
+import { phyloXml } from './phyloxml';
 import { forester, isString } from './forester';
 import d3 from 'd3';
 import * as AP from './constants';
@@ -6520,7 +6520,7 @@ export default class alcmonavispoeschli {
   };
 
   orderSubtree = (n: Alcmonavis.phylo, order: boolean) => {
-    var changed = false;
+    let changed: boolean = false;
     ord(n);
     if (!changed) {
       order = !order;
@@ -6530,21 +6530,44 @@ export default class alcmonavispoeschli {
       if (!n.children) {
         return;
       }
-      var c = n.children;
-      var l = c.length;
-      if (l == 2) {
-        var e0 = forester.calcSumOfAllExternalDescendants(c[0]);
-        var e1 = forester.calcSumOfAllExternalDescendants(c[1]);
-        if (e0 !== e1 && e0 < e1 === order) {
-          changed = true;
-          var c0 = c[0];
-          c[0] = c[1];
-          c[1] = c0;
+      let sortFields: Array<[number, number, string]>;
+      sortFields = n.children.map(
+        (c) => [
+            forester.calcSumOfAllExternalDescendants(c), 
+            c.branch_length ? c.branch_length : 0,
+            c.name ? c.name : '']
+      );
+      // Sort children by corresponding order of subtreeSizes, then by branch length,
+      // then alphanumerically by node name
+      let sortedIndices: Array<[[number, number, string], number]>;
+      sortedIndices = sortFields.map((e,i) => [e, i]);
+      sortedIndices.sort(
+        ([[a_size, a_bl, a_name], a_idx], [[b_size, b_bl, b_name], b_idx]) =>  {
+            if (a_size != b_size)
+                return a_size - b_size;
+            else if (a_bl != b_bl)
+                return a_bl - b_bl;
+            else
+                return a_name.localeCompare(b_name, 'en', { numeric: true })
         }
+      );
+      if (!order){
+        sortedIndices = sortedIndices.reverse();
       }
-      for (var i = 0; i < l; ++i) {
-        ord(c[i]);
+      // Assign sorted children and check if changed from previous ordering
+      let sortedChildren: Array<Alcmonavis.phylo>;
+      // NB we know that i is in range of the original array, but ts doesn't
+      // @ts-ignore: Object is possibly 'null'
+      sortedChildren = sortedIndices.map(([e,i]) => n.children[i]);
+      // If anything changed in this sort operation, set changed=true
+      // changed should report on whether anything changed in any recursive sort level
+      // @ts-ignore: Object is possibly 'null'
+      if (sortedChildren.some((e,i) => (e != n.children[i]))){
+          changed = true;
       }
+      n.children = sortedChildren;
+      // sort recursively
+      n.children.forEach(ord);
     }
   };
 
