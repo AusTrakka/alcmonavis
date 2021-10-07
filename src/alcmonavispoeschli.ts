@@ -6531,39 +6531,33 @@ export default class alcmonavispoeschli {
         return;
       }
       let sortFields: Array<[number, number, string]>;
-      sortFields = n.children.map(
-        (c) => [
-            forester.calcSumOfAllExternalDescendants(c), 
-            c.branch_length ? c.branch_length : 0,
-            c.name ? c.name : '']
-      );
+      sortFields = n.children.map((c) => [
+        forester.calcSumOfAllExternalDescendants(c),
+        c.branch_length ? c.branch_length : 0,
+        c.name ? c.name : '',
+      ]);
       // Sort children by corresponding order of subtreeSizes, then by branch length,
       // then alphanumerically by node name
       let sortedIndices: Array<[[number, number, string], number]>;
-      sortedIndices = sortFields.map((e,i) => [e, i]);
-      sortedIndices.sort(
-        ([[a_size, a_bl, a_name], a_idx], [[b_size, b_bl, b_name], b_idx]) =>  {
-            if (a_size != b_size)
-                return a_size - b_size;
-            else if (a_bl != b_bl)
-                return a_bl - b_bl;
-            else
-                return a_name.localeCompare(b_name, 'en', { numeric: true })
-        }
-      );
-      if (!order){
+      sortedIndices = sortFields.map((e, i) => [e, i]);
+      sortedIndices.sort(([[a_size, a_bl, a_name], a_idx], [[b_size, b_bl, b_name], b_idx]) => {
+        if (a_size != b_size) return a_size - b_size;
+        else if (a_bl != b_bl) return a_bl - b_bl;
+        else return a_name.localeCompare(b_name, 'en', { numeric: true });
+      });
+      if (!order) {
         sortedIndices = sortedIndices.reverse();
       }
       // Assign sorted children and check if changed from previous ordering
       let sortedChildren: Array<Alcmonavis.phylo>;
       // NB we know that i is in range of the original array, but ts doesn't
       // @ts-ignore: Object is possibly 'null'
-      sortedChildren = sortedIndices.map(([e,i]) => n.children[i]);
+      sortedChildren = sortedIndices.map(([e, i]) => n.children[i]);
       // If anything changed in this sort operation, set changed=true
       // changed should report on whether anything changed in any recursive sort level
       // @ts-ignore: Object is possibly 'null'
-      if (sortedChildren.some((e,i) => (e != n.children[i]))){
-          changed = true;
+      if (sortedChildren.some((e, i) => e != n.children[i])) {
+        changed = true;
       }
       n.children = sortedChildren;
       // sort recursively
