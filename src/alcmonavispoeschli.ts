@@ -4489,7 +4489,7 @@ export default class alcmonavispoeschli {
 
   refresh = (resetDepth = true) => {
     this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
-    this.updateNodeVisualizationsAndLegends(this.root);
+    //this.updateNodeVisualizationsAndLegends(this.root);
     if (resetDepth) {
       this.resetDepthCollapseDepthValue();
       this.resetRankCollapseRankValue();
@@ -5484,7 +5484,7 @@ export default class alcmonavispoeschli {
               forester.deleteSubtree(tree, d);
               self.treeData = tree;
               self.basicTreeProperties = forester.collectBasicTreeProperties(self.treeData);
-              self.updateNodeVisualizationsAndLegends(self.treeData);
+              //self.updateNodeVisualizationsAndLegends(self.treeData);
               self.resetDepthCollapseDepthValue();
               self.resetRankCollapseRankValue();
               self.resetBranchLengthCollapseValue();
@@ -5688,7 +5688,7 @@ export default class alcmonavispoeschli {
     if (this.root && this.superTreeRoots.length > 0) {
       this.root = this.superTreeRoots.pop()!;
       this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
-      this.updateNodeVisualizationsAndLegends(this.root);
+      //this.updateNodeVisualizationsAndLegends(this.root);
       this.resetDepthCollapseDepthValue();
       this.resetRankCollapseRankValue();
       this.resetBranchLengthCollapseValue();
