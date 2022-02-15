@@ -3168,6 +3168,7 @@ export default class alcmonavispoeschli {
     var found1 = 0;
     var found0and1 = 0;
     var total = 0;
+    var displayQuantity;
     if (this.foundNodes0 && this.foundNodes1) {
       forester.preOrderTraversalAll(node, (n) => {
         if (forester.isHasNodeData(n)) {
@@ -3190,26 +3191,29 @@ export default class alcmonavispoeschli {
         if (found0and1 === total) {
           return this.options.found0and1ColorDefault;
         }
+        displayQuantity = (total + this.foundSum)/2;
         return d3.scale
           .linear<string>()
           .domain([0, total])
-          .range([this.options.branchColorDefault, this.options.found0and1ColorDefault])(this.foundSum);
+          .range([this.options.branchColorDefault, this.options.found0and1ColorDefault])(displayQuantity);
       } else if (found0 > 0) {
         if (found0 === total) {
           return this.options.found0ColorDefault;
         }
+        displayQuantity = (total + found0)/2;
         return d3.scale
           .linear<string>()
           .domain([0, total])
-          .range([this.options.branchColorDefault, this.options.found0ColorDefault])(found0);
+          .range([this.options.branchColorDefault, this.options.found0ColorDefault])(displayQuantity);
       } else if (found1 > 0) {
         if (found1 === total) {
           return this.options.found1ColorDefault;
         }
+        displayQuantity = (total + found1)/2;
         return d3.scale
           .linear<string>()
           .domain([0, total])
-          .range([this.options.branchColorDefault, this.options.found1ColorDefault])(found1);
+          .range([this.options.branchColorDefault, this.options.found1ColorDefault])(displayQuantity);
       }
     }
     return null;
