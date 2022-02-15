@@ -1,4 +1,4 @@
-require('./Blob.js');
+require('./blob.js');
 require('./canvas-toBlob.js');
 //import { saveAs } from 'file-saver';
 //import Canvg from 'canvg';
