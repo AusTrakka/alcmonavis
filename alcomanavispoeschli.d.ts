@@ -245,6 +245,7 @@ declare namespace Alcmonavis {
         visualizationsLegendOrientation?: 'vertical' | 'horizontal'
 
         initialCollapseDepth?: number;
+        initialCollapseThreshold?: number;
     }
 
     interface OptionalOptions {
