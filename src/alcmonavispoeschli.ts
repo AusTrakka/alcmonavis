@@ -3784,6 +3784,10 @@ export default class alcmonavispoeschli {
       this.options.initialCollapseDepth = -1;
     }
 
+    if (!this.options.initialCollapseThreshold) {
+      this.options.initialCollapseThreshold = 0;
+    }
+
     this.options.externalNodeFontSize = parseInt(this.options.externalNodeFontSize as string);
     this.options.internalNodeFontSize = parseInt(this.options.internalNodeFontSize as string);
     this.options.branchDataFontSize = parseInt(this.options.branchDataFontSize as string);
@@ -4344,7 +4348,8 @@ export default class alcmonavispoeschli {
       } else {
         console.log(AP.WARNING + ' initial value for collapse by feature [' + feature + '] not present');
       }
-    } else if (this.options && this.options.initialCollapseDepth && this.options.initialCollapseDepth > 0) {
+    } else if (this.options && this.options.initialCollapseDepth && this.options.initialCollapseDepth > 0
+                && (!this.options.initialCollapseThreshold || this.basicTreeProperties.externalNodesCount > this.options.initialCollapseThreshold)) {
       this.depth_collapse_level = this.options.initialCollapseDepth;
       var max_depth = forester.calcMaxDepth(this.root);
       if (this.depth_collapse_level >= max_depth) {
@@ -4418,7 +4423,12 @@ export default class alcmonavispoeschli {
     }
     this.root = this.treeData;
     forester.addParents(this.root);
-    this.depth_collapse_level = this.options?.initialCollapseDepth || -1;
+    if (!this.options?.initialCollapseThreshold  || !this.basicTreeProperties?.externalNodesCount
+        || this.basicTreeProperties?.externalNodesCount > this.options.initialCollapseThreshold) {
+      this.depth_collapse_level = this.options?.initialCollapseDepth || -1;
+    } else {
+      this.depth_collapse_level = -1;
+    }
     forester.collapseToDepth(this.root, this.depth_collapse_level);
     this.updateDepthCollapseDepthDisplay();
     this.refresh(false);
@@ -4429,7 +4439,7 @@ export default class alcmonavispoeschli {
       this.goToSubTree(this.currentParentNode, history, false);
     }
   };
-
+  
   goToSuperTree = (history: boolean = true) => {
     if (history) {
       this.setBack();
@@ -7270,6 +7280,7 @@ export function OptionsDeclared(
     HasValue(options.found0and1ColorDefault) &&
     HasValue(options.found1ColorDefault) &&
     HasValue(options.initialCollapseDepth) &&
+    HasValue(options.initialCollapseThreshold) &&
     HasValue(options.internalNodeFontSize) &&
     HasValue(options.labelColorDefault) &&
     HasValue(options.nameForNhDownload) &&
