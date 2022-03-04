@@ -5832,12 +5832,15 @@ export default class alcmonavispoeschli {
 
   populateNodes = (nodes: Dict<any>[]) => nodes.forEach((n) => this.populateNode(n, this.root));
 
+  markNodesFound = (nodeNames: string[], family: 0 | 1) => this.searchNodes(nodeNames.map(n => ({ID: n})), family, 'ID', false);
+  
   searchNodes = (
     nodes: Dict<string>[],
     family: 0 | 1 = 0,
-    IDfield = 'ID',
-    source = 'database',
-    provider = 'unknown',
+    IDfield: string = 'ID',
+    populate: boolean = true,
+    source: string = 'database',
+    provider: string = 'unknown',
   ) => {
     if (nodes.every((n) => IDfield in n)) {
       const foundnodes = new Set<Forester.phylo>();
@@ -5845,7 +5848,9 @@ export default class alcmonavispoeschli {
       const addnode = (phy: Forester.phylo) => {
         const node = nodes.find((n) => n[IDfield] === phy.name);
         if (node) {
-          this.populateNode(node, phy, IDfield, source, provider);
+          if (populate) {
+            this.populateNode(node, phy, IDfield, source, provider);
+          }
           if (forester.isDescendant(phy, this.root)) {
             internal++;
           }
