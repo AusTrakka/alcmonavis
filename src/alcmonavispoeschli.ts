@@ -4423,14 +4423,15 @@ export default class alcmonavispoeschli {
     }
     this.root = this.treeData;
     forester.addParents(this.root);
-    if (!this.options?.initialCollapseThreshold  || !this.basicTreeProperties?.externalNodesCount
-        || this.basicTreeProperties?.externalNodesCount > this.options.initialCollapseThreshold) {
-      this.depth_collapse_level = this.options?.initialCollapseDepth || -1;
-    } else {
-      this.depth_collapse_level = -1;
+
+    if( this.options && this.options.initialCollapseDepth && this.options.initialCollapseThreshold
+        && this.basicTreeProperties?.externalNodesCount
+        && this.basicTreeProperties.externalNodesCount > this.options.initialCollapseThreshold)
+    {
+      this.depth_collapse_level = this.options.initialCollapseDepth;
+      forester.collapseToDepth(this.root, this.depth_collapse_level);
+      this.updateDepthCollapseDepthDisplay();
     }
-    forester.collapseToDepth(this.root, this.depth_collapse_level);
-    this.updateDepthCollapseDepthDisplay();
     this.refresh(false);
   };
 
