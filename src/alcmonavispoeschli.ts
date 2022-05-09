@@ -4373,6 +4373,10 @@ export default class alcmonavispoeschli {
     this.zoomToFit();
   };
 
+  getExternalNodeCount = () => {
+    return this.basicTreeProperties?.externalNodesCount;  
+  }
+  
   calcMaxExtLabel = () => {
     this.maxLabelLength = (this.options && this.options.nodeLabelGap) || 0;
     forester.preOrderTraversal(this.root, (d) => {
