@@ -1996,7 +1996,6 @@ export default class alcmonavispoeschli {
       this.isUpdating = false;
     };
 
-    console.log('updating');
     this.isUpdating = true;
 
     const start = performance.now();
@@ -4368,8 +4367,7 @@ export default class alcmonavispoeschli {
       this.updateDepthCollapseDepthDisplay();
     }
 
-    this.update(undefined, 0);
-
+    // Calls update() since we are at root
     this.zoomToFit();
   };
 
