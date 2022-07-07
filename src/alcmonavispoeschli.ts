@@ -4394,8 +4394,17 @@ export default class alcmonavispoeschli {
 
   removeTooltips = () => this.svgGroup.selectAll('.tooltipElem').remove();
 
+  // This returns the only child of this.root (this.root is always a node with a single uncollapsed child)
+  // The node returned by this function is the node to target in a goToSubtree jump, if we want to return here
+  currentRootNode = () =>
+  {
+    if (this.root._children || !this.root.children || this.root.children.length != 1) 
+      throw "Expect root node to have exactly one, uncollapsed child node";
+    return this.root.children[0];
+  }
+  
   setBack = () => {
-    this.backTreeRoots.push(this.root);
+    this.backTreeRoots.push(this.currentRootNode());
     this.forwardTreeRoots.length = 0;
     this.TriggerHandler('forwardEnable', false);
     this.TriggerHandler('backwardEnable', true);
@@ -4403,7 +4412,7 @@ export default class alcmonavispoeschli {
 
   goForward = () => {
     if (this.forwardTreeRoots.length > 0) {
-      this.backTreeRoots.push(this.root);
+      this.backTreeRoots.push(this.currentRootNode());
       this.goToSubTree(this.forwardTreeRoots.pop()!, false, false);
       this.TriggerHandler('forwardEnable', this.forwardTreeRoots.length > 0);
       this.TriggerHandler('backwardEnable', true);
@@ -4412,7 +4421,7 @@ export default class alcmonavispoeschli {
 
   goBackward = () => {
     if (this.backTreeRoots.length > 0) {
-      this.forwardTreeRoots.push(this.root);
+      this.forwardTreeRoots.push(this.currentRootNode());
       this.goToSubTree(this.backTreeRoots.pop()!, false, false);
       this.TriggerHandler('forwardEnable', true);
       this.TriggerHandler('backwardEnable', this.backTreeRoots.length > 0);
@@ -4465,7 +4474,7 @@ export default class alcmonavispoeschli {
       if (pushCurrent) {
         this.superTreeRoots.push(this.root);
       }
-      this.currentParentNode = node.parent;
+      this.currentParentNode = node._parent;
       const fakeNode = {
         children: [node],
         x: 0,
@@ -4513,7 +4522,7 @@ export default class alcmonavispoeschli {
       this.resetBranchLengthCollapseValue();
     }
     this.zoomToFit();
-    this.TriggerHandler('HasParent', Boolean(this.root.parent && this.root.parent.parent));
+    console.log(`Refreshing tree, resetDepth ${resetDepth}, has parent ${Boolean(this.root.parent && this.root.parent.parent)}, at root ${this.root === this.treeData}`);
     this.TriggerHandler('AtRoot', this.root === this.treeData);
   };
 
