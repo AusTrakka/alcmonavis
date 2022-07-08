@@ -5695,22 +5695,7 @@ export default class alcmonavispoeschli {
       this.centerNode(this.root, (this.settings && this.settings.rootOffset) || 0, AP.TOP_AND_BOTTOM_BORDER_HEIGHT);
     }
   };
-
-  returnToSupertreeButtonPressed = () => {
-    if (this.root && this.superTreeRoots.length > 0) {
-      this.root = this.superTreeRoots.pop()!;
-      this.basicTreeProperties = forester.collectBasicTreeProperties(this.root);
-      //this.updateNodeVisualizationsAndLegends(this.root);
-      this.resetDepthCollapseDepthValue();
-      this.resetRankCollapseRankValue();
-      this.resetBranchLengthCollapseValue();
-      this.search0Text(this.searchQueries[0]);
-      //this.search0();
-      this.search1();
-      this.zoomToFit();
-    }
-  };
-
+  
   orderButtonPressed = () => {
     if (this.root) {
       if (!this.treeFn.visData) {
