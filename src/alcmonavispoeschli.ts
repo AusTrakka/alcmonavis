@@ -86,7 +86,6 @@ export default class alcmonavispoeschli {
   settings: Alcmonavis.Settings | null | undefined = null;
   showColorPicker = false;
   showLegends = true;
-  superTreeRoots: Alcmonavis.phylo[] = [];
   backTreeRoots: Alcmonavis.phylo[] = [];
   forwardTreeRoots: Alcmonavis.phylo[] = [];
   currentParentNode: Alcmonavis.phylo | undefined = undefined;
@@ -4403,6 +4402,8 @@ export default class alcmonavispoeschli {
     return this.root.children[0];
   }
   
+  atRoot = () => { return this.root == this.treeData; }
+  
   setBack = () => {
     this.backTreeRoots.push(this.currentRootNode());
     this.forwardTreeRoots.length = 0;
@@ -4451,15 +4452,6 @@ export default class alcmonavispoeschli {
       this.goToSubTree(this.currentParentNode, history, false);
     }
   };
-  
-  goToSuperTree = (history: boolean = true) => {
-    if (history) {
-      this.setBack();
-    }
-    this.root = this.superTreeRoots.pop()!;
-    forester.addParents(this.root);
-    this.refresh();
-  };
 
   goToSubTree = (node: Alcmonavis.phylo, history: boolean = true, pushCurrent: boolean = true) => {
     if (node === this.treeData) {
@@ -4467,12 +4459,6 @@ export default class alcmonavispoeschli {
     } else {
       if (history) {
         this.setBack();
-      }
-      if (this.superTreeRoots.slice(-1, 1)[0] === this.root) {
-        this.superTreeRoots.pop();
-      }
-      if (pushCurrent) {
-        this.superTreeRoots.push(this.root);
       }
       this.currentParentNode = node._parent;
       const fakeNode = {
@@ -5218,7 +5204,7 @@ export default class alcmonavispoeschli {
             if (
               d.parent &&
               (d.children || d._children) &&
-              self.superTreeRoots.length > 0 &&
+              !self.atRoot() &&
               self.root.children &&
               d === self.root.children[0]
             ) {
@@ -5227,7 +5213,7 @@ export default class alcmonavispoeschli {
             }
             return '';
           })
-          .on('click', self.goToSuperTree);
+          .on('click', self.goToRootTree);
 
         d3.select(this)
           .append('text')
@@ -5247,8 +5233,8 @@ export default class alcmonavispoeschli {
           .text((d: Alcmonavis.phylo) => {
             if (
               d.parent &&
-              (d.children || d._children) &&
-              self.superTreeRoots.length > 0 &&
+              (d.children || d._children) && 
+              !self.atRoot() &&
               self.root.children &&
               d === self.root.children[0]
             ) {
@@ -5344,8 +5330,8 @@ export default class alcmonavispoeschli {
             if (
               d.parent &&
               d.parent.parent &&
-              self.superTreeRoots.length < 1 &&
-              self.treeData &&
+              self.treeData && 
+              self.atRoot() &&
               (self.treeData.rerootable === undefined || self.treeData.rerootable === true)
             ) {
               textSum += textInc;
@@ -5491,7 +5477,7 @@ export default class alcmonavispoeschli {
             .style('font-weight', 'bold')
             .style('text-decoration', 'none')
             .text(function (d) {
-              if (d.parent && d.parent.parent && d.parent.parent.parent && self.superTreeRoots.length < 1) {
+              if (d.parent && d.parent.parent && d.parent.parent.parent && self.atRoot()) {
                 textSum += textInc;
                 if (d.children || d._children) {
                   if (d.children && d.children.length > 1) {
@@ -5753,8 +5739,8 @@ export default class alcmonavispoeschli {
   midpointRootButtonPressed = () => {
     if (
       this.root &&
-      this.superTreeRoots.length < 1 &&
       this.treeData &&
+      this.atRoot() &&  
       (this.treeData.rerootable === undefined || this.treeData.rerootable === true)
     ) {
       this.unCollapseAll(this.root);
@@ -6912,7 +6898,7 @@ export default class alcmonavispoeschli {
     if (!OptionsDeclared(this.options)) throw 'Options not set';
     if (!SettingsDeclared(this.settings)) throw 'Settings not set';
 
-    if (this.superTreeRoots && this.superTreeRoots.length > 0) {
+    if (!this.atRoot()) {
       this.enableButton($('#' + AP.RETURN_TO_SUPERTREE_BUTTON));
     } else {
       this.disableButton($('#' + AP.RETURN_TO_SUPERTREE_BUTTON));
@@ -6924,7 +6910,7 @@ export default class alcmonavispoeschli {
       this.disableButton($('#' + AP.UNCOLLAPSE_ALL_BUTTON));
     }
     if (
-      this.superTreeRoots.length < 1 &&
+      this.atRoot() &&  
       this.treeData &&
       (this.treeData.rerootable === undefined || this.treeData.rerootable === true)
     ) {
