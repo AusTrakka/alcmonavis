@@ -5991,16 +5991,18 @@ export default class alcmonavispoeschli {
     }
     this.update();
   };
-
+  
   confidenceValuesCbClicked = () => {
     this.options!.showConfidenceValues = this.getCheckboxValue(AP.CONFIDENCE_VALUES_CB);
     this.update();
   };
 
-  branchLengthsCbClicked = () => {
-    this.options!.showBranchLengthValues = this.getCheckboxValue(AP.BRANCH_LENGTH_VALUES_CB);
+  // replaces branchLengthsCbClicked
+  setShowBranchLengths = (val: boolean) => {
+    console.log("setShowBranchLengths called, value ",val);
+    this.options!.showBranchLengthValues = val;
     this.update();
-  };
+  }
 
   nodeEventsCbClicked = () => {
     this.options!.showNodeEvents = this.getCheckboxValue(AP.NODE_EVENTS_CB);
@@ -6022,16 +6024,18 @@ export default class alcmonavispoeschli {
     this.update();
   };
 
-  internalNodesCbClicked = () => {
-    this.options!.showInternalNodes = this.getCheckboxValue(AP.INTERNAL_NODES_CB);
+  // replaces internalNodesCbClicked
+  setShowInternalNodes = (val: boolean) => {
+    this.options!.showInternalNodes = val;
     this.update();
   };
-
-  externalNodesCbClicked = () => {
-    this.options!.showExternalNodes = this.getCheckboxValue(AP.EXTERNAL_NODES_CB);
+  
+  // replaces externalNodesCbClicked
+  setShowExternalNodes = (val: boolean) => {
+    this.options!.showExternalNodes = val;
     this.update();
   };
-
+  
   nodeVisCbClicked = () => {
     this.options!.showNodeVisualizations = this.getCheckboxValue(AP.NODE_VIS_CB);
     this.resetVis();
