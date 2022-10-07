@@ -124,6 +124,7 @@ export default class alcmonavispoeschli {
     nodeVisualizations?: Dict<Alcmonavis.NodeVisualisation>,
     specialVisualizations?: Dict<Alcmonavis.SpecialVisulaisation>,
   ) {
+    console.log("Launching alcmonavis test 2");
     $('html').on('click', (d) => {
       var attrClass = d.target.getAttribute('class');
       if (attrClass !== 'nodeCircleOptions') {
@@ -3792,6 +3793,7 @@ export default class alcmonavispoeschli {
   };
 
   initializeSettings = (settings: Alcmonavis.Settings) => {
+    console.log("initializeSettings");
     this.settings = settings ? settings : ({} as Alcmonavis.Settings);
 
     if (!this.settings.controls1Width) {
@@ -3942,7 +3944,8 @@ export default class alcmonavispoeschli {
 
     this.settings.controlsFontSize = parseInt(this.settings.controlsFontSize as string);
 
-    this.intitializeDisplaySize();
+    console.log("Will call initializeDisplaySize");
+    this.initializeDisplaySize();
 
     if (!this.settings.controls1Left) {
       // this needs to be after intitializeDisplaySize()
@@ -3950,21 +3953,27 @@ export default class alcmonavispoeschli {
     }
   };
 
-  intitializeDisplaySize = () => {
+  initializeDisplaySize = () => {
     //if (!SettingsDeclared(this.settings)) throw 'Settings not set';
+    console.log("initialDisplaySize");
     if (this.settings && this.settings.enableDynamicSizing) {
+      console.log('enableDynamicSizing');
       if (this.baseSvg) {
+        console.log('baseSvg already set');
         this.displayHeight = +this.baseSvg.attr('height');
         this.displayWidth = +this.baseSvg.attr('width');
       } else {
+        console.log('finding width and height');
         var element = d3.select(this.id).node() as HTMLElement;
         var width = element.getBoundingClientRect().width - AP.WIDTH_OFFSET;
         var top = element.getBoundingClientRect().top;
         var height = window.innerHeight - (top + AP.HEIGHT_OFFSET);
+        console.log(width, height);
         this.displayHeight = height;
         this.displayWidth = width;
       }
     } else {
+      console.log('Getting fixed sizes');
       this.displayHeight = (this.settings && this.settings.displayHeight) || 0;
       this.displayWidth = (this.settings && this.settings.displayWidth) || 0;
     }
@@ -4117,6 +4126,10 @@ export default class alcmonavispoeschli {
     this.zoomListener = d3.behavior.zoom().scaleExtent([0.1, 10]).on('zoom', this.zoom); //?
     this.basicTreeProperties = forester.collectBasicTreeProperties(this.treeData);
 
+    console.log("Launching, got properties");
+    console.log(phylo);
+    console.log(this.basicTreeProperties);
+    
     if (settings.groupSpecies) {
       if (settings.groupSpecies.source && settings.groupSpecies.target) {
         console.log(
@@ -4175,6 +4188,7 @@ export default class alcmonavispoeschli {
       //forester.moveSimpleCharacteristicsToProperties(this.treeData);
     }
 
+    console.log("Will call initializeSettings");
     this.initializeOptions(options);
     this.initializeSettings(settings);
 
@@ -5687,7 +5701,7 @@ export default class alcmonavispoeschli {
     this.zoomed_x_or_y = false;
     if (this.root) {
       this.calcMaxExtLabel();
-      this.intitializeDisplaySize();
+      this.initializeDisplaySize();
       //initializeSettings(this.settings); //TODO why is/was this called here?
       this.removeColorPicker();
       this.zoomListener.scale(1);
@@ -5813,6 +5827,8 @@ export default class alcmonavispoeschli {
     phy.populated = true;
   };
 
+  // TODO does this.root imply we won't populate metadata above the current view? 
+  // TODO are we searching the tree multiple times?
   populateNodes = (nodes: Dict<any>[]) => nodes.forEach((n) => this.populateNode(n, this.root));
 
   markNodesFound = (nodeNames: string[], family: 0 | 1) => this.searchNodes(nodeNames.map(n => ({ID: n})), family, 'ID', false);

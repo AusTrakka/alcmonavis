@@ -30760,7 +30760,7 @@ class alcmonavispoeschli {
                 this.settings.groupYears = null;
             }
             this.settings.controlsFontSize = parseInt(this.settings.controlsFontSize);
-            this.intitializeDisplaySize();
+            this.initializeDisplaySize();
             if (!this.settings.controls1Left) {
                 // this needs to be after intitializeDisplaySize()
                 this.settings.controls1Left = this.displayWidth - this.settings.controls1Width;
@@ -32227,7 +32227,7 @@ class alcmonavispoeschli {
             this.zoomed_x_or_y = false;
             if (this.root) {
                 this.calcMaxExtLabel();
-                this.intitializeDisplaySize();
+                this.initializeDisplaySize();
                 //initializeSettings(this.settings); //TODO why is/was this called here?
                 this.removeColorPicker();
                 this.zoomListener.scale(1);
